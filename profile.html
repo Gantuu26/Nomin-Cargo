@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Профайл - Номин Транс</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0050ff",
+            "surface": "#ffffff",
+          },
+          fontFamily: {
+            "body": ["Gilroy", "sans-serif"],
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    body { font-family: 'Gilroy', sans-serif; -webkit-font-smoothing: antialiased; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen pb-32">
+  <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+    <div class="flex items-center px-4 py-4 max-w-lg mx-auto relative justify-center">
+      <h1 class="text-[17px] font-bold tracking-tight">Миний профайл</h1>
+    </div>
+  </header>
+
+  <main class="pt-24 px-5 max-w-lg mx-auto">
+    
+    <!-- Profile Card -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-5 mb-8">
+      <div class="w-16 h-16 rounded-full bg-blue-50 text-primary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-[32px] filled">person</span>
+      </div>
+      <div>
+        <h2 class="text-[18px] font-bold text-gray-900 mb-0.5">зочин</h2>
+        <p class="text-[13px] text-gray-500 font-medium whitespace-pre-wrap">Нэвтрэх эсвэл бүртгүүлнэ үү</p>
+      </div>
+    </div>
+
+    <!-- Menus -->
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+      <a href="#" class="flex items-center justify-between p-5 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
+            <span class="material-symbols-outlined text-[18px]">history</span>
+          </div>
+          <span class="text-[15px] font-bold text-gray-800">Захиалгын түүх</span>
+        </div>
+        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
+      </a>
+
+      <a href="faq.html" class="flex items-center justify-between p-5 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
+            <span class="material-symbols-outlined text-[18px]">help</span>
+          </div>
+          <span class="text-[15px] font-bold text-gray-800">Түгээмэл асуулт</span>
+        </div>
+        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
+      </a>
+      <a href="contact.html" class="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
+            <span class="material-symbols-outlined text-[18px]">support_agent</span>
+          </div>
+          <span class="text-[15px] font-bold text-gray-800">Холбоо барих</span>
+        </div>
+        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-white/95 backdrop-blur-xl z-50 shadow-[0px_-12px_32px_rgba(25,28,29,0.04)]">
+    <a href="index.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
+      <span class="material-symbols-outlined mb-1">home</span>
+      <span class="text-[11px] font-bold">Нүүр</span>
+    </a>
+    <a href="order.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
+      <span class="material-symbols-outlined mb-1">add_box</span>
+      <span class="text-[11px] font-bold">Захиалга</span>
+    </a>
+    <a href="tracking.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
+      <span class="material-symbols-outlined mb-1">local_shipping</span>
+      <span class="text-[11px] font-bold">Хяналт</span>
+    </a>
+    <a href="profile.html" class="flex flex-col items-center justify-center text-primary">
+      <span class="material-symbols-outlined mb-1 filled">person</span>
+      <span class="text-[11px] font-bold">Профайл</span>
+    </a>
+  </nav>
+
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Захиалгын дэлгэрэнгүй - Админ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0050ff",
+            "success": "#10b981",    // Green for delivered/success
+            "warning": "#f59e0b",    // Orange/Yellow for pending
+            "info": "#3b82f6",       // Blue for in transit
+          },
+          fontFamily: {
+            "body": ["Gilroy", "sans-serif"],
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    body { font-family: 'Gilroy', sans-serif; -webkit-font-smoothing: antialiased; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    
+    @media print {
+      body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      header, .flex.gap-3:last-of-type, #sms-modal { display: none !important; }
+      main { margin-top: 0 !important; padding-top: 0 !important; box-shadow: none !important; }
+      * { border-color: #ddd !important; }
+    }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen pb-24">
+  
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100">
+    <div class="flex items-center justify-between px-4 py-4 max-w-lg mx-auto relative">
+      <a href="admin-orders.html" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
+        <span class="material-symbols-outlined">arrow_back</span>
+      </a>
+      <h1 class="text-[17px] font-bold text-gray-900 tracking-tight absolute left-1/2 -translate-x-1/2">Захиалга MN03</h1>
+      <button onclick="window.print()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-primary" title="Хэвлэх (인쇄)">
+        <span class="material-symbols-outlined">print</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="pt-[88px] px-5 max-w-lg mx-auto space-y-6">
+    
+    <!-- Current Status Banner -->
+    <div class="bg-warning/10 border border-warning/20 rounded-2xl p-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white text-warning flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">schedule</span>
+        </div>
+        <div>
+          <p class="text-[12px] font-bold text-warning uppercase">Одоогийн төлөв</p>
+          <h2 class="text-[16px] font-bold text-gray-900">Шалгагдаж байна</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Status Actions -->
+    <section>
+      <h3 class="text-[15px] font-bold text-gray-900 mb-3 px-1">Төлөв өөрчлөх</h3>
+      <div class="grid grid-cols-2 gap-3">
+         <!-- Set as In Transit -->
+         <button class="bg-white border-2 border-gray-100 hover:border-info p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group transition-colors">
+            <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-info/10 group-hover:text-info transition-colors">
+              <span class="material-symbols-outlined text-[24px]">directions_boat</span>
+            </div>
+            <span class="text-[13px] font-bold text-gray-700 group-hover:text-info">Тээвэрт гарсан</span>
+         </button>
+
+         <!-- Set as Arrived -->
+         <button class="bg-white border-2 border-gray-100 hover:border-primary p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group transition-colors">
+            <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+              <span class="material-symbols-outlined text-[24px]">storefront</span>
+            </div>
+            <span class="text-[13px] font-bold text-gray-700 group-hover:text-primary">Салбарт ирсэн</span>
+         </button>
+
+         <!-- Set as Delivered (takes full width) -->
+         <button class="col-span-2 bg-white border-2 border-gray-100 hover:border-success p-4 rounded-2xl flex flex-col items-center justify-center gap-2 group transition-colors">
+            <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-success/10 group-hover:text-success transition-colors">
+              <span class="material-symbols-outlined text-[24px] filled">check_circle</span>
+            </div>
+            <span class="text-[14px] font-bold text-gray-700 group-hover:text-success">Хэрэглэгчид олгогдсон</span>
+         </button>
+      </div>
+    </section>
+
+    <!-- Order Details -->
+    <section>
+      <h3 class="text-[15px] font-bold text-gray-900 mb-3 px-1">Дэлгэрэнгүй мэдээлэл</h3>
+      <div class="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm space-y-4">
+        
+        <div class="flex justify-between border-b border-gray-50 pb-3">
+          <p class="text-[13px] text-gray-500">Төрөл</p>
+          <p class="text-[14px] font-bold text-gray-900">Энгийн ачаа</p>
+        </div>
+        
+        <div class="flex justify-between border-b border-gray-50 pb-3">
+          <p class="text-[13px] text-gray-500">Бүртгэсэн огноо</p>
+          <p class="text-[14px] font-bold text-gray-900">2026.03.22 14:30</p>
+        </div>
+
+        <div class="flex justify-between border-b border-gray-50 pb-3">
+          <p class="text-[13px] text-gray-500">Салбар</p>
+          <p class="text-[14px] font-bold text-primary">Салбар 1 (Одгэрэл)</p>
+        </div>
+
+        <!-- Илгээгчийн мэдээлэл -->
+        <div class="border-b border-gray-50 pb-4">
+          <p class="text-[14px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[18px]">person</span>
+            Илгээгчийн мэдээлэл
+          </p>
+          <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 space-y-3">
+             <div class="flex justify-between items-start">
+               <span class="text-[12px] text-gray-500">Нэр</span>
+               <span class="text-[13px] font-bold text-gray-900">О. Гантулга</span>
+             </div>
+             <div class="flex justify-between items-start">
+               <span class="text-[12px] text-gray-500">Утасны дугаар</span>
+               <span class="text-[13px] font-bold text-gray-900">010-1234-5678</span>
+             </div>
+             <div>
+               <span class="text-[12px] text-gray-500 block mb-1">Хаяг (Солонгос дахь хаяг)</span>
+               <span class="text-[13px] font-bold text-gray-800 leading-[1.4] block">Сөүл хот, Тундэмун дүүрэг, 2-р гудамж 15 тоот</span>
+             </div>
+          </div>
+        </div>
+
+        <!-- Барааны мэдээлэл -->
+        <div class="border-b border-gray-50 pb-4">
+          <p class="text-[14px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[18px]">package</span>
+            Барааны мэдээлэл
+          </p>
+          <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 space-y-3">
+             <div class="flex justify-between items-start">
+               <span class="text-[12px] text-gray-500">Барааны төрөл</span>
+               <span class="text-[13px] font-bold text-gray-900">Энгийн ачаа, Хувцас</span>
+             </div>
+             <div class="flex justify-between items-start">
+               <span class="text-[12px] text-gray-500">Барааны тоо ширхэг</span>
+               <span class="text-[13px] font-bold text-gray-900">2 хайрцаг</span>
+             </div>
+             <div>
+               <span class="text-[12px] text-gray-500 block mb-1">Нэмэлт тайлбар</span>
+               <span class="text-[13px] text-gray-600 italic block leading-[1.4]">"Хэврэг ачаа тул анхааралтай харьцана уу"</span>
+             </div>
+             <div class="pt-1">
+               <span class="text-[12px] text-gray-500 block mb-2">Барааны зураг</span>
+               <div class="flex gap-2">
+                  <div class="w-16 h-16 bg-gray-200 rounded-lg bg-cover bg-center border border-gray-200 shadow-sm" style="background-image: url('https://placehold.co/100x100/e5e7eb/6b7280?text=IMG1');"></div>
+                  <div class="w-16 h-16 bg-gray-200 rounded-lg bg-cover bg-center border border-gray-200 shadow-sm" style="background-image: url('https://placehold.co/100x100/e5e7eb/6b7280?text=IMG2');"></div>
+               </div>
+             </div>
+          </div>
+        </div>
+
+        <!-- Хүлээн авагчийн мэдээлэл -->
+        <div>
+          <p class="text-[14px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[18px]">where_to_vote</span>
+            Хүлээн авагчийн мэдээлэл
+          </p>
+          <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 space-y-3">
+             <div class="flex justify-between items-start">
+               <span class="text-[12px] text-gray-500">Нэр</span>
+               <span class="text-[13px] font-bold text-gray-900">Б. Сараа</span>
+             </div>
+             <div class="flex justify-between items-start">
+               <span class="text-[12px] text-gray-500">Утасны дугаар</span>
+               <span class="text-[13px] font-bold text-gray-900">+976 8811-2233</span>
+             </div>
+             <div>
+               <span class="text-[12px] text-gray-500 block mb-1">Хаяг (Монгол хаяг)</span>
+               <span class="text-[13px] font-bold text-gray-800 leading-[1.4] block">Улаанбаатар хот, БЗД, Парк вью хотхон 702 тоот</span>
+             </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="flex gap-3">
+       <button onclick="document.getElementById('sms-modal').classList.remove('hidden')" class="flex-1 py-3.5 bg-gray-100 text-gray-800 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors">
+         <span class="material-symbols-outlined text-[20px]">sms</span> Мессеж 
+       </button>
+       <button class="flex-1 py-3.5 bg-red-50 text-red-500 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-red-100">
+         <span class="material-symbols-outlined text-[20px]">delete</span> Устгах
+       </button>
+    </div>
+
+  </main>
+
+  <!-- SMS Modal -->
+  <div id="sms-modal" class="fixed inset-0 z-[100] hidden bg-gray-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center">
+    <!-- Modal Content -->
+    <div class="bg-white w-full max-w-lg sm:rounded-3xl rounded-t-3xl h-[85vh] sm:h-[80vh] flex flex-col animate-slide-up shadow-2xl">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-100 shrink-0">
+        <div class="flex items-center gap-2 text-green-600">
+          <span class="material-symbols-outlined text-[24px]">sms</span>
+          <h2 class="text-[18px] font-bold text-gray-900">SMS мессеж илгээх</h2>
+        </div>
+        <button onclick="document.getElementById('sms-modal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      
+      <!-- Body -->
+      <div class="p-5 overflow-y-auto no-scrollbar flex-1 pb-10">
+        <p class="text-[13px] text-gray-500 mb-4">Доорх мессежийг хуулж, харилцагчид илгээнэ үү</p>
+        
+        <!-- Customer Info Card -->
+        <div class="bg-gray-50 rounded-2xl p-4 mb-5 border border-gray-100">
+          <div class="flex items-center gap-3 mb-2 text-[14px] font-bold text-gray-900">
+            <span class="material-symbols-outlined text-[18px] text-gray-500">person</span> О. Гантулга
+          </div>
+          <div class="flex items-center gap-3 text-[14px] text-primary font-medium mb-3">
+            <span class="material-symbols-outlined text-[18px] text-gray-500">call</span> 010-1234-5678
+          </div>
+          <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+            <span class="text-[13px] text-gray-600">Захиалга: #MN03</span>
+            <span class="text-[13px] font-bold text-info">Энгийн ачаа</span>
+          </div>
+        </div>
+
+        <h3 class="text-[14px] font-bold text-gray-900 mb-3">Мессеж сонгох:</h3>
+        
+        <div class="space-y-3">
+          <!-- Template 1 -->
+          <div class="border border-green-500 bg-green-50/20 rounded-xl p-4 relative">
+             <div class="flex justify-between items-start mb-2">
+               <span class="text-[12px] font-bold text-gray-500">Захиалга баталгаажсан</span>
+               <span class="text-[10px] font-bold bg-green-500 text-white px-2 py-0.5 rounded uppercase">Одоогийн төлөв</span>
+             </div>
+             <p class="text-[13px] text-gray-800 leading-relaxed mb-3">
+               [Nomin Cargo] Таны MN03 дугаартай захиалга амжилттай бүртгэгдлээ. Тээвэрт гарах үед дахин мэдэгдэх болно.
+             </p>
+             <div class="flex justify-between items-center pt-2 border-t border-green-500/10">
+               <div class="flex items-center gap-1.5 text-[12px] text-primary font-medium">
+                 <span class="material-symbols-outlined text-[14px]">smartphone</span> 010-1234-5678
+               </div>
+               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 дугаартай захиалга амжилттай бүртгэгдлээ. Тээвэрт гарах үед дахин мэдэгдэх болно." class="flex items-center gap-1 text-[12px] font-bold text-green-600 hover:text-green-700">
+                 <span class="material-symbols-outlined text-[16px]">send</span> Дарж илгээх
+               </a>
+             </div>
+          </div>
+
+          <!-- Template 2 -->
+          <div class="border border-gray-200 bg-white rounded-xl p-4 relative">
+             <div class="mb-2">
+               <span class="text-[12px] font-bold text-gray-500">Төлбөр хүлээгдэж байна</span>
+             </div>
+             <p class="text-[13px] text-gray-800 leading-relaxed mb-3">
+               [Nomin Cargo] Таны MN03 дугаартай захиалгын төлбөр хүлээгдэж байна. Төлбөрөө баталгаажуулна уу.
+             </p>
+             <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+               <div class="flex items-center gap-1.5 text-[12px] text-primary font-medium">
+                 <span class="material-symbols-outlined text-[14px]">smartphone</span> 010-1234-5678
+               </div>
+               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 дугаартай захиалгын төлбөр хүлээгдэж байна. Төлбөрөө баталгаажуулна уу." class="flex items-center gap-1 text-[12px] font-bold text-green-600 hover:text-green-700">
+                 <span class="material-symbols-outlined text-[16px]">send</span> Дарж илгээх
+               </a>
+             </div>
+          </div>
+
+          <!-- Template 3 -->
+          <div class="border border-gray-200 bg-white rounded-xl p-4 relative">
+             <div class="mb-2">
+               <span class="text-[12px] font-bold text-gray-500">Тээвэрт гарсан</span>
+             </div>
+             <p class="text-[13px] text-gray-800 leading-relaxed mb-3">
+               [Nomin Cargo] Таны MN03 дугаартай захиалга Улаанбаатар руу тээвэрт гарлаа. Удахгүй очно.
+             </p>
+             <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+               <div class="flex items-center gap-1.5 text-[12px] text-primary font-medium">
+                 <span class="material-symbols-outlined text-[14px]">smartphone</span> 010-1234-5678
+               </div>
+               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 дугаартай захиалга Улаанбаатар руу тээвэрт гарлаа. Удахгүй очно." class="flex items-center gap-1 text-[12px] font-bold text-green-600 hover:text-green-700">
+                 <span class="material-symbols-outlined text-[16px]">send</span> Дарж илгээх
+               </a>
+             </div>
+          </div>
+
+          <!-- Template 4 -->
+          <div class="border border-gray-200 bg-white rounded-xl p-4 relative">
+             <div class="mb-2">
+               <span class="text-[12px] font-bold text-gray-500">Салбарт ирсэн</span>
+             </div>
+             <p class="text-[13px] text-gray-800 leading-relaxed mb-3">
+               [Nomin Cargo] Таны MN03 захиалга Салбар 1-т ирлээ. Ажлын цагаар ирж авна уу. Баярлалаа.
+             </p>
+             <div class="flex justify-between items-center pt-2 border-t border-gray-100">
+               <div class="flex items-center gap-1.5 text-[12px] text-primary font-medium">
+                 <span class="material-symbols-outlined text-[14px]">smartphone</span> 010-1234-5678
+               </div>
+               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 захиалга Салбар 1-т ирлээ. Ажлын цагаар ирж авна уу. Баярлалаа." class="flex items-center gap-1 text-[12px] font-bold text-green-600 hover:text-green-700">
+                 <span class="material-symbols-outlined text-[16px]">send</span> Дарж илгээх
+               </a>
+             </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

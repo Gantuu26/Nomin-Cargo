@@ -1,0 +1,17 @@
+name = "nomin-cargo"
+compatibility_date = "2024-03-20"
+pages_build_output_dir = "."
+
+# Bindings for the database
+[[d1_databases]]
+binding = "DB"
+database_name = "nomin-cargo-db"
+database_id = "YOUR_DATABASE_ID_HERE"
+preview_database_id = "DB"
+migrations_dir = "migrations"
+
+# Bindings for the image upload bucket
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "nomin-cargo-images"
+preview_bucket_name = "nomin-cargo-images-preview"
