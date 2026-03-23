@@ -1,155 +1,174 @@
 <!DOCTYPE html>
 <html lang="mn">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Холбоо барих - Номин Транс</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
           colors: {
-            "primary": "#0050ff",
+            "primary": "#3B82F6",
+            "primary-dark": "#2563EB",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
           },
           fontFamily: {
-            "body": ["Gilroy", "sans-serif"],
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
           }
         },
       },
     }
   </script>
   <style>
-    body { font-family: 'Gilroy', sans-serif; -webkit-font-smoothing: antialiased; }
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
   </style>
   <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
-  <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-    <div class="flex items-center px-4 py-4 max-w-lg mx-auto relative justify-center">
-      <a href="profile.html" class="absolute left-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-        <span class="material-symbols-outlined">arrow_back</span>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen">
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="flex items-center px-4 py-3.5 max-w-lg mx-auto relative justify-center">
+      <a href="profile.html" class="absolute left-4 w-10 h-10 flex items-center justify-center rounded-2xl bg-white shadow-card border border-blue-100/60 hover:shadow-card-hover transition-all text-[#0F172A]">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
       </a>
       <h1 class="text-[17px] font-bold tracking-tight">Холбоо барих</h1>
     </div>
   </header>
 
-  <main class="pt-24 px-5 pb-12 max-w-lg mx-auto">
-    <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 text-center mb-6">
-      <div class="w-16 h-16 rounded-full bg-blue-50 text-primary flex items-center justify-center mx-auto mb-4">
-        <span class="material-symbols-outlined text-[32px]">support_agent</span>
+  <main class="pt-[76px] px-4 pb-12 max-w-lg mx-auto">
+    
+    <div class="bg-white rounded-3xl p-6 shadow-card border border-blue-100/50 text-center mb-6 animate-fade-in-up">
+      <div class="w-16 h-16 rounded-2xl bg-blue-50 text-primary flex items-center justify-center mx-auto mb-4 border border-blue-100/50">
+        <span class="material-symbols-outlined text-[32px] filled">support_agent</span>
       </div>
-      <h2 class="text-[20px] font-bold mb-2">Бидэнтэй холбогдох</h2>
-      <p class="text-[14px] text-gray-500 mb-6">
-        Танд асууж тодруулах зүйл байвал доорх сувгуудаар холбогдоорой. Бид танд туслахад хэзээд бэлэн байх болно.
-      </p>
+      <h2 class="text-[20px] font-bold text-gray-900 mb-2">Бидэнтэй холбогдох</h2>
+      <p class="text-[13px] text-slate-500 mb-6 leading-relaxed">Танд асууж тодруулах зүйл байвал доорх сувгуудаар холбогдоорой.<br>Бид танд туслахад хэзээд бэлэн байх болно.</p>
 
       <div class="space-y-3">
-        <a href="tel:01081384849" class="flex items-center justify-center gap-2 w-full py-3.5 bg-gray-50 hover:bg-gray-100 transition-colors rounded-xl text-gray-800 font-bold">
-          <span class="material-symbols-outlined text-[20px] text-gray-400">call</span>
+        <a href="tel:01081384849" class="flex items-center justify-center gap-2.5 w-full py-4 bg-[#F5F7FF] hover:bg-[#EEF2FF] transition-colors rounded-2xl text-gray-800 font-bold border border-slate-100">
+          <span class="material-symbols-outlined text-[20px] text-primary">call</span>
           +82 010-8138-4849
         </a>
-        <a href="https://m.me/nomincargo" target="_blank" class="flex items-center justify-center gap-2 w-full py-3.5 bg-blue-50 hover:bg-blue-100 transition-colors rounded-xl text-primary font-bold">
+        <a href="https://m.me/nomincargo" target="_blank" class="flex items-center justify-center gap-2.5 w-full py-4 bg-gradient-to-r from-primary to-primary-dark text-white shadow-btn hover:shadow-lg transition-all rounded-2xl font-bold">
           <span class="material-symbols-outlined text-[20px]">chat</span>
           Messenger-ээр холбогдох
         </a>
       </div>
     </div>
     
-    <h3 class="font-bold text-[18px] text-gray-900 mb-4 px-1">Манай салбарууд</h3>
+    <h3 class="font-bold text-[18px] text-gray-900 mb-4 pl-1 animate-fade-in-up delay-100">Манай салбарууд</h3>
     
-    <div class="space-y-4">
+    <div class="space-y-4 animate-fade-in-up delay-100">
       <!-- Branch 1 -->
-      <div class="p-5 rounded-[24px] border border-gray-100 bg-white shadow-sm hover:border-gray-200 transition-colors">
+      <div class="p-5 rounded-3xl border border-blue-100/50 bg-white shadow-card">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary border border-blue-100/50">
             <span class="material-symbols-outlined text-[20px]">storefront</span>
           </div>
           <h4 class="font-bold text-gray-900 text-[16px]">Салбар 1</h4>
         </div>
         
         <div class="space-y-2.5 mb-5 pl-1">
-          <div class="flex items-center text-[14px]">
-            <span class="material-symbols-outlined text-[16px] text-gray-400 shrink-0 w-7">person</span>
-            <span class="font-semibold text-gray-700 w-24 shrink-0">Одгэрэл:</span> 
+          <div class="flex items-center text-[13px]">
+            <span class="material-symbols-outlined text-[16px] text-slate-400 shrink-0 w-7">person</span>
+            <span class="font-semibold text-gray-600 w-24 shrink-0">Одгэрэл:</span> 
             <a href="tel:01081384849" class="text-primary font-medium hover:underline">010-8138-4849</a>
           </div>
-          <div class="flex items-center text-[14px]">
-            <span class="material-symbols-outlined text-[16px] text-gray-400 shrink-0 w-7">person</span>
-            <span class="font-semibold text-gray-700 w-24 shrink-0">Дүгэрсүрэн:</span> 
+          <div class="flex items-center text-[13px]">
+            <span class="material-symbols-outlined text-[16px] text-slate-400 shrink-0 w-7">person</span>
+            <span class="font-semibold text-gray-600 w-24 shrink-0">Дүгэрсүрэн:</span> 
             <a href="tel:01084605703" class="text-primary font-medium hover:underline">010-8460-5703</a>
           </div>
         </div>
 
-        <div class="bg-gray-50 rounded-2xl p-4">
-          <div class="text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <div class="bg-surface-container-low rounded-2xl p-4 border border-blue-100/50">
+          <div class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[15px]">location_on</span> АЧАА АВАХ ХОТ
           </div>
-          <p class="text-[13px] text-gray-600 leading-[1.6]">
+          <p class="text-[13px] text-slate-600 leading-relaxed">
             Пусан(부산), Кимхэ(김해), Янсан(양산), Пухан(포항), Улсан(울산), Дэжон(대전), Чонан(천안), Андун(안동), Ёнжу(영주), Чан-ён, Чанвон(창원), Бөөрөнхий Чонжү
           </p>
         </div>
       </div>
 
       <!-- Branch 2 -->
-      <div class="p-5 rounded-[24px] border border-gray-100 bg-white shadow-sm hover:border-gray-200 transition-colors">
+      <div class="p-5 rounded-3xl border border-blue-100/50 bg-white shadow-card">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary border border-blue-100/50">
             <span class="material-symbols-outlined text-[20px]">storefront</span>
           </div>
           <h4 class="font-bold text-gray-900 text-[16px]">Салбар 2</h4>
         </div>
         
         <div class="space-y-2.5 mb-5 pl-1">
-          <div class="flex items-center text-[14px]">
-            <span class="material-symbols-outlined text-[16px] text-gray-400 shrink-0 w-7">person</span>
-            <span class="font-semibold text-gray-700 w-24 shrink-0">Оргил:</span> 
+          <div class="flex items-center text-[13px]">
+            <span class="material-symbols-outlined text-[16px] text-slate-400 shrink-0 w-7">person</span>
+            <span class="font-semibold text-gray-600 w-24 shrink-0">Оргил:</span> 
             <a href="tel:01082562953" class="text-primary font-medium hover:underline">010-8256-2953</a>
           </div>
-          <div class="flex items-center text-[14px]">
-            <span class="material-symbols-outlined text-[16px] text-gray-400 shrink-0 w-7">person</span>
-            <span class="font-semibold text-gray-700 w-24 shrink-0">Бооб:</span> 
+          <div class="flex items-center text-[13px]">
+            <span class="material-symbols-outlined text-[16px] text-slate-400 shrink-0 w-7">person</span>
+            <span class="font-semibold text-gray-600 w-24 shrink-0">Бооб:</span> 
             <a href="tel:01081745995" class="text-primary font-medium hover:underline">010-8174-5995</a>
           </div>
         </div>
 
-        <div class="bg-gray-50 rounded-2xl p-4">
-          <div class="text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <div class="bg-surface-container-low rounded-2xl p-4 border border-blue-100/50">
+          <div class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[15px]">location_on</span> АЧАА АВАХ ХОТ
           </div>
-          <p class="text-[13px] text-gray-600 leading-[1.6]">
+          <p class="text-[13px] text-slate-600 leading-relaxed">
             Мугпу(목포), Том Гуанжу, Сүнчон(순천), Дөрвөлжин Чонжу
           </p>
         </div>
       </div>
 
       <!-- Branch 3 -->
-      <div class="p-5 rounded-[24px] border border-gray-100 bg-white shadow-sm hover:border-gray-200 transition-colors">
+      <div class="p-5 rounded-3xl border border-blue-100/50 bg-white shadow-card">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary">
+          <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-primary border border-blue-100/50">
             <span class="material-symbols-outlined text-[20px]">storefront</span>
           </div>
           <h4 class="font-bold text-gray-900 text-[16px]">Салбар 3</h4>
         </div>
         
         <div class="space-y-2.5 mb-5 pl-1">
-          <div class="flex items-center text-[14px]">
-            <span class="material-symbols-outlined text-[16px] text-gray-400 shrink-0 w-7">person</span>
-            <span class="font-semibold text-gray-700 w-24 shrink-0">Пүүжээ:</span> 
+          <div class="flex items-center text-[13px]">
+            <span class="material-symbols-outlined text-[16px] text-slate-400 shrink-0 w-7">person</span>
+            <span class="font-semibold text-gray-600 w-24 shrink-0">Пүүжээ:</span> 
             <a href="tel:01058506206" class="text-primary font-medium hover:underline">010-5850-6206</a>
           </div>
         </div>
 
-        <div class="bg-gray-50 rounded-2xl p-4">
-          <div class="text-[12px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <div class="bg-surface-container-low rounded-2xl p-4 border border-blue-100/50">
+          <div class="text-[12px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[15px]">location_on</span> АЧАА АВАХ ХОТ
           </div>
-          <p class="text-[13px] text-gray-600 leading-[1.6]">
+          <p class="text-[13px] text-slate-600 leading-relaxed">
             Тэгү(대구), Күмин(구민), Ёнчан, Кёнсан
           </p>
         </div>

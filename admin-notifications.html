@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Мэдэгдэл удирдлага - Админ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#3B82F6",
+            "primary-dark": "#2563EB",
+            "success": "#10B981",
+            "warning": "#F59E0B",
+            "info": "#3B82F6",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
+          },
+          fontFamily: {
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+            "nav": "0 -1px 12px rgba(15, 23, 42, 0.06)",
+            "btn": "0 4px 14px rgba(59, 130, 246, 0.35)",
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .nav-glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    
+    .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
+
+  <!-- PWA Manifest for Admin -->
+  <link rel="manifest" href="admin-manifest.json">
+  <link rel="apple-touch-icon" href="https://placehold.co/192x192/3B82F6/ffffff.png?text=N.T">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Админ">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw-admin.js')
+          .then(reg => console.log('Admin SW registered!', reg))
+          .catch(err => console.log('Admin SW failed:', err));
+      });
+    }
+  </script>
+</head>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-24">
+  
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="px-5 py-3 max-w-lg mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="admin.html" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200/50 active:scale-95 transition-all text-slate-700">
+          <span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span>
+        </a>
+        <h1 class="text-[18px] font-bold text-gray-900 tracking-tight">Мэдэгдэл удирдлага</h1>
+      </div>
+      <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200/50 active:scale-95 transition-all text-slate-700">
+        <span class="material-symbols-outlined text-[24px]">menu</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="pt-[88px] px-4 max-w-lg mx-auto space-y-6">
+    
+    <!-- Upload Section -->
+    <section class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card animate-fade-in-up">
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="form-title" class="text-[16px] font-bold text-gray-900 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary" id="form-icon">add_circle</span>
+          Шинэ мэдэгдэл үүсгэх
+        </h2>
+        <button id="cancel-edit-btn" onclick="cancelEdit()" class="hidden text-[12px] font-bold text-slate-500 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">Болих</button>
+      </div>
+      
+      <div class="space-y-4">
+        <!-- Title Input -->
+        <div>
+          <label class="block text-[12px] font-bold text-slate-700 mb-1.5 pl-1">Гарчиг</label>
+          <input type="text" id="notification-title" placeholder="Жишээ: Системийн шинэчлэл" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[14px] font-bold text-gray-900 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+        </div>
+        
+        <!-- Content Input -->
+        <div>
+          <label class="block text-[12px] font-bold text-slate-700 mb-1.5 pl-1">Мэдээлэл</label>
+          <textarea id="notification-content" rows="4" placeholder="Жишээ: 2026 оны 3 сарын 25-ны өдөр системд шинэчлэл хийгдэх тул..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[13px] text-gray-700 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"></textarea>
+        </div>
+      </div>
+      
+      <button onclick="saveNotification()" id="save-btn" class="w-full mt-5 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-[14px] shadow-btn active:scale-[0.98] hover:shadow-lg transition-all flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[20px]">send</span>
+        <span>Мэдэгдэл илгээх</span>
+      </button>
+    </section>
+
+    <!-- Current Notifications List -->
+    <section class="animate-fade-in-up delay-100">
+      <h3 class="text-[16px] font-bold text-gray-900 mb-4 px-1 flex items-center justify-between">
+        Одоогийн мэдэгдлүүд
+        <span id="notification-count" class="bg-primary/10 text-primary px-2 py-0.5 rounded-md text-[11px] font-bold">0 ширхэг</span>
+      </h3>
+      
+      <div id="notifications-list" class="space-y-4">
+        <!-- Dynamically rendered notifications will appear here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Sidebar Overlay -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
+  
+  <!-- Sidebar Drawer -->
+  <aside id="sidebar-drawer" class="fixed top-0 right-0 w-[280px] h-full bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col">
+    <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-dark flex items-center justify-center text-white font-bold text-[14px] shadow-sm">
+          АД
+        </div>
+        <div>
+          <h3 class="text-[14px] font-bold text-gray-900 leading-tight">Админ</h3>
+          <p class="text-[11px] text-slate-500 font-medium">nomincargo@admin.mn</p>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1.5 px-3">
+        <li>
+          <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
+            Хяналтын самбар
+          </a>
+        </li>
+        <li>
+          <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">list_alt</span>
+            Захиалгууд
+          </a>
+        </li>
+        <li>
+          <a href="admin-banners.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">view_carousel</span>
+            Баннер
+          </a>
+        </li>
+        <li>
+          <a href="admin-notifications.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">campaign</span>
+            Мэдэгдэл
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+            Тохиргоо
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="p-5 border-t border-slate-100">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        Гарах
+      </a>
+    </div>
+  </aside>
+
+  <script>
+    // Initial Mock Data
+    const defaultNotifications = [
+      {
+        id: 0,
+        title: 'Шинэ салбар нээгдлээ',
+        content: 'Бид хэрэглэгчдийнхээ тав тухыг хангах үүднээс шинэ салбараа амжилттай нээлээ.',
+        date: '2026.03.22'
+      },
+      {
+        id: 1,
+        title: 'Системийн шинэчлэл',
+        content: 'Маргааш буюу 3 сарын 25-ны 23:00 цагаас эхлэн системд шинэчлэл хийгдэх тул та бүхэн анхаарна уу.',
+        date: '2026.03.20'
+      }
+    ];
+
+    let notifications = JSON.parse(localStorage.getItem('nomin_notifications')) || defaultNotifications;
+    let editingId = null;
+
+    function saveToStorage() {
+      localStorage.setItem('nomin_notifications', JSON.stringify(notifications));
+    }
+
+    // Sidebar Toggle
+    function toggleSidebar() {
+      const overlay = document.getElementById('sidebar-overlay');
+      const drawer = document.getElementById('sidebar-drawer');
+      if (drawer.classList.contains('translate-x-full')) {
+        drawer.classList.remove('translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    // Render Notifications List
+    function renderNotifications() {
+      const listContainer = document.getElementById('notifications-list');
+      const countLabel = document.getElementById('notification-count');
+      countLabel.textContent = `${notifications.length} ширхэг`;
+      listContainer.innerHTML = '';
+
+      if (notifications.length === 0) {
+        listContainer.innerHTML = `<div class="text-center py-8 text-slate-400 text-[13px] font-medium border-2 border-dashed border-slate-200 rounded-3xl">Мэдэгдэл олдсонгүй</div>`;
+        return;
+      }
+
+      notifications.forEach(notification => {
+        const itemHtml = `
+          <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card flex flex-col gap-3 group relative overflow-hidden transition-all hover:border-primary/50">
+            <div class="flex items-start justify-between gap-4">
+              <div class="w-10 h-10 rounded-xl bg-blue-50 text-primary flex items-center justify-center shrink-0 mt-1">
+                <span class="material-symbols-outlined text-[20px]">notifications</span>
+              </div>
+              <div class="flex-1">
+                <h4 class="text-[15px] font-bold text-gray-900 mb-1 leading-tight">${notification.title}</h4>
+                <p class="text-[13px] text-slate-600 line-clamp-2 leading-relaxed">${notification.content}</p>
+                <div class="text-[11px] text-slate-400 mt-2 font-medium">
+                  Нийтлэгдсэн: ${notification.date}
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 mt-1">
+              <button onclick="editNotification(${notification.id})" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-primary transition-colors text-[12px] font-bold">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+                Засах
+              </button>
+              <button onclick="deleteNotification(${notification.id})" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors text-[12px] font-bold">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+                Устгах
+              </button>
+            </div>
+          </div>
+        `;
+        listContainer.insertAdjacentHTML('beforeend', itemHtml);
+      });
+    }
+
+    // Prepare Edit Mode
+    function editNotification(id) {
+      const notification = notifications.find(n => n.id === id);
+      if (!notification) return;
+      
+      editingId = id;
+      
+      // Update form text
+      document.getElementById('form-title').innerHTML = `<span class="material-symbols-outlined text-primary" id="form-icon">edit_square</span>Мэдэгдэл засах`;
+      document.getElementById('save-btn').querySelector('span:nth-child(2)').textContent = "Шинэчлэх";
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      
+      // Fill values
+      document.getElementById('notification-title').value = notification.title;
+      document.getElementById('notification-content').value = notification.content;
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Cancel Edit
+    function cancelEdit() {
+      editingId = null;
+      document.getElementById('form-title').innerHTML = `<span class="material-symbols-outlined text-primary" id="form-icon">add_circle</span>Шинэ мэдэгдэл үүсгэх`;
+      document.getElementById('save-btn').querySelector('span:nth-child(2)').textContent = "Мэдэгдэл илгээх";
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      
+      // Clear values
+      document.getElementById('notification-title').value = '';
+      document.getElementById('notification-content').value = '';
+    }
+
+    function deleteNotification(id) {
+      if (confirm("Энэ мэдэгдлийг устгахдаа итгэлтэй байна уу?")) {
+        notifications = notifications.filter(n => n.id !== id);
+        saveToStorage();
+        renderNotifications();
+        if (editingId === id) cancelEdit();
+      }
+    }
+
+    function saveNotification() {
+      const title = document.getElementById('notification-title').value.trim();
+      const content = document.getElementById('notification-content').value.trim();
+
+      if (!title) {
+        alert("Гарчиг оруулна уу.");
+        return;
+      }
+      if (!content) {
+        alert("Мэдээлэл оруулна уу.");
+        return;
+      }
+
+      if (editingId !== null) {
+        // Update existing
+        const notification = notifications.find(n => n.id === editingId);
+        if (notification) {
+          notification.title = title;
+          notification.content = content;
+        }
+      } else {
+        // Add new
+        const today = new Date();
+        const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
+
+        const newNotification = {
+          id: Date.now(),
+          title: title,
+          content: content,
+          date: formattedDate
+        };
+        // Add to beginning of array
+        notifications.unshift(newNotification);
+      }
+
+      saveToStorage();
+      cancelEdit();
+      renderNotifications();
+      alert(editingId !== null ? "Амжилттай шинэчлэгдлээ!" : "Шинэ мэдэгдэл амжилттай нэмэгдлээ!");
+    }
+
+    // Initialize list on load
+    document.addEventListener("DOMContentLoaded", renderNotifications);
+    // Add order notification badges dynamically
+    document.addEventListener('DOMContentLoaded', () => {
+      let pendingCount = 0;
+      try {
+        const orders = JSON.parse(localStorage.getItem('nomin_orders')) || [];
+        pendingCount = orders.filter(o => o.status === 'pending').length;
+      } catch(e) {}
+      
+      if (pendingCount > 0) {
+        // 1. Bottom Nav Badge
+        const bottomNavs = document.querySelectorAll('nav a[href="admin-orders.html"]');
+        bottomNavs.forEach(nav => {
+          const iconContainer = nav.querySelector('div');
+          if (iconContainer) {
+            iconContainer.classList.add('relative');
+            const badge = document.createElement('span');
+            badge.className = 'absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
+            badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+            iconContainer.appendChild(badge);
+          }
+        });
+
+        // 2. Sidebar Badge
+        const sidebarNavs = document.querySelectorAll('aside a[href="admin-orders.html"]');
+        sidebarNavs.forEach(nav => {
+          if (!nav.classList.contains('justify-between')) {
+             nav.classList.add('justify-between');
+          }
+          const badge = document.createElement('span');
+          badge.className = 'bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
+          badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+          nav.appendChild(badge);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

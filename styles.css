@@ -3,6 +3,18 @@
    Main screen is handled by Tailwind CSS
    ======================================== */
 
+/* ========== FOUT PREVENTION ========== */
+/* Hide Material Symbols text until font loads */
+.material-symbols-outlined {
+  font-size: 0 !important;
+  letter-spacing: 0 !important;
+}
+
+.fonts-loaded .material-symbols-outlined {
+  font-size: unset !important;
+  letter-spacing: normal !important;
+}
+
 /* ========== TICKER NOTIFICATION ========== */
 .ticker-track {
   display: inline-block;

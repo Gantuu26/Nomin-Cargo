@@ -1,122 +1,224 @@
 <!DOCTYPE html>
 <html lang="mn">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Админ - Номин Транс</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet">
   <script>
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
           colors: {
-            "primary": "#0050ff",
-            "success": "#10b981",    // Green for delivered/success
-            "warning": "#f59e0b",    // Orange/Yellow for pending
-            "info": "#3b82f6",       // Blue for in transit
+            "primary": "#3B82F6",
+            "success": "#10B981",    // Green for delivered/success
+            "warning": "#F59E0B",    // Orange/Yellow for pending
+            "info": "#3B82F6",       // Blue for in transit
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
           },
           fontFamily: {
-            "body": ["Gilroy", "sans-serif"],
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+            "nav": "0 -1px 12px rgba(15, 23, 42, 0.06)",
           }
         },
       },
     }
   </script>
   <style>
-    body { font-family: 'Gilroy', sans-serif; -webkit-font-smoothing: antialiased; }
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #F0F4FF;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .material-symbols-outlined.filled {
+      font-variation-settings: 'FILL' 1;
+    }
+
+    .header-blur {
+      background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .nav-glass {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fade-in-up {
+      animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .delay-100 {
+      animation-delay: 0.1s;
+      opacity: 0;
+    }
   </style>
   <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
+
+  <!-- PWA Manifest for Admin -->
+  <link rel="manifest" href="admin-manifest.json">
+  <link rel="apple-touch-icon" href="https://placehold.co/192x192/3B82F6/ffffff.png?text=N.T">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Админ">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw-admin.js')
+          .then(reg => console.log('Admin SW registered!', reg))
+          .catch(err => console.log('Admin SW failed:', err));
+      });
+    }
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen pb-24">
-  
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-32">
+
   <!-- Admin Header -->
-  <header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100">
-    <div class="flex items-center justify-between px-5 py-4 max-w-lg mx-auto">
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="flex items-center justify-between px-5 py-3 max-w-lg mx-auto">
       <div>
-        <h1 class="text-[14px] text-gray-500 font-medium">Номин Транс</h1>
-        <h2 class="text-[20px] font-bold text-gray-900 tracking-tight leading-tight">Хаяналтын самбар</h2>
+        <h1 class="text-[12px] text-primary font-bold uppercase tracking-wider mb-0.5">Номин Транс</h1>
+        <h2 class="text-[18px] font-bold text-gray-900 tracking-tight leading-tight">Хяналтын самбар</h2>
       </div>
-      <div class="flex items-center gap-3">
-        <button class="relative w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-colors">
-          <span class="material-symbols-outlined text-[22px]">notifications</span>
-          <span class="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
+      <div class="flex items-center gap-2">
+        <button
+          class="relative w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 hover:text-primary transition-colors">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <span
+            class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-500 border-2 border-white box-content"></span>
         </button>
-        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[14px] shadow-sm shadow-primary/30">
-          АД
-        </div>
+        <button onclick="toggleSidebar()"
+          class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-gray-800 hover:bg-slate-50 transition-colors active:scale-95">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="pt-24 px-5 max-w-lg mx-auto space-y-6">
-    
+  <main class="pt-[84px] px-4 max-w-lg mx-auto space-y-6">
+
     <!-- Daily Stats -->
-    <section>
-      <div class="flex items-center justify-between mb-3">
-         <h3 class="text-[16px] font-bold text-gray-900">Өнөөдрийн тойм</h3>
-         <span class="text-[12px] font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">2026.03.22</span>
+    <section class="animate-fade-in-up">
+      <div class="flex items-center justify-between mb-4 px-1">
+        <h3 class="text-[16px] font-bold text-gray-900">Өнөөдрийн тойм</h3>
+        <span class="text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">2026.03.22</span>
       </div>
-      
+
       <div class="grid grid-cols-2 gap-3">
         <!-- New Orders Card -->
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-warning/30 transition-colors cursor-pointer">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-warning/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500"></div>
-          <div class="relative z-10">
-            <div class="flex items-center gap-2 text-warning mb-2">
-              <span class="material-symbols-outlined text-[18px]">package</span>
+        <div
+          class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card relative overflow-hidden group hover:border-warning/50 transition-colors cursor-pointer">
+          <div
+            class="absolute -right-4 -top-4 w-20 h-20 bg-warning/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+          </div>
+          <div class="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div class="w-8 h-8 rounded-full bg-warning/10 text-warning flex items-center justify-center mb-3">
+                <span class="material-symbols-outlined text-[16px]">package</span>
+              </div>
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Шинэ захиалга</p>
             </div>
-            <p class="text-[12px] font-medium text-gray-500 uppercase tracking-wide">Шинэ захиалга</p>
-            <div class="flex items-end gap-2 mt-1">
-              <h4 class="text-[28px] font-bold text-gray-900 leading-none">12</h4>
-              <span class="text-[12px] font-bold text-green-500 mb-1">+3</span>
+            <div class="flex items-end gap-2 mt-2">
+              <h4 class="text-[28px] font-bold text-gray-900 leading-none tracking-tight">12</h4>
+              <span class="text-[11px] font-bold text-green-500 mb-1 bg-green-50 px-1.5 py-0.5 rounded">+3</span>
             </div>
           </div>
         </div>
 
         <!-- In Transit Card -->
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-info/30 transition-colors cursor-pointer">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-info/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500"></div>
-           <div class="relative z-10">
-            <div class="flex items-center gap-2 text-info mb-2">
-              <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+        <div
+          class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card relative overflow-hidden group hover:border-info/50 transition-colors cursor-pointer">
+          <div
+            class="absolute -right-4 -top-4 w-20 h-20 bg-info/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+          </div>
+          <div class="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div class="w-8 h-8 rounded-full bg-info/10 text-info flex items-center justify-center mb-3">
+                <span class="material-symbols-outlined text-[16px]">local_shipping</span>
+              </div>
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Тээвэрт гарсан</p>
             </div>
-            <p class="text-[12px] font-medium text-gray-500 uppercase tracking-wide">Тээвэрт гарсан</p>
-            <div class="flex items-end gap-2 mt-1">
-              <h4 class="text-[28px] font-bold text-gray-900 leading-none">45</h4>
+            <div class="flex items-end gap-2 mt-2">
+              <h4 class="text-[28px] font-bold text-gray-900 leading-none tracking-tight">45</h4>
             </div>
           </div>
         </div>
 
         <!-- Arrived Branch Card -->
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-primary/30 transition-colors cursor-pointer">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-primary/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500"></div>
-           <div class="relative z-10">
-            <div class="flex items-center gap-2 text-primary mb-2">
-              <span class="material-symbols-outlined text-[18px]">storefront</span>
+        <div
+          class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card relative overflow-hidden group hover:border-primary/50 transition-colors cursor-pointer">
+          <div
+            class="absolute -right-4 -top-4 w-20 h-20 bg-primary/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+          </div>
+          <div class="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+                <span class="material-symbols-outlined text-[16px]">storefront</span>
+              </div>
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Салбарт ирсэн</p>
             </div>
-            <p class="text-[12px] font-medium text-gray-500 uppercase tracking-wide">Салбарт ирсэн</p>
-            <div class="flex items-end gap-2 mt-1">
-              <h4 class="text-[28px] font-bold text-gray-900 leading-none">8</h4>
+            <div class="flex items-end gap-2 mt-2">
+              <h4 class="text-[28px] font-bold text-gray-900 leading-none tracking-tight">8</h4>
             </div>
           </div>
         </div>
 
         <!-- Delivered Card -->
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-success/30 transition-colors cursor-pointer">
-          <div class="absolute -right-3 -top-3 w-16 h-16 bg-success/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500"></div>
-           <div class="relative z-10">
-            <div class="flex items-center gap-2 text-success mb-2">
-              <span class="material-symbols-outlined text-[18px] filled">check_circle</span>
+        <div
+          class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card relative overflow-hidden group hover:border-success/50 transition-colors cursor-pointer">
+          <div
+            class="absolute -right-4 -top-4 w-20 h-20 bg-success/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+          </div>
+          <div class="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div class="w-8 h-8 rounded-full bg-success/10 text-success flex items-center justify-center mb-3">
+                <span class="material-symbols-outlined text-[16px] filled">check_circle</span>
+              </div>
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Олгогдсон</p>
             </div>
-            <p class="text-[12px] font-medium text-gray-500 uppercase tracking-wide">Олгогдсон</p>
-            <div class="flex items-end gap-2 mt-1">
-              <h4 class="text-[28px] font-bold text-gray-900 leading-none">24</h4>
+            <div class="flex items-end gap-2 mt-2">
+              <h4 class="text-[28px] font-bold text-gray-900 leading-none tracking-tight">24</h4>
             </div>
           </div>
         </div>
@@ -124,95 +226,432 @@
     </section>
 
     <!-- Quick Actions -->
-    <section>
-      <h3 class="text-[16px] font-bold text-gray-900 mb-3 block">Шуурхай үйлдэл</h3>
+    <section class="animate-fade-in-up delay-100">
+      <h3 class="text-[16px] font-bold text-gray-900 mb-4 px-1">Шуурхай үйлдэл</h3>
       <div class="flex gap-3">
-        <button class="flex-1 bg-gray-900 text-white p-4 rounded-2xl flex flex-col items-center justify-center gap-2 active:scale-95 transition-transform">
-          <span class="material-symbols-outlined text-[28px]">qr_code_scanner</span>
-          <span class="text-[13px] font-bold">Баркод уншуулах</span>
-        </button>
-        <button class="flex-1 bg-primary text-white p-4 rounded-2xl flex flex-col items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform">
-          <span class="material-symbols-outlined text-[28px]">post_add</span>
-          <span class="text-[13px] font-bold">Захиалга нэмэх</span>
+        <button onclick="openManualOrderModal()"
+          class="w-full bg-gradient-to-r from-primary to-primary-dark text-white p-4 sm:p-5 rounded-3xl shadow-btn flex items-center gap-4 active:scale-[0.98] transition-all hover:shadow-lg text-left">
+          <div
+            class="w-12 h-12 shrink-0 rounded-full bg-white/20 flex items-center justify-center text-white backdrop-blur-sm">
+            <span class="material-symbols-outlined text-[24px]">support_agent</span>
+          </div>
+          <span class="text-[14px] sm:text-[15px] font-bold leading-snug">Утсаар захиалга хийсэн хүмүүсийн мэдээлэл
+            оруулах</span>
         </button>
       </div>
     </section>
 
     <!-- Recent Orders List -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
+    <section class="animate-fade-in-up delay-100">
+      <div class="flex items-center justify-between mb-4 px-1">
         <h3 class="text-[16px] font-bold text-gray-900">Сүүлийн захиалгууд</h3>
-        <a href="admin-orders.html" class="text-primary text-[13px] font-bold hover:underline">Бүгдийг харах</a>
+        <a href="admin-orders.html" class="flex items-center gap-1 text-primary text-[13px] font-bold hover:underline">
+          Бүгдийг
+          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </a>
       </div>
-
-      <div class="space-y-3">
-        
-        <!-- Order Item (Pending) -->
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-warning/10 text-warning flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[20px]">schedule</span>
-            </div>
-            <div>
-              <p class="text-[14px] font-bold text-gray-900 mb-0.5">MN03 <span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] ml-1 uppercase">Энгийн</span></p>
-              <p class="text-[12px] text-gray-500">Гантулга • 010-1234-5678</p>
-            </div>
-          </div>
-          <span class="text-[11px] font-bold text-warning bg-warning/10 px-2 py-1 rounded-md">Хүлээгдэж буй</span>
-        </div>
-
-        <!-- Order Item (In Transit) -->
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-info/10 text-info flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[20px]">directions_boat</span>
-            </div>
-            <div>
-              <p class="text-[14px] font-bold text-gray-900 mb-0.5">MN02 <span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] ml-1 uppercase">Экспресс</span></p>
-              <p class="text-[12px] text-gray-500">Батдорж • 010-9876-5432</p>
-            </div>
-          </div>
-          <span class="text-[11px] font-bold text-info bg-info/10 px-2 py-1 rounded-md">Тээвэрт гарсан</span>
-        </div>
-
-        <!-- Order Item (Arrived) -->
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[20px]">storefront</span>
-            </div>
-            <div>
-               <p class="text-[14px] font-bold text-gray-900 mb-0.5">MN01 <span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] ml-1 uppercase">Энгийн</span></p>
-              <p class="text-[12px] text-gray-500">Саруул • 010-5555-4444</p>
-            </div>
-          </div>
-          <span class="text-[11px] font-bold text-primary bg-primary/10 px-2 py-1 rounded-md">Салбарт ирсэн</span>
-        </div>
-
+      <div id="recent-orders-list" class="space-y-3">
+        <!-- Dynamically rendered -->
       </div>
     </section>
 
   </main>
 
   <!-- Admin Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-white/95 backdrop-blur-xl z-50 border-t border-gray-100">
-    <a href="admin.html" class="flex flex-col items-center justify-center text-primary">
-      <span class="material-symbols-outlined mb-1 filled">dashboard</span>
-      <span class="text-[11px] font-bold">Самбар</span>
-    </a>
-    <a href="admin-orders.html" class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
-      <span class="material-symbols-outlined mb-1">list_alt</span>
-      <span class="text-[11px] font-bold">Захиалгууд</span>
-    </a>
-    <a href="#" class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
-      <span class="material-symbols-outlined mb-1">group</span>
-      <span class="text-[11px] font-bold">Хэрэглэгчид</span>
-    </a>
-    <a href="#" class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
-      <span class="material-symbols-outlined mb-1">settings</span>
-      <span class="text-[11px] font-bold">Тохиргоо</span>
-    </a>
+  <nav class="fixed bottom-0 left-0 w-full nav-glass shadow-nav border-t border-blue-100/40 z-50">
+    <div class="flex justify-around items-center px-4 pb-7 pt-2.5 max-w-lg mx-auto">
+      <a href="admin.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+        <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary filled text-[22px]">dashboard</span>
+        </div>
+        <span class="text-[11px] font-bold text-primary">Самбар</span>
+      </a>
+      <a href="admin-orders.html"
+        class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">list_alt</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Захиалгууд</span>
+      </a>
+      <a href="admin-containers.html"
+        class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Контейнер</span>
+      </a>
+      <a href="#"
+        class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">settings</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Тохиргоо</span>
+      </a>
+    </div>
   </nav>
 
+  <!-- Sidebar Overlay -->
+  <div id="sidebar-overlay"
+    class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm"
+    onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar Drawer -->
+  <aside id="sidebar-drawer"
+    class="fixed top-0 right-0 w-[280px] h-full bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col">
+    <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-dark flex items-center justify-center text-white font-bold text-[14px] shadow-sm">
+          АД
+        </div>
+        <div>
+          <h3 class="text-[14px] font-bold text-gray-900 leading-tight">Админ</h3>
+          <p class="text-[11px] text-slate-500 font-medium">nomincargo@admin.mn</p>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()"
+        class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1.5 px-3">
+        <li>
+          <a href="admin.html"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px]">
+            <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
+            Хяналтын самбар
+          </a>
+        </li>
+        <li>
+          <a href="admin-orders.html"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">list_alt</span>
+            Захиалгууд
+          </a>
+        </li>
+        <li>
+          <a href="#"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">group</span>
+            Хэрэглэгчид
+          </a>
+        </li>
+        <li>
+          <a href="#"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+            Тээврийн хэрэгсэл
+          </a>
+        </li>
+        <li>
+          <a href="admin-banners.html"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">view_carousel</span>
+            Баннер
+          </a>
+        </li>
+        <li>
+          <a href="admin-notifications.html"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">campaign</span>
+            Мэдэгдэл
+          </a>
+        </li>
+        <li>
+          <a href="#"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+            Тохиргоо
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="p-5 border-t border-slate-100">
+      <a href="index.html"
+        class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        Гарах
+      </a>
+    </div>
+  </aside>
+
+  <!-- Manual Order Modal -->
+  <div id="manual-order-modal"
+    class="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeManualOrderModal()"></div>
+    <div
+      class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative z-10 transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]"
+      id="manual-order-card">
+      <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+        <h3 class="text-[18px] font-bold text-gray-900">Шинэ захиалга бүртгэх</h3>
+        <button onclick="closeManualOrderModal()"
+          class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-full bg-white text-slate-500 hover:bg-slate-50 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto bg-slate-50 flex-1 space-y-4">
+        <!-- Sender -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+          <h4 class="text-[13px] font-bold text-gray-900 mb-3 border-b border-slate-100 pb-2">1. Илгээгч</h4>
+          <input type="text" id="mo-s-name" placeholder="Нэр"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="tel" id="mo-s-phone" placeholder="Утас"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="text" id="mo-s-address" placeholder="Хаяг"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] focus:border-primary focus:outline-none">
+        </div>
+        <!-- Receiver -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+          <h4 class="text-[13px] font-bold text-gray-900 mb-3 border-b border-slate-100 pb-2">2. Хүлээн авагч</h4>
+          <input type="text" id="mo-r-name" placeholder="Нэр"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="tel" id="mo-r-phone" placeholder="Утас"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="text" id="mo-r-address" placeholder="Хаяг"
+            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] focus:border-primary focus:outline-none">
+        </div>
+        <!-- Item -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 flex gap-2">
+          <div class="flex-1">
+            <label class="block text-[11px] text-slate-500 mb-1">Төрөл</label>
+            <input type="text" id="mo-i-category" placeholder="Хувцас"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:border-primary focus:outline-none">
+          </div>
+          <div class="w-24">
+            <label class="block text-[11px] text-slate-500 mb-1">Тоо/ш</label>
+            <input type="number" id="mo-i-quantity" placeholder="1"
+              class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:border-primary focus:outline-none text-center">
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+          <label class="block text-[11px] text-slate-500 mb-1">Салбар/Төрөл</label>
+          <div class="flex gap-2">
+            <select id="mo-branch"
+              class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:outline-none">
+              <option value="Салбар 1">Салбар 1</option>
+              <option value="Салбар 2">Салбар 2</option>
+              <option value="Салбар 3">Салбар 3</option>
+              <option value="Бусад">Бусад</option>
+            </select>
+            <select id="mo-type"
+              class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:outline-none">
+              <option value="standard">Энгийн</option>
+              <option value="express">Экспресс</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-100 bg-white">
+        <button onclick="saveManualOrder()"
+          class="w-full py-3.5 bg-primary text-white font-bold rounded-xl text-[15px] shadow-btn hover:bg-blue-600 transition-colors active:scale-95">Бүртгэх</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const overlay = document.getElementById('sidebar-overlay');
+      const drawer = document.getElementById('sidebar-drawer');
+      if (drawer.classList.contains('translate-x-full')) {
+        // Open
+        drawer.classList.remove('translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        // Close
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function openManualOrderModal() {
+      document.getElementById('manual-order-modal').classList.remove('opacity-0', 'pointer-events-none');
+      document.getElementById('manual-order-card').classList.remove('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+    }
+
+    function closeManualOrderModal() {
+      document.getElementById('manual-order-card').classList.add('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+      setTimeout(() => document.getElementById('manual-order-modal').classList.add('opacity-0', 'pointer-events-none'), 300);
+    }
+
+    function saveManualOrder() {
+      const sName = document.getElementById('mo-s-name').value;
+      const sPhone = document.getElementById('mo-s-phone').value;
+      const sAddress = document.getElementById('mo-s-address').value;
+      const rName = document.getElementById('mo-r-name').value;
+      const rPhone = document.getElementById('mo-r-phone').value;
+      const rAddress = document.getElementById('mo-r-address').value;
+      const iCat = document.getElementById('mo-i-category').value;
+      const iQty = document.getElementById('mo-i-quantity').value;
+      const branch = document.getElementById('mo-branch').value;
+      const typeOpts = document.getElementById('mo-type').value;
+
+      if (!sName || !rName) return alert('Нэр оруулна уу (Name is required)');
+
+      let existingOrders = [];
+      try { existingOrders = JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch (e) { }
+
+      let maxNum = 3;
+      existingOrders.forEach(o => {
+        if (o.orderId && o.orderId.toUpperCase().startsWith('MN')) {
+          const num = parseInt(o.orderId.substring(2), 10);
+          if (!isNaN(num) && num > maxNum) maxNum = num;
+        }
+      });
+      const nextNum = maxNum + 1;
+      const orderId = 'MN' + String(nextNum).padStart(2, '0');
+
+      const newOrder = {
+        orderId: orderId,
+        type: typeOpts,
+        branch: branch,
+        date: new Date().toISOString(),
+        status: "pending",
+        sender: { name: sName, phone: sPhone, address: sAddress },
+        receiver: { name: rName, phone: rPhone, address: rAddress },
+        item: { category: iCat, quantity: iQty },
+        images: [],
+        containerId: null
+      };
+
+      existingOrders.unshift(newOrder); // Add to top
+      localStorage.setItem('nomin_orders', JSON.stringify(existingOrders));
+
+      closeManualOrderModal();
+
+      // Briefly show a success state then redirect to orders page
+      const btn = document.querySelector('#manual-order-card button.bg-primary');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '✔ Амжилттай!';
+      btn.classList.replace('bg-primary', 'bg-success');
+
+      // Optional: Update dashboard counts if needed, but going to orders page is standard
+      setTimeout(() => {
+        window.location.href = 'admin-orders.html';
+      }, 700);
+    }
+
+    // Add order notification badges dynamically
+    document.addEventListener('DOMContentLoaded', () => {
+      let orders = [];
+      let containers = [];
+      try { orders = JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch (e) { }
+      try { containers = JSON.parse(localStorage.getItem('nomin_containers')) || []; } catch (e) { }
+
+      // ---- Determine effective status for each order ----
+      function getEffectiveStatus(order) {
+        if (order.containerId) {
+          const c = containers.find(x => x.id === order.containerId);
+          if (c) return c.status;
+        }
+        return order.status || 'pending';
+      }
+
+      // ---- Update stat cards ----
+      const pendingCount = orders.filter(o => getEffectiveStatus(o) === 'pending' || getEffectiveStatus(o) === 'checking' || getEffectiveStatus(o) === 'picking_up').length;
+      const inTransitCount = orders.filter(o => ['loaded', 'departed', 'in_transit'].includes(getEffectiveStatus(o))).length;
+      const arrivedCount = orders.filter(o => getEffectiveStatus(o) === 'arrived').length;
+      const deliveredCount = orders.filter(o => getEffectiveStatus(o) === 'delivered').length;
+
+      // Update the 4 stat card numbers
+      const statCards = document.querySelectorAll('.grid.grid-cols-2 h4');
+      if (statCards[0]) statCards[0].textContent = pendingCount;
+      if (statCards[1]) statCards[1].textContent = inTransitCount;
+      if (statCards[2]) statCards[2].textContent = arrivedCount;
+      if (statCards[3]) statCards[3].textContent = deliveredCount;
+
+      // Update today's date
+      const todayEl = document.querySelector('section .text-primary.bg-primary\\/10');
+      if (todayEl) {
+        const now = new Date();
+        todayEl.textContent = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+      }
+
+      // ---- Render recent orders ----
+      const STATUS_MAP = {
+        'pending': { label: 'Хүлээгдэж буй', color: 'text-warning', bg: 'bg-warning/10', borderHover: 'hover:border-warning/50', icon: 'schedule' },
+        'checking': { label: 'Шалгаж байна', color: 'text-warning', bg: 'bg-warning/10', borderHover: 'hover:border-warning/50', icon: 'schedule' },
+        'picking_up': { label: 'Хаягаар очиж байна', color: 'text-info', bg: 'bg-info/10', borderHover: 'hover:border-info/50', icon: 'local_shipping' },
+        'loaded': { label: 'Контейнерт ачигдлаа', color: 'text-info', bg: 'bg-info/10', borderHover: 'hover:border-info/50', icon: 'inventory_2' },
+        'departed': { label: 'Инчоноос хөдөлсөн', color: 'text-info', bg: 'bg-info/10', borderHover: 'hover:border-info/50', icon: 'directions_boat' },
+        'in_transit': { label: 'Ачаа замдаа явж байна', color: 'text-info', bg: 'bg-info/10', borderHover: 'hover:border-info/50', icon: 'directions_boat' },
+        'arrived': { label: 'Монголд ачаа буусан', color: 'text-primary', bg: 'bg-primary/10', borderHover: 'hover:border-primary/50', icon: 'storefront' },
+        'delivered': { label: 'Олгогдсон', color: 'text-success', bg: 'bg-success/10', borderHover: 'hover:border-success/50', icon: 'check_circle' }
+      };
+
+      const recentOrdersList = document.getElementById('recent-orders-list');
+      // Sort by date descending (newest first), take top 5
+      const sortedOrders = [...orders].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 5);
+
+      if (sortedOrders.length === 0) {
+        recentOrdersList.innerHTML = `
+           <div class="bg-white p-8 rounded-3xl border border-blue-100/50 shadow-card text-center">
+             <span class="material-symbols-outlined text-[40px] text-slate-300 mb-3 block">inbox</span>
+             <p class="text-[14px] font-bold text-slate-400">Захиалга байхгүй байна</p>
+             <p class="text-[12px] text-slate-400 mt-1">Шинэ захиалга орж ирэхэд энд харагдана</p>
+           </div>
+         `;
+      } else {
+        let html = '';
+        sortedOrders.forEach((order, index) => {
+          const effStatus = getEffectiveStatus(order);
+          const statusInfo = STATUS_MAP[effStatus] || STATUS_MAP['pending'];
+          const typeLabel = order.type === 'express' ? 'Экспресс' : 'Энгийн';
+          const typeBadgeClass = order.type === 'express' ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-500';
+          const senderName = order.sender ? order.sender.name : 'Тодорхойгүй';
+          const senderPhone = order.sender ? order.sender.phone : '';
+
+          html += `
+              <div class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card flex items-center justify-between group ${statusInfo.borderHover} transition-colors cursor-pointer animate-fade-in-up" style="animation-delay: ${index * 0.05}s; opacity: 0; animation-fill-mode: forwards;">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-2xl ${statusInfo.bg} ${statusInfo.color} flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">${statusInfo.icon}</span>
+                  </div>
+                  <div>
+                    <p class="text-[15px] font-bold text-gray-900 mb-0.5 flex items-center gap-2">${order.orderId} <span class="${typeBadgeClass} px-1.5 py-0.5 rounded-md text-[9px] uppercase tracking-wider font-bold">${typeLabel}</span></p>
+                    <p class="text-[12px] font-medium text-slate-500">${senderName}${senderPhone ? ' • ' + senderPhone : ''}</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-[11px] font-bold ${statusInfo.color} ${statusInfo.bg} px-2.5 py-1 rounded-lg whitespace-nowrap">${statusInfo.label}</span>
+                </div>
+              </div>
+            `;
+        });
+        recentOrdersList.innerHTML = html;
+      }
+
+      // ---- Notification Badges ----
+      if (pendingCount > 0) {
+        // 1. Bottom Nav Badge
+        const bottomNavs = document.querySelectorAll('nav a[href="admin-orders.html"]');
+        bottomNavs.forEach(nav => {
+          const iconContainer = nav.querySelector('div');
+          if (iconContainer) {
+            iconContainer.classList.add('relative');
+            const badge = document.createElement('span');
+            badge.className = 'absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
+            badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+            iconContainer.appendChild(badge);
+          }
+        });
+
+        // 2. Sidebar Badge
+        const sidebarNavs = document.querySelectorAll('aside a[href="admin-orders.html"]');
+        sidebarNavs.forEach(nav => {
+          if (!nav.classList.contains('justify-between')) {
+            nav.classList.add('justify-between');
+          }
+          const badge = document.createElement('span');
+          badge.className = 'bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
+          badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+          nav.appendChild(badge);
+        });
+      }
+    });
+  </script>
 </body>
+
 </html>

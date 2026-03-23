@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Хориглох зүйлс - Номин Карго</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#3B82F6",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
+          },
+          fontFamily: {
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+    .delay-200 { animation-delay: 0.2s; opacity: 0; }
+    .delay-300 { animation-delay: 0.3s; opacity: 0; }
+    .law-header { background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); }
+    .item-row { transition: background-color 0.15s ease; }
+    .item-row:hover { background-color: rgba(241, 245, 249, 0.5); }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
+</head>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen">
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="flex items-center px-4 py-3.5 max-w-lg mx-auto relative justify-center">
+      <a href="index.html" class="absolute left-4 w-10 h-10 flex items-center justify-center rounded-2xl bg-white shadow-card border border-blue-100/60 hover:shadow-card-hover transition-all text-[#0F172A]">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+      </a>
+      <h1 class="text-[17px] font-bold tracking-tight">Хориглох зүйлс</h1>
+    </div>
+  </header>
+
+  <main class="pt-[76px] px-4 pb-12 max-w-lg mx-auto">
+    <!-- Intro -->
+    <div class="mt-2 mb-5 flex items-start gap-3 p-4 bg-red-50 rounded-2xl border border-red-100/50 animate-fade-in-up">
+      <span class="material-symbols-outlined text-red-500 text-[22px] mt-0.5 shrink-0 filled">warning</span>
+      <p class="text-[12px] text-red-700/80 leading-relaxed font-medium">
+        Доорх зүйлсийг илгээхийг хатуу хориглоно. Зөрчсөн тохиолдолд хуулийн хариуцлага ногдуулна.
+      </p>
+    </div>
+
+    <!-- Section 1: Монгол Улсын "Гаалийн тухай хууль" -->
+    <div class="bg-white rounded-3xl shadow-card border border-blue-100/50 overflow-hidden mb-4 animate-fade-in-up">
+      <div class="law-header px-4 py-3 flex items-center justify-between">
+        <h2 class="text-white text-[13px] font-bold tracking-wide uppercase">Монгол Улсын "Гаалийн тухай хууль"-ийн заалтаас</h2>
+        <span class="text-blue-300 text-[12px] font-bold shrink-0 ml-2">Зүйл 223</span>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">block</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.1.</strong> Монгол Улсын хилээр нэвтрүүлэхийг хориглосон бараа;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">money_off</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.2.</strong> Үндэсний болон гадаад валют, үнэт цаас;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">checkroom</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.3.</strong> Ариуттал хийгдээгүй хуучин гутал, хувцас, цагаан хэрэглэл;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">science</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.4.</strong> Цацраг идэвхт бодис, химийн хорт болон аюултай бодис, тэсэрч дэлбэрэх бодис зэрэг аюултай бараа;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">inventory_2</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.5.</strong> Амархан муудах, гэмтэх хадгалалтын онцгой нөхцөл шаардсан бараа;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">gavel</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.6.</strong> Хуулиар хориглосон бусад бараа</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Монгол Улсын "Шуудангийн тухай хууль" -->
+    <div class="bg-white rounded-3xl shadow-card border border-blue-100/50 overflow-hidden mb-4 animate-fade-in-up delay-100">
+      <div class="law-header px-4 py-3 flex items-center justify-between">
+        <h2 class="text-white text-[13px] font-bold tracking-wide uppercase">Монгол Улсын "Шуудангийн тухай хууль"-ийн заалтаас</h2>
+        <span class="text-blue-300 text-[12px] font-bold shrink-0 ml-2">Зүйл 24</span>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">local_fire_department</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.1.</strong> Галт зэвсэг, байлдааны галт хэрэгсэл, тэсэрч дэлбэрэх болон цацраг идэвхт бодис, түргэн шатамхай бодис, орчиндоо аюул учруулж болох бусад хэрэгсэл;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">pest_control</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.2.</strong> Хортон ургамал, амьтан;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">medication</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.3.</strong> Хар тамхи, мансууруулах буюу хордуулах бодис;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">account_balance</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.4.</strong> Хуульд өөрөөр заагаагүй бол Монгол Улсын болон гадаад улсын мөнгөн тэмдэгт;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">restaurant</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.5.</strong> Түргэн муудах хүнсний бүтээгдэхүүн;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">explicit</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.6.</strong> Садар самууныг сурталчилсан хэвлэл, ном зохиол, зураг, кино, дүрс бичлэг, бусад материал;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">gavel</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.7.</strong> Хууль тогтоомжоор хориглосон бусад зүйл.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: ДШХ-ны конвенц -->
+    <div class="bg-white rounded-3xl shadow-card border border-blue-100/50 overflow-hidden mb-4 animate-fade-in-up delay-200">
+      <div class="law-header px-4 py-3 flex items-center justify-between">
+        <h2 class="text-white text-[13px] font-bold tracking-wide uppercase">ДШХ-ны конвенц-ийн заалтаас</h2>
+        <span class="text-blue-300 text-[12px] font-bold shrink-0 ml-2">Зүйл 18</span>
+      </div>
+      <div class="px-4 py-3 bg-slate-50/50 border-b border-slate-100">
+        <p class="text-[12px] text-slate-600 leading-relaxed font-medium">2. Улс хоорондын шуудангийн бүх төрөлд дор дурдсан зүйлүүдийг илгээхийг хориглоно. Үүнд:</p>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">medication</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>2.1.1</strong> Мансууруулах болон сэтгэцэд нөлөөлөх бодисууд, эсвэл хүлээн авах орны хуулиар хориглосон хууль бус эмийн зүйлс;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">explicit</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>2.1.2</strong> Садар самууныг сурталчилсан бүх төрлийн зүйлс;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">content_copy</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>2.1.3</strong> Хуурамчаар, дуурайлган хийсэн зүйлс;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">gavel</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>2.1.4</strong> Хүлээн авагч орны хуулиар хориглосон бусад зүйлс;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">dangerous</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>2.1.5</strong> Тухайн илгээмж болон түүний савлагаа нь бусдад аюултай байж болох эсвэл бусад илгээмж болон гуравдагч этгээдийн өмчийг гэмтээж болохүйц зүйлс;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">description</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>2.1.6</strong> Илгээгч болон хүлээн авагчаас өөр бусад хүний хувийн бичиг баримтууд;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">local_fire_department</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>3.1</strong> Шатах тэсрэх, цацраг идэвхит аюултай бүх зүйлс;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">bomb</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>3.2</strong> Дуурайлал болон цэнэггүй тэсрэх бөмбөг, гранат, сум, болон бусад цэргийн галалтай зүйлс;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">pets</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>4.1</strong> Амьд амьтан болон амьтны гаралтай бүтээгдэхүүн;</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">paid</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>6.1</strong> Зоос, мөнгөн дэвсгэрт болон үнэт зүйлс, төлбөрийн хэрэгсэл болох авлагчийн чек, төлбөрийн хуудас, цагаан алт, алт, мөнгө, засагдсан болон засагдаагүй үнэт чулуу, эрдэнэс, бусад үнэ бүхий зүйлс;</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Олон улсын агаарын тээвэр -->
+    <div class="bg-white rounded-3xl shadow-card border border-blue-100/50 overflow-hidden mb-4 animate-fade-in-up delay-300">
+      <div class="law-header px-4 py-3 flex items-center justify-between">
+        <h2 class="text-white text-[12px] font-bold tracking-wide uppercase leading-snug">"Олон улсын агаарын тээврийн байгууллагын "Аюултай ачаа"-ны дүрмийн заалтаас</h2>
+      </div>
+      <div class="divide-y divide-slate-100">
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">bomb</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>1.</strong> Тэсрэх бодис (салют, цаасан буу, сум, дарь)</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">propane</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>2.</strong> Хий (асаагуур, дезодорант, төрөл бүрийн шүршигчүүд, аялалын газ, галын хор)</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">water_drop</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>3.</strong> Шатамхай шингэн (тосон будаг, цавуу, үнэртэй ус, хумсны болон нүүрний будаг арилгагч шингэн, хумсны лак бусад маникюрын хэрэгсэлүүд)</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">whatshot</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>4.</strong> Шатамхай хатуу (шүдэнз, Модны нүүрс)</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">science</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>5.</strong> Исэлдүүлэгч, хэт исэл (хүчилтөрөгч генератор химийн бодис, цайруулах нунтаг)</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">skull</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>6.</strong> Хортой бодис & халдварт бодис (хөдөө аж ахуйн химийн бодис, шавьж устгах хор, мөнгөн ус агуулсан зүйлс, нян, бактер, вирус агуулсан хүн болон амьтны цусны дээж)</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">radio_button_checked</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>7.</strong> Цацраг идэвхит бодис</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">water</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>8.</strong> Идэмхий бодис (нойтон батерей, мөнгөн ус, давсны хүчил)</p>
+        </div>
+        <div class="item-row flex items-start gap-3 px-4 py-3.5">
+          <span class="material-symbols-outlined text-red-400 text-[20px] mt-0.5 shrink-0">battery_alert</span>
+          <p class="text-[13px] text-slate-700 leading-relaxed"><strong>9.</strong> Бусад төрөл бүрий аюултай ачаа (соронзон бүтээгдэхүүнүүд, төрөл бүрийн хөдөлгүүрүүд, литиум батерей агуулсан бүх зүйлс /зөөврийн цэнэглэгч, нисдэг камер, камер, гар утас, нэтбүүк г.м./, хуурай мөс, модны нүүрс)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Note -->
+    <div class="text-center py-4">
+      <p class="text-[11px] text-slate-400 leading-relaxed">
+        Дээрх жагсаалтад ороогүй ч хуулиар хориглосон бүх зүйлс хамаарна.<br>
+        Асуудал тулгарвал манай салбарт хандана уу.
+      </p>
+    </div>
+
+  </main>
+</body>
+</html>

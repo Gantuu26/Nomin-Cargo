@@ -1,287 +1,152 @@
 <!DOCTYPE html>
 <html lang="mn">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Захиалгууд - Админ</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
           colors: {
-            "primary": "#0050ff",
-            "success": "#10b981",    // Green for delivered/success
-            "warning": "#f59e0b",    // Orange/Yellow for pending
-            "info": "#3b82f6",       // Blue for in transit
+            "primary": "#3B82F6",
+            "primary-dark": "#2563EB",
+            "success": "#10B981",    // Green for delivered/success
+            "warning": "#F59E0B",    // Orange/Yellow for pending
+            "info": "#3B82F6",       // Blue for in transit
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
           },
           fontFamily: {
-            "body": ["Gilroy", "sans-serif"],
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+            "nav": "0 -1px 12px rgba(15, 23, 42, 0.06)",
+            "btn": "0 4px 14px rgba(59, 130, 246, 0.35)",
           }
         },
       },
     }
   </script>
   <style>
-    body { font-family: 'Gilroy', sans-serif; -webkit-font-smoothing: antialiased; }
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
     
     /* Hide scrollbar for Chrome, Safari and Opera */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
     /* Hide scrollbar for IE, Edge and Firefox */
-    .no-scrollbar {
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
-    }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    .animate-fade-in { animation: fadeIn 0.25s ease-in-out; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .nav-glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    
+    .animate-fade-in { animation: fadeIn 0.25s ease-in-out forwards; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
   </style>
   <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
+
+  <!-- PWA Manifest for Admin -->
+  <link rel="manifest" href="admin-manifest.json">
+  <link rel="apple-touch-icon" href="https://placehold.co/192x192/3B82F6/ffffff.png?text=N.T">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Админ">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw-admin.js')
+          .then(reg => console.log('Admin SW registered!', reg))
+          .catch(err => console.log('Admin SW failed:', err));
+      });
+    }
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen pb-24">
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-32">
   
   <!-- Admin Header -->
-  <header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100">
-    <div class="px-5 py-4 max-w-lg mx-auto">
-      <div class="flex items-center justify-between mb-4">
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="px-5 py-3 max-w-lg mx-auto">
+      <div class="flex items-center justify-between mb-3">
         <h1 class="text-[20px] font-bold text-gray-900 tracking-tight">Захиалгууд</h1>
-        <button class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-700 hover:bg-gray-100 transition-colors">
-          <span class="material-symbols-outlined text-[20px]">search</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="openManualOrderModal()" class="flex items-center gap-1 pl-3 pr-4 py-2 mr-1 rounded-xl bg-primary text-white shadow-btn hover:bg-blue-600 transition-colors active:scale-95">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            <span class="font-bold text-[13px]">Үүсгэх</span>
+          </button>
+          <button class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[20px]">search</span>
+          </button>
+          <button onclick="toggleSidebar()" class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-gray-800 hover:bg-slate-50 transition-colors active:scale-95">
+            <span class="material-symbols-outlined text-[24px]">menu</span>
+          </button>
+        </div>
       </div>
       
       <!-- Filter Tabs -->
-      <div class="flex overflow-x-auto gap-2 pb-1 no-scrollbar">
-        <button class="whitespace-nowrap px-4 py-2 rounded-full bg-gray-900 text-white font-bold text-[13px]">Бүгд</button>
-        <button class="whitespace-nowrap px-4 py-2 rounded-full bg-gray-100 text-gray-600 font-bold text-[13px] hover:bg-gray-200">Хүлээгдэж буй</button>
-        <button class="whitespace-nowrap px-4 py-2 rounded-full bg-gray-100 text-gray-600 font-bold text-[13px] hover:bg-gray-200">Тээвэрт гарсан</button>
-        <button class="whitespace-nowrap px-4 py-2 rounded-full bg-gray-100 text-gray-600 font-bold text-[13px] hover:bg-gray-200">Салбарт ирсэн</button>
+      <div id="filter-tabs-container" class="flex overflow-x-auto gap-2 pb-1 no-scrollbar px-1">
+        <!-- Tabs injected dynamically via JS -->
       </div>
     </div>
   </header>
 
-  <main class="pt-[140px] px-5 max-w-lg mx-auto space-y-4">
+  <main class="pt-[140px] px-4 max-w-lg mx-auto space-y-4">
     
-    <!-- Order Card 1 (Pending) -->
-    <div class="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm relative">
-      <div class="mb-3 border-b border-gray-50 pb-3">
-        <div class="flex items-center gap-1.5 mb-1.5 text-[11px] font-bold uppercase tracking-wide">
-          <span class="text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">Салбар 1</span>
-          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-          <span class="text-primary normal-case tracking-normal">Энгийн ачаа</span>
-        </div>
-        <h3 class="text-[18px] font-bold text-gray-900 leading-tight mb-0.5">MN03</h3>
-        <p class="text-[11px] text-gray-400 font-medium">2026.03.22 14:30</p>
-      </div>
-      
-      <!-- Tabs UI -->
-      <div class="flex gap-2 mb-3 border-b border-gray-100 mt-3 relative z-10 w-full overflow-x-auto no-scrollbar">
-         <button onclick="switchTab('o1', 'sender')" id="o1-tab-sender" class="o1-tab flex-1 whitespace-nowrap min-w-max pb-2 border-b-2 border-primary text-primary font-bold text-[12px] transition-colors focus:outline-none">Илгээгч</button>
-         <button onclick="switchTab('o1', 'goods')" id="o1-tab-goods" class="o1-tab flex-1 whitespace-nowrap min-w-max pb-2 border-b-2 border-transparent text-gray-400 font-bold text-[12px] transition-colors focus:outline-none">Бараа</button>
-         <button onclick="switchTab('o1', 'receiver')" id="o1-tab-receiver" class="o1-tab flex-1 whitespace-nowrap min-w-max pb-2 border-b-2 border-transparent text-gray-400 font-bold text-[12px] transition-colors focus:outline-none">Хүлээн авагч</button>
-      </div>
-
-      <!-- Tab Contents -->
-      <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 mb-4 min-h-[125px]">
-         <!-- Sender -->
-         <div id="o1-content-sender" class="o1-content block animate-fade-in">
-           <div class="flex flex-wrap justify-between items-start gap-y-2 mb-2">
-             <div class="w-1/2 pr-2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Нэр</span>
-               <span class="text-[13px] font-bold text-gray-900 line-clamp-1">О. Гантулга</span>
-             </div>
-             <div class="w-1/2 pl-1">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Утасны дугаар</span>
-               <span class="text-[13px] font-bold text-gray-900">010-1234-5678</span>
-             </div>
-           </div>
-           <div>
-             <span class="text-[11px] text-gray-500 block mb-0.5">Хаяг</span>
-             <span class="text-[12px] font-bold text-gray-800 leading-[1.4] block">Сөүл хот, Тундэмун дүүрэг, 2-р гудамж 15 тоот</span>
-           </div>
-         </div>
-
-         <!-- Goods -->
-         <div id="o1-content-goods" class="o1-content hidden animate-fade-in">
-           <div class="flex flex-wrap justify-between items-start gap-y-2 mb-3">
-             <div class="w-1/2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Барааны төрөл</span>
-               <span class="text-[13px] font-bold text-gray-900 leading-tight block">Хувцас</span>
-             </div>
-             <div class="w-1/2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Тоо ширхэг</span>
-               <div class="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-[12px]">2 хайрцаг</div>
-             </div>
-           </div>
-           <div>
-               <span class="text-[11px] text-gray-500 block mb-1">Барааны зураг & Хүсэлт</span>
-               <p class="text-[11px] text-gray-600 italic mb-2 leading-[1.3]">"Хэврэг ачаа тул анхааралтай харьцана уу"</p>
-               <div class="flex gap-2">
-                  <div class="w-12 h-12 bg-gray-200 rounded-lg bg-cover bg-center border border-gray-200 shadow-sm" style="background-image: url('https://placehold.co/100x100/e5e7eb/6b7280?text=IMG1');"></div>
-                  <div class="w-12 h-12 bg-gray-200 rounded-lg bg-cover bg-center border border-gray-200 shadow-sm" style="background-image: url('https://placehold.co/100x100/e5e7eb/6b7280?text=IMG2');"></div>
-               </div>
-           </div>
-         </div>
-
-         <!-- Receiver -->
-         <div id="o1-content-receiver" class="o1-content hidden animate-fade-in">
-           <div class="flex flex-wrap justify-between items-start gap-y-2 mb-2">
-             <div class="w-1/2 pr-2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Нэр</span>
-               <span class="text-[13px] font-bold text-gray-900 line-clamp-1">Б. Сараа</span>
-             </div>
-             <div class="w-1/2 pl-1">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Утасны дугаар</span>
-               <span class="text-[13px] font-bold text-gray-900">+976 8811-2233</span>
-             </div>
-           </div>
-           <div>
-             <span class="text-[11px] text-gray-500 block mb-0.5">Хаяг (Монгол хаяг)</span>
-             <span class="text-[12px] font-bold text-gray-800 leading-[1.4] block">Улаанбаатар хот, БЗД, Парк вью 702 тоот</span>
-           </div>
-         </div>
-      </div>
-
-      <div class="flex gap-2 mt-1">
-        <a href="tel:01012345678" class="flex-[1.2] py-2 rounded-xl border border-gray-200 text-gray-700 active:scale-95 transition-transform flex flex-col items-center justify-center hover:bg-gray-50">
-          <div class="flex items-center gap-1 text-[13px] font-bold">
-            <span class="material-symbols-outlined text-[16px]">phone</span>
-            Залгах
-          </div>
-          <span class="text-[10px] text-gray-400 font-medium mt-0.5" style="letter-spacing: -0.2px;">Илгээгч: 010-1234-5678</span>
-        </a>
-        <a href="admin-order-detail.html" class="flex-1 py-2 rounded-xl bg-primary text-white font-bold text-[13px] shadow-sm shadow-primary/20 active:scale-95 transition-transform flex items-center justify-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px]">edit_note</span>
-          Удирдах
-        </a>
-      </div>
-    </div>
-
-    <!-- Order Card 2 (In Transit) -->
-    <div class="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm relative">
-      <div class="mb-3 border-b border-gray-50 pb-3">
-        <div class="flex items-center gap-1.5 mb-1.5 text-[11px] font-bold uppercase tracking-wide">
-          <span class="text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">Салбар 2</span>
-          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-          <span class="text-primary normal-case tracking-normal">Экспресс ачаа</span>
-        </div>
-        <h3 class="text-[18px] font-bold text-gray-900 leading-tight mb-0.5">MN02</h3>
-        <p class="text-[11px] text-gray-400 font-medium">2026.03.21 09:15</p>
-      </div>
-      
-      <!-- Tabs UI -->
-      <div class="flex gap-2 mb-3 border-b border-gray-100 mt-3 relative z-10 w-full overflow-x-auto no-scrollbar">
-         <button onclick="switchTab('o2', 'sender')" id="o2-tab-sender" class="o2-tab flex-1 whitespace-nowrap min-w-max pb-2 border-b-2 border-primary text-primary font-bold text-[12px] transition-colors focus:outline-none">Илгээгч</button>
-         <button onclick="switchTab('o2', 'goods')" id="o2-tab-goods" class="o2-tab flex-1 whitespace-nowrap min-w-max pb-2 border-b-2 border-transparent text-gray-400 font-bold text-[12px] transition-colors focus:outline-none">Бараа</button>
-         <button onclick="switchTab('o2', 'receiver')" id="o2-tab-receiver" class="o2-tab flex-1 whitespace-nowrap min-w-max pb-2 border-b-2 border-transparent text-gray-400 font-bold text-[12px] transition-colors focus:outline-none">Хүлээн авагч</button>
-      </div>
-
-      <!-- Tab Contents -->
-      <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-100 mb-4 min-h-[125px]">
-         <!-- Sender -->
-         <div id="o2-content-sender" class="o2-content block animate-fade-in">
-           <div class="flex flex-wrap justify-between items-start gap-y-2 mb-2">
-             <div class="w-1/2 pr-2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Нэр</span>
-               <span class="text-[13px] font-bold text-gray-900 line-clamp-1">Б. Батдорж</span>
-             </div>
-             <div class="w-1/2 pl-1">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Утасны дугаар</span>
-               <span class="text-[13px] font-bold text-gray-900">010-9876-5432</span>
-             </div>
-           </div>
-           <div>
-             <span class="text-[11px] text-gray-500 block mb-0.5">Хаяг</span>
-             <span class="text-[12px] font-bold text-gray-800 leading-[1.4] block">Улсан хот, Намгү дүүрэг, 2-р хороолол</span>
-           </div>
-         </div>
-
-         <!-- Goods -->
-         <div id="o2-content-goods" class="o2-content hidden animate-fade-in">
-           <div class="flex flex-wrap justify-between items-start gap-y-2 mb-3">
-             <div class="w-1/2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Барааны төрөл</span>
-               <span class="text-[13px] font-bold text-gray-900 leading-tight block">Бичиг баримт</span>
-             </div>
-             <div class="w-1/2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Тоо ширхэг</span>
-               <div class="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary font-bold text-[12px]">1 хайрцаг</div>
-             </div>
-           </div>
-           <div>
-               <span class="text-[11px] text-gray-500 block mb-1">Барааны зураг & Хүсэлт</span>
-               <p class="text-[11px] text-gray-600 italic mb-2 leading-[1.3]">"Хурдан хүргэж өгнө үү"</p>
-               <div class="flex gap-2">
-                  <div class="w-12 h-12 bg-gray-200 rounded-lg bg-cover bg-center border border-gray-200 shadow-sm" style="background-image: url('https://placehold.co/100x100/e5e7eb/6b7280?text=IMG1');"></div>
-               </div>
-           </div>
-         </div>
-
-         <!-- Receiver -->
-         <div id="o2-content-receiver" class="o2-content hidden animate-fade-in">
-           <div class="flex flex-wrap justify-between items-start gap-y-2 mb-2">
-             <div class="w-1/2 pr-2">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Нэр</span>
-               <span class="text-[13px] font-bold text-gray-900 line-clamp-1">Б. Доржоо</span>
-             </div>
-             <div class="w-1/2 pl-1">
-               <span class="text-[11px] text-gray-500 block mb-0.5">Утасны дугаар</span>
-               <span class="text-[13px] font-bold text-gray-900">+976 9911-0000</span>
-             </div>
-           </div>
-           <div>
-             <span class="text-[11px] text-gray-500 block mb-0.5">Хаяг (Монгол хаяг)</span>
-             <span class="text-[12px] font-bold text-gray-800 leading-[1.4] block">Дархан-Уул, 2-р баг, 5 тоот</span>
-           </div>
-         </div>
-      </div>
-
-      <div class="flex gap-2 mt-1">
-        <a href="tel:01098765432" class="flex-[1.2] py-2 rounded-xl border border-gray-200 text-gray-700 active:scale-95 transition-transform flex flex-col items-center justify-center hover:bg-gray-50">
-          <div class="flex items-center gap-1 text-[13px] font-bold">
-            <span class="material-symbols-outlined text-[16px]">phone</span>
-            Залгах
-          </div>
-          <span class="text-[10px] text-gray-400 font-medium mt-0.5" style="letter-spacing: -0.2px;">Илгээгч: 010-9876-5432</span>
-        </a>
-        <a href="admin-order-detail.html" class="flex-1 py-2 rounded-xl bg-primary text-white font-bold text-[13px] shadow-sm shadow-primary/20 active:scale-95 transition-transform flex items-center justify-center gap-1.5">
-          <span class="material-symbols-outlined text-[18px]">edit_note</span>
-          Удирдах
-        </a>
-      </div>
+    <div id="orders-list" class="space-y-4">
+      <!-- Orders dynamically injected here -->
     </div>
 
   </main>
 
   <!-- Admin Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-white/95 backdrop-blur-xl z-50 border-t border-gray-100">
-    <a href="admin.html" class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
-      <span class="material-symbols-outlined mb-1">dashboard</span>
-      <span class="text-[11px] font-bold">Самбар</span>
-    </a>
-    <a href="admin-orders.html" class="flex flex-col items-center justify-center text-primary">
-      <span class="material-symbols-outlined mb-1 filled">list_alt</span>
-      <span class="text-[11px] font-bold">Захиалгууд</span>
-    </a>
-    <a href="#" class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
-      <span class="material-symbols-outlined mb-1">group</span>
-      <span class="text-[11px] font-bold">Хэрэглэгчид</span>
-    </a>
-    <a href="#" class="flex flex-col items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
-      <span class="material-symbols-outlined mb-1">settings</span>
-      <span class="text-[11px] font-bold">Тохиргоо</span>
-    </a>
-  </nav>
+  <nav class="fixed bottom-0 left-0 w-full nav-glass shadow-nav border-t border-blue-100/40 z-50">
+    <div class="flex justify-around items-center px-4 pb-7 pt-2.5 max-w-lg mx-auto">
+      <a href="admin.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">dashboard</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Самбар</span>
+      </a>
+      <a href="admin-orders.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+        <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary filled text-[22px]">list_alt</span>
+        </div>
+        <span class="text-[11px] font-bold text-primary">Захиалгууд</span>
+      </a>
+      <a href="admin-containers.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">inventory_2</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Контейнер</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">settings</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Тохиргоо</span>
+      </a>
+    </div>
   </nav>
 
   <script>
@@ -298,13 +163,469 @@
       // Reset tabs styling
       document.querySelectorAll('.' + orderId + '-tab').forEach(el => {
         el.classList.remove('border-primary', 'text-primary');
-        el.classList.add('border-transparent', 'text-gray-400');
+        el.classList.add('border-transparent', 'text-slate-400');
       });
       // Highlight selected tab
       const activeTab = document.getElementById(orderId + '-tab-' + tabName);
-      activeTab.classList.remove('border-transparent', 'text-gray-400');
+      activeTab.classList.remove('border-transparent', 'text-slate-400');
       activeTab.classList.add('border-primary', 'text-primary');
     }
+
+    let currentFilter = 'all';
+
+    function setFilter(filter) {
+       currentFilter = filter;
+       renderOrders();
+    }
+
+    // Render Orders from localStorage
+    function renderOrders() {
+      const ordersList = document.getElementById('orders-list');
+      let orders = [];
+      let containers = [];
+      try {
+        const storedOrders = localStorage.getItem('nomin_orders');
+        if (storedOrders) orders = JSON.parse(storedOrders);
+        const storedCons = localStorage.getItem('nomin_containers');
+        if (storedCons) containers = JSON.parse(storedCons);
+      } catch (e) {}
+
+      // Determine if order is pending
+      const isPending = (o) => {
+         if (!o.containerId) return true;
+         const c = containers.find(x => x.id === o.containerId);
+         if (!c) return true;
+         if (['checking', 'picking_up'].includes(c.status)) return true;
+         return false; // It's in transit or arrived, so hide from this screen
+      };
+
+      // Only care about pending orders on this page
+      const pendingOrders = orders.filter(isPending);
+
+      // Determine the branch tab mapping
+      const getBranchCategory = (o) => {
+         const b = o.branch || '';
+         if (b.includes('Салбар 1')) return 'branch1';
+         if (b.includes('Салбар 2')) return 'branch2';
+         if (b.includes('Салбар 3')) return 'branch3';
+         return 'other';
+      };
+
+      // Calculate counts
+      let counts = { all: pendingOrders.length, branch1: 0, branch2: 0, branch3: 0, other: 0 };
+      pendingOrders.forEach(o => counts[getBranchCategory(o)]++);
+
+      // Render filter tabs
+      const tabsContainer = document.getElementById('filter-tabs-container');
+      const tabsInfo = [
+         { id: 'all', label: 'Хүлээгдэж буй (Бүгд)' },
+         { id: 'branch1', label: 'Салбар 1' },
+         { id: 'branch2', label: 'Салбар 2' },
+         { id: 'branch3', label: 'Салбар 3' },
+         { id: 'other', label: 'Бусад' }
+      ];
+      
+      // Hide tabs that have 0 count if they are specific branches, to keep UI clean, but always show 'all'
+      const visibleTabs = tabsInfo.filter(t => t.id === 'all' || counts[t.id] > 0);
+
+      tabsContainer.innerHTML = visibleTabs.map(t => {
+         const isActive = t.id === currentFilter;
+         const badgeClass = isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200';
+         return `
+         <button onclick="setFilter('${t.id}')" class="group whitespace-nowrap px-4 py-2.5 rounded-2xl ${isActive ? 'bg-slate-800 text-white shadow-md' : 'bg-white border border-blue-100/50 text-slate-500 hover:bg-slate-50 shadow-sm'} font-bold text-[13px] transition-all flex items-center gap-2">
+            ${t.label}
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold ${badgeClass} transition-colors">${counts[t.id]}</span>
+         </button>
+         `;
+      }).join('');
+
+      // Filter list
+      const filteredOrders = currentFilter === 'all' ? pendingOrders : pendingOrders.filter(o => getBranchCategory(o) === currentFilter);
+
+      if (!filteredOrders || filteredOrders.length === 0) {
+        ordersList.innerHTML = `<div class="text-center py-10 text-slate-400 text-[14px] font-medium border-2 border-dashed border-slate-200 rounded-3xl animate-fade-in-up">Тохирох захиалга алга байна</div>`;
+        return;
+      }
+
+      let html = '';
+      filteredOrders.forEach(order => {
+        const t = new Date(order.date);
+        const formattedDate = `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, '0')}.${String(t.getDate()).padStart(2, '0')} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+        
+        const typeLabel = order.type === 'standard' ? 'Энгийн ачаа' : 'Экспресс ачаа';
+        
+        let imagesHtml = '';
+        if (order.images && order.images.length > 0) {
+           imagesHtml = `
+             <div class="w-full mt-2">
+               <span class="text-[11px] text-slate-400 font-medium block mb-2">Хавсаргасан зураг</span>
+               <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                 ${order.images.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0" onclick="window.open('${img}', '_blank')">`).join('')}
+               </div>
+             </div>
+           `;
+        }
+
+        let containerLabel = '';
+        if (order.containerId) {
+           const c = containers.find(x => x.id === order.containerId);
+           if (c) {
+              const STATUSES = {
+                 'checking': 'Шалгаж байна',
+                 'picking_up': 'Хаягаар очиж байна',
+                 'loaded': 'Контейнерт ачигдлаа',
+                 'departed': 'Инчоноос хөдөлсөн',
+                 'in_transit': 'Ачаа замдаа явж байна',
+                 'arrived': 'Монголд ачаа буусан'
+              };
+              const sName = STATUSES[c.status] || 'Шалгаж байна';
+              containerLabel = `<span class="w-1 h-1 rounded-full bg-slate-300"></span><span class="bg-blue-600 text-white px-2 py-0.5 rounded-md normal-case tracking-normal">${c.name} : ${sName}</span>`;
+           }
+        } else {
+           containerLabel = `<span class="w-1 h-1 rounded-full bg-slate-300"></span><span class="bg-warning text-white px-2 py-0.5 rounded-md normal-case tracking-normal">Хүлээгдэж буй</span>`;
+        }
+
+        // Escape backticks in our HTML generation if needed
+        html += `
+        <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card relative animate-fade-in-up">
+          <div class="mb-3 border-b border-slate-100 pb-3">
+            <div class="flex items-center flex-wrap gap-2 mb-2 text-[11px] font-bold uppercase tracking-wide">
+              <span class="text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">${order.branch}</span>
+              <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+              <span class="text-primary bg-primary/10 px-2 py-0.5 rounded-md normal-case tracking-normal">${typeLabel}</span>
+              ${containerLabel}
+            </div>
+            <h3 class="text-[18px] font-bold text-gray-900 leading-tight mb-0.5">${order.orderId}</h3>
+            <p class="text-[12px] text-slate-400 font-medium tracking-wide">${formattedDate}</p>
+          </div>
+          
+          <!-- Tabs UI -->
+          <div class="flex gap-2 border-b border-slate-100 mt-2 relative z-10 w-full overflow-x-auto no-scrollbar">
+             <button onclick="switchTab('${order.orderId}', 'sender')" id="${order.orderId}-tab-sender" class="${order.orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-primary text-primary font-bold text-[13px] transition-colors focus:outline-none">Илгээгч</button>
+             <button onclick="switchTab('${order.orderId}', 'goods')" id="${order.orderId}-tab-goods" class="${order.orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-transparent text-slate-400 font-bold text-[13px] transition-colors focus:outline-none">Бараа</button>
+             <button onclick="switchTab('${order.orderId}', 'receiver')" id="${order.orderId}-tab-receiver" class="${order.orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-transparent text-slate-400 font-bold text-[13px] transition-colors focus:outline-none">Хүлээн авагч</button>
+          </div>
+
+          <!-- Tab Contents -->
+          <div class="bg-surface-container-low p-4 rounded-2xl border border-blue-100/50 mb-4 min-h-[125px] mt-4">
+             <!-- Sender -->
+             <div id="${order.orderId}-content-sender" class="${order.orderId}-content block animate-fade-in">
+               <div class="flex flex-wrap justify-between items-start gap-y-3 mb-3">
+                 <div class="w-1/2 pr-2">
+                   <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Нэр</span>
+                   <span class="text-[14px] font-bold text-gray-900 line-clamp-1">${order.sender.name}</span>
+                 </div>
+                 <div class="w-1/2 pl-1">
+                   <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Утасны дугаар</span>
+                   <span class="text-[14px] font-bold text-gray-900">${order.sender.phone}</span>
+                 </div>
+               </div>
+               <div>
+                 <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Хаяг</span>
+                 <span class="text-[13px] font-semibold text-gray-800 leading-relaxed block">${order.sender.address}</span>
+               </div>
+             </div>
+
+             <!-- Goods -->
+             <div id="${order.orderId}-content-goods" class="${order.orderId}-content hidden animate-fade-in">
+               <div class="flex flex-wrap justify-between items-start gap-y-3 mb-4">
+                 <div class="w-1/2">
+                   <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Барааны төрөл</span>
+                   <span class="text-[14px] font-bold text-gray-900 leading-tight block">${order.item.category}</span>
+                 </div>
+                 <div class="w-1/2">
+                   <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Тоо ширхэг</span>
+                   <div class="inline-block px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-bold text-[12px]">${order.item.quantity} хайрцаг/ш</div>
+                 </div>
+               </div>
+               ${imagesHtml}
+             </div>
+
+             <!-- Receiver -->
+             <div id="${order.orderId}-content-receiver" class="${order.orderId}-content hidden animate-fade-in">
+               <div class="flex flex-wrap justify-between items-start gap-y-3 mb-3">
+                 <div class="w-1/2 pr-2">
+                   <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Нэр</span>
+                   <span class="text-[14px] font-bold text-gray-900 line-clamp-1">${order.receiver.name}</span>
+                 </div>
+                 <div class="w-1/2 pl-1">
+                   <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Утасны дугаар</span>
+                   <span class="text-[14px] font-bold text-gray-900">${order.receiver.phone}</span>
+                 </div>
+               </div>
+               <div>
+                 <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Хаяг (Монгол хаяг)</span>
+                 <span class="text-[13px] font-semibold text-gray-800 leading-relaxed block">${order.receiver.address}</span>
+               </div>
+             </div>
+          </div>
+
+          <div class="flex gap-2.5 mt-2">
+            <a href="tel:${order.sender.phone}" class="flex-[1] py-3 rounded-2xl border border-blue-100/80 bg-white text-gray-700 active:scale-[0.98] transition-all hover:bg-slate-50 flex flex-col items-center justify-center shadow-sm">
+              <div class="flex items-center gap-1.5 text-[14px] font-bold mb-0.5">
+                <span class="material-symbols-outlined text-[18px]">phone</span>
+                Залгах
+              </div>
+              <span class="text-[10px] text-slate-400 font-semibold tracking-wide">${order.sender.phone}</span>
+            </a>
+            <a href="admin-order-detail.html" class="flex-[1] py-3 rounded-2xl bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-[14px] shadow-btn active:scale-[0.98] hover:shadow-lg transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[20px]">edit_note</span>
+              Дэлгэрэнгүй
+            </a>
+          </div>
+        </div>
+        `;
+      });
+      ordersList.innerHTML = html;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderOrders();
+      
+      // Auto-open modal if requested via URL
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('openModal') === 'true') {
+        // Must delay slightly to ensure DOM is fully ready or just call it directly
+        setTimeout(openManualOrderModal, 100);
+        // Clean up URL so refresh doesn't keep opening it
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+  </script>
+
+  <!-- Manual Order Modal -->
+  <div id="manual-order-modal" class="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeManualOrderModal()"></div>
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative z-10 transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="manual-order-card">
+      <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+        <h3 class="text-[18px] font-bold text-gray-900">Шинэ захиалга бүртгэх</h3>
+        <button onclick="closeManualOrderModal()" class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-full bg-white text-slate-500 hover:bg-slate-50 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto bg-slate-50 flex-1 space-y-4">
+        <!-- Sender -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+          <h4 class="text-[13px] font-bold text-gray-900 mb-3 border-b border-slate-100 pb-2">1. Илгээгч</h4>
+          <input type="text" id="mo-s-name" placeholder="Нэр" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="tel" id="mo-s-phone" placeholder="Утас" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="text" id="mo-s-address" placeholder="Хаяг" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] focus:border-primary focus:outline-none">
+        </div>
+        <!-- Receiver -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+          <h4 class="text-[13px] font-bold text-gray-900 mb-3 border-b border-slate-100 pb-2">2. Хүлээн авагч</h4>
+          <input type="text" id="mo-r-name" placeholder="Нэр" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="tel" id="mo-r-phone" placeholder="Утас" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] mb-2 focus:border-primary focus:outline-none">
+          <input type="text" id="mo-r-address" placeholder="Хаяг" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] focus:border-primary focus:outline-none">
+        </div>
+        <!-- Item -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 flex gap-2">
+          <div class="flex-1">
+             <label class="block text-[11px] text-slate-500 mb-1">Төрөл</label>
+             <input type="text" id="mo-i-category" placeholder="Хувцас" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:border-primary focus:outline-none">
+          </div>
+          <div class="w-24">
+             <label class="block text-[11px] text-slate-500 mb-1">Тоо/ш</label>
+             <input type="number" id="mo-i-quantity" placeholder="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:border-primary focus:outline-none text-center">
+          </div>
+        </div>
+        <div class="bg-white p-4 rounded-2xl border border-slate-200">
+           <label class="block text-[11px] text-slate-500 mb-1">Салбар/Төрөл</label>
+           <div class="flex gap-2">
+             <select id="mo-branch" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:outline-none">
+               <option value="Салбар 1">Салбар 1</option>
+               <option value="Салбар 2">Салбар 2</option>
+               <option value="Салбар 3">Салбар 3</option>
+               <option value="Бусад">Бусад</option>
+             </select>
+             <select id="mo-type" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-[13px] focus:outline-none">
+               <option value="standard">Энгийн</option>
+               <option value="express">Экспресс</option>
+             </select>
+           </div>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-100 bg-white">
+        <button onclick="saveManualOrder()" class="w-full py-3.5 bg-primary text-white font-bold rounded-xl text-[15px] shadow-btn hover:bg-blue-600 transition-colors active:scale-95">Бүртгэх</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Overlay -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
+  
+  <!-- Sidebar Drawer -->
+  <aside id="sidebar-drawer" class="fixed top-0 right-0 w-[280px] h-full bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col">
+    <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-dark flex items-center justify-center text-white font-bold text-[14px] shadow-sm">
+          АД
+        </div>
+        <div>
+          <h3 class="text-[14px] font-bold text-gray-900 leading-tight">Админ</h3>
+          <p class="text-[11px] text-slate-500 font-medium">nomincargo@admin.mn</p>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1.5 px-3">
+        <li>
+          <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
+            Хяналтын самбар
+          </a>
+        </li>
+        <li>
+          <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">list_alt</span>
+            Захиалгууд
+          </a>
+        </li>
+        <li>
+          <a href="admin-banners.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">view_carousel</span>
+            Баннер
+          </a>
+        </li>
+        <li>
+          <a href="admin-notifications.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">campaign</span>
+            Мэдэгдэл
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+            Тохиргоо
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="p-5 border-t border-slate-100">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        Гарах
+      </a>
+    </div>
+  </aside>
+
+  <script>
+    function toggleSidebar() {
+      const overlay = document.getElementById('sidebar-overlay');
+      const drawer = document.getElementById('sidebar-drawer');
+      if (drawer.classList.contains('translate-x-full')) {
+        drawer.classList.remove('translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    function openManualOrderModal() {
+       document.getElementById('manual-order-modal').classList.remove('opacity-0', 'pointer-events-none');
+       document.getElementById('manual-order-card').classList.remove('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+    }
+    
+    function closeManualOrderModal() {
+       document.getElementById('manual-order-card').classList.add('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+       setTimeout(() => document.getElementById('manual-order-modal').classList.add('opacity-0', 'pointer-events-none'), 300);
+    }
+    
+    function saveManualOrder() {
+       const sName = document.getElementById('mo-s-name').value;
+       const sPhone = document.getElementById('mo-s-phone').value;
+       const sAddress = document.getElementById('mo-s-address').value;
+       const rName = document.getElementById('mo-r-name').value;
+       const rPhone = document.getElementById('mo-r-phone').value;
+       const rAddress = document.getElementById('mo-r-address').value;
+       const iCat = document.getElementById('mo-i-category').value;
+       const iQty = document.getElementById('mo-i-quantity').value;
+       const branch = document.getElementById('mo-branch').value;
+       const typeOpts = document.getElementById('mo-type').value;
+
+       if(!sName || !rName) return alert('Нэр оруулна уу (Name is required)');
+
+       let existingOrders = [];
+       try { existingOrders = JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch(e) {}
+       
+       let maxNum = 3;
+       existingOrders.forEach(o => {
+          if (o.orderId && o.orderId.toUpperCase().startsWith('MN')) {
+             const num = parseInt(o.orderId.substring(2), 10);
+             if (!isNaN(num) && num > maxNum) maxNum = num;
+          }
+       });
+       const nextNum = maxNum + 1;
+       const orderId = 'MN' + String(nextNum).padStart(2, '0');
+
+       const newOrder = {
+          orderId: orderId,
+          type: typeOpts,
+          branch: branch,
+          addressMode: 'branch',
+          sender: { name: sName, phone: sPhone, address: sAddress },
+          receiver: { name: rName, phone: rPhone, address: rAddress },
+          item: { category: iCat || 'Бусад', quantity: iQty || 1, value: '' },
+          images: [],
+          date: new Date().toISOString(),
+          status: 'pending' // pending until it gets a container status
+       };
+
+       existingOrders.unshift(newOrder);
+       localStorage.setItem('nomin_orders', JSON.stringify(existingOrders));
+
+       closeManualOrderModal();
+       
+       // Clear inputs
+       ['s-name','s-phone','s-address','r-name','r-phone','r-address','i-category','i-quantity'].forEach(id => {
+          const el = document.getElementById('mo-'+id);
+          if (el) el.value = '';
+       });
+       
+       renderOrders();
+    }
+
+    // Add order notification badges dynamically
+    document.addEventListener('DOMContentLoaded', () => {
+      let pendingCount = 0;
+      try {
+        const orders = JSON.parse(localStorage.getItem('nomin_orders')) || [];
+        pendingCount = orders.filter(o => o.status === 'pending').length;
+      } catch(e) {}
+      
+      if (pendingCount > 0) {
+        // 1. Bottom Nav Badge
+        const bottomNavs = document.querySelectorAll('nav a[href="admin-orders.html"]');
+        bottomNavs.forEach(nav => {
+          const iconContainer = nav.querySelector('div');
+          if (iconContainer) {
+            iconContainer.classList.add('relative');
+            const badge = document.createElement('span');
+            badge.className = 'absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
+            badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+            iconContainer.appendChild(badge);
+          }
+        });
+
+        // 2. Sidebar Badge
+        const sidebarNavs = document.querySelectorAll('aside a[href="admin-orders.html"]');
+        sidebarNavs.forEach(nav => {
+          if (!nav.classList.contains('justify-between')) {
+             nav.classList.add('justify-between');
+          }
+          const badge = document.createElement('span');
+          badge.className = 'bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
+          badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
+          nav.appendChild(badge);
+        });
+      }
+    });
   </script>
 </body>
 </html>

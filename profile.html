@@ -6,9 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Профайл - Номин Транс</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -16,97 +14,312 @@
       theme: {
         extend: {
           colors: {
-            "primary": "#0050ff",
-            "surface": "#ffffff",
+            "primary": "#3B82F6",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
           },
           fontFamily: {
-            "body": ["Gilroy", "sans-serif"],
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+            "nav": "0 -1px 12px rgba(15, 23, 42, 0.06)",
           }
         },
       },
     }
   </script>
   <style>
-    body { font-family: 'Gilroy', sans-serif; -webkit-font-smoothing: antialiased; }
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .nav-glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
   </style>
   <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
 </head>
 
-<body class="bg-gray-50 text-gray-900 min-h-screen pb-32">
-  <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-    <div class="flex items-center px-4 py-4 max-w-lg mx-auto relative justify-center">
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-32">
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="flex items-center px-4 py-3.5 max-w-lg mx-auto relative justify-center">
       <h1 class="text-[17px] font-bold tracking-tight">Миний профайл</h1>
     </div>
   </header>
 
-  <main class="pt-24 px-5 max-w-lg mx-auto">
+  <main class="pt-[76px] px-4 max-w-lg mx-auto">
     
     <!-- Profile Card -->
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-5 mb-8">
-      <div class="w-16 h-16 rounded-full bg-blue-50 text-primary flex items-center justify-center shrink-0">
+    <div class="bg-white p-6 rounded-3xl shadow-card border border-blue-100/50 flex items-center gap-5 mb-6 animate-fade-in-up">
+      <div class="w-16 h-16 rounded-2xl bg-blue-50 text-primary flex items-center justify-center shrink-0 border border-blue-100/50">
         <span class="material-symbols-outlined text-[32px] filled">person</span>
       </div>
       <div>
-        <h2 class="text-[18px] font-bold text-gray-900 mb-0.5">зочин</h2>
-        <p class="text-[13px] text-gray-500 font-medium whitespace-pre-wrap">Нэвтрэх эсвэл бүртгүүлнэ үү</p>
+        <h2 class="text-[18px] font-bold text-gray-900 mb-1">Зочин</h2>
+        <p class="text-[13px] text-slate-500 font-medium">Нэвтрэх эсвэл бүртгүүлнэ үү</p>
+      </div>
+    </div>
+
+    <!-- No Orders Placeholder -->
+    <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card animate-fade-in-up mb-6 text-center hidden" id="no-orders-card">
+      <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3 text-slate-300">
+        <span class="material-symbols-outlined text-[32px]">inventory_2</span>
+      </div>
+      <h3 class="text-[15px] font-bold text-gray-900 mb-1">Таны захиалга одоогоор алга байна</h3>
+      <p class="text-[12px] text-slate-500 mb-4">Та шинэ захиалга өгөх бол доорх товчийг дарна уу.</p>
+      <a href="order.html" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-primary/10 text-primary text-[13px] font-bold rounded-xl transition-colors hover:bg-primary/20">
+        <span class="material-symbols-outlined text-[18px]">add_circle</span>
+        Захиалга өгөх
+      </a>
+    </div>
+
+    <!-- Active Order Tracker -->
+    <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card animate-fade-in-up mb-6 delay-100 hidden" id="user-tracker-card" style="animation-delay: 0.1s; animation-fill-mode: forwards;">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-[15px] font-bold text-gray-900">Миний захиалга (MN03)</h3>
+        <a href="order-history.html" class="text-[12px] font-semibold text-primary focus:outline-none hover:underline">Илүү дэлгэрэнгүй</a>
+      </div>
+
+      <!-- Top Title and Subtitle -->
+      <div class="flex justify-between items-start mb-6 pt-3 border-t border-slate-100">
+        <div>
+          <h2 id="tracker-title" class="text-[20px] font-extrabold text-gray-900 flex items-center gap-2 mb-1">
+            Шалгаж байна <span class="text-[22px]">📦</span>
+          </h2>
+          <p id="tracker-subtitle" class="text-[12px] text-slate-500 font-medium tracking-wide">Ачааны мэдээллийг шалгаж байна</p>
+        </div>
+        <div id="tracker-badge" class="bg-warning/10 text-warning px-3 py-1.5 rounded-xl flex flex-col items-center justify-center transition-colors">
+          <span class="text-[10px] uppercase font-bold tracking-wider mb-0.5">Төлөв</span>
+          <span id="tracker-step-text" class="text-[13px] font-bold">Алхам 1</span>
+        </div>
+      </div>
+
+      <!-- Center Graphic Container -->
+      <div class="flex justify-center mb-8 relative">
+        <div class="w-28 h-28 bg-gradient-to-tr from-blue-50 to-blue-100 border-4 border-white rounded-full flex items-center justify-center relative shadow-sm animate-pulse">
+           <span id="tracker-icon" class="material-symbols-outlined text-[56px] text-primary transition-all duration-300" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+           <div class="absolute top-1 right-1 w-3 h-3 rounded-full bg-blue-300"></div>
+           <div class="absolute bottom-3 left-2 w-2 h-2 rounded-full bg-blue-200"></div>
+        </div>
+      </div>
+
+      <!-- Progress Bar Tracker -->
+      <div class="relative px-2">
+        <div class="absolute top-3.5 left-[16.666%] right-[16.666%] h-[4px]">
+          <div class="absolute inset-0 bg-slate-100 rounded-full z-0"></div>
+          <div id="tracker-progress" class="absolute top-0 left-0 h-full bg-primary rounded-full z-0 transition-all duration-500" style="width: 0%"></div>
+        </div>
+
+        <div class="relative z-10 flex justify-between">
+          <div class="flex-1 flex flex-col items-center gap-2 transition-transform group">
+            <div id="step-1-dot" class="w-8 h-8 rounded-full bg-primary border-4 border-white shadow-sm flex items-center justify-center transition-colors"></div>
+            <span id="step-1-text" class="text-[11px] font-bold text-primary text-center leading-[1.3] transition-colors">Шалгаж<br>байна</span>
+          </div>
+          
+          <div class="flex-1 flex flex-col items-center gap-2 transition-transform group">
+            <div id="step-2-dot" class="w-8 h-8 rounded-full bg-slate-200 border-4 border-white shadow-sm transition-colors"></div>
+            <span id="step-2-text" class="text-[11px] font-medium text-slate-400 text-center leading-[1.3] transition-colors">Хаягаар<br>очиж байна</span>
+          </div>
+
+          <div class="flex-1 flex flex-col items-center gap-2 transition-transform group">
+            <div id="step-3-dot" class="w-8 h-8 rounded-full bg-slate-200 border-4 border-white shadow-sm transition-colors"></div>
+            <span id="step-3-text" class="text-[11px] font-medium text-slate-400 text-center leading-[1.3] transition-colors">Контейнерт<br>ачигдлаа</span>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Menus -->
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-      <a href="#" class="flex items-center justify-between p-5 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
-            <span class="material-symbols-outlined text-[18px]">history</span>
+    <div class="bg-white rounded-3xl shadow-card border border-blue-100/50 overflow-hidden mb-6 animate-fade-in-up" style="animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards;">
+      <a href="order-history.html" class="flex items-center justify-between p-5 border-b border-slate-100 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-[#F5F7FF] flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">history</span>
           </div>
-          <span class="text-[15px] font-bold text-gray-800">Захиалгын түүх</span>
+          <span class="text-[15px] font-semibold text-gray-800">Захиалгын түүх</span>
         </div>
-        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
+        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
       </a>
 
-      <a href="faq.html" class="flex items-center justify-between p-5 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
-            <span class="material-symbols-outlined text-[18px]">help</span>
+      <a href="faq.html" class="flex items-center justify-between p-5 border-b border-slate-100 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-[#F5F7FF] flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">help_center</span>
           </div>
-          <span class="text-[15px] font-bold text-gray-800">Түгээмэл асуулт</span>
+          <span class="text-[15px] font-semibold text-gray-800">Түгээмэл асуулт</span>
         </div>
-        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
+        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
       </a>
-      <a href="contact.html" class="flex items-center justify-between p-5 hover:bg-gray-50 transition-colors">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-600">
-            <span class="material-symbols-outlined text-[18px]">support_agent</span>
+      
+      <a href="contact.html" class="flex items-center justify-between p-5 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-[#F5F7FF] flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[20px]">support_agent</span>
           </div>
-          <span class="text-[15px] font-bold text-gray-800">Холбоо барих</span>
+          <span class="text-[15px] font-semibold text-gray-800">Холбоо барих</span>
         </div>
-        <span class="material-symbols-outlined text-gray-300">chevron_right</span>
+        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
       </a>
     </div>
 
   </main>
 
   <!-- Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-white/95 backdrop-blur-xl z-50 shadow-[0px_-12px_32px_rgba(25,28,29,0.04)]">
-    <a href="index.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
-      <span class="material-symbols-outlined mb-1">home</span>
-      <span class="text-[11px] font-bold">Нүүр</span>
-    </a>
-    <a href="order.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
-      <span class="material-symbols-outlined mb-1">add_box</span>
-      <span class="text-[11px] font-bold">Захиалга</span>
-    </a>
-    <a href="tracking.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
-      <span class="material-symbols-outlined mb-1">local_shipping</span>
-      <span class="text-[11px] font-bold">Хяналт</span>
-    </a>
-    <a href="profile.html" class="flex flex-col items-center justify-center text-primary">
-      <span class="material-symbols-outlined mb-1 filled">person</span>
-      <span class="text-[11px] font-bold">Профайл</span>
-    </a>
+  <nav class="fixed bottom-0 left-0 w-full z-50 nav-glass shadow-nav border-t border-blue-100/40">
+    <div class="flex justify-around items-center px-2 pb-7 pt-2.5 max-w-lg mx-auto">
+      <a href="index.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">home</span>
+        </div>
+        <span class="text-[11px] font-semibold">Нүүр</span>
+      </a>
+      <a href="order.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">add_box</span>
+        </div>
+        <span class="text-[11px] font-semibold">Захиалга</span>
+      </a>
+      <a href="tracking.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">local_shipping</span>
+        </div>
+        <span class="text-[11px] font-semibold">Хяналт</span>
+      </a>
+      <a href="profile.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+        <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-primary filled text-[22px]">person</span>
+        </div>
+        <span class="text-[11px] font-bold text-primary">Профайл</span>
+      </a>
+    </div>
   </nav>
 
+  <script>
+    const statuses = {
+      1: {
+        title: 'Шалгаж байна <span class="text-[22px]">📦</span>',
+        subtitle: 'Ачааны мэдээллийг шалгаж байна',
+        icon: 'inventory_2',
+        progress: '0%',
+        badgeClass: 'bg-warning/10 text-warning',
+        stepParams: [
+          { dot: 'bg-primary border-4 border-white shadow-sm', text: 'font-bold text-primary' },
+          { dot: 'bg-slate-200 border-4 border-white shadow-sm', text: 'font-medium text-slate-400' },
+          { dot: 'bg-slate-200 border-4 border-white shadow-sm', text: 'font-medium text-slate-400' }
+        ]
+      },
+      2: {
+        title: 'Хаягаар очиж байна <span class="text-[22px]">🚚</span>',
+        subtitle: 'Таны оруулсан хаягаар ачаагаа авахаар очиж байна',
+        icon: 'local_shipping',
+        progress: '50%',
+        badgeClass: 'bg-info/10 text-info',
+        stepParams: [
+          { dot: 'bg-primary border-4 border-white shadow-sm', text: 'font-bold text-primary' },
+          { dot: 'bg-primary border-4 border-white shadow-sm', text: 'font-bold text-primary' },
+          { dot: 'bg-slate-200 border-4 border-white shadow-sm', text: 'font-medium text-slate-400' }
+        ]
+      },
+      3: {
+        title: 'Контейнерт ачигдлаа <span class="text-[22px]">🚢</span>',
+        subtitle: 'Захиалга амжилттай чингэлэгт ачигдсан',
+        icon: 'directions_boat',
+        progress: '100%',
+        badgeClass: 'bg-success/10 text-success',
+        stepParams: [
+          { dot: 'bg-primary border-4 border-white shadow-sm', text: 'font-bold text-primary' },
+          { dot: 'bg-primary border-4 border-white shadow-sm', text: 'font-bold text-primary' },
+          { dot: 'bg-primary border-4 border-white shadow-sm', text: 'font-bold text-primary' }
+        ]
+      }
+    };
+
+    let lastKnownStep = null;
+    let lastKnownOrderId = null;
+
+    function initTracker() {
+      const ordersStr = localStorage.getItem('nomin_orders');
+      let orders = [];
+      try { orders = JSON.parse(ordersStr) || []; } catch(e) {}
+      
+      const noOrdersCard = document.getElementById('no-orders-card');
+      const trackerCard = document.getElementById('user-tracker-card');
+      
+      if (orders.length === 0) {
+        trackerCard.classList.add('hidden');
+        noOrdersCard.classList.remove('hidden');
+        return;
+      }
+
+      noOrdersCard.classList.add('hidden');
+      
+      const latestOrder = orders[0];
+      let currentStep = '1';
+      if (latestOrder.status === 'in_transit') currentStep = '2';
+      if (latestOrder.status === 'delivered') currentStep = '3';
+      
+      // Override for demo purposes
+      const manualDemoStatus = localStorage.getItem('nominCargoStatus');
+      if (manualDemoStatus) {
+         currentStep = manualDemoStatus;
+      }
+      
+      if (currentStep === lastKnownStep && latestOrder.orderId === lastKnownOrderId) return;
+      
+      lastKnownStep = currentStep;
+      lastKnownOrderId = latestOrder.orderId;
+      
+      const data = statuses[currentStep];
+      if (!data) return;
+      
+      // Unhide card
+      trackerCard.classList.remove('hidden');
+
+      // Update Order ID in Title dynamically
+      document.querySelector('#user-tracker-card h3').textContent = `Миний захиалга (${latestOrder.orderId})`;
+
+      // Update Top Texts
+      document.getElementById('tracker-title').innerHTML = data.title;
+      document.getElementById('tracker-subtitle').textContent = data.subtitle;
+      document.getElementById('tracker-step-text').textContent = 'Алхам ' + currentStep;
+      
+      // Update Badge Color
+      const badge = document.getElementById('tracker-badge');
+      badge.className = `px-3 py-1.5 rounded-xl flex flex-col items-center justify-center transition-colors duration-500 ${data.badgeClass}`;
+      
+      // Update Middle Icon
+      const icon = document.getElementById('tracker-icon');
+      icon.textContent = data.icon;
+      
+      // Update Progress Bar
+      document.getElementById('tracker-progress').style.width = data.progress;
+
+      // Update Dots and Text styling
+      for (let i = 1; i <= 3; i++) {
+        const dot = document.getElementById(`step-${i}-dot`);
+        const text = document.getElementById(`step-${i}-text`);
+        const params = data.stepParams[i - 1];
+        
+        dot.className = `w-8 h-8 rounded-full border-4 border-white flex items-center justify-center transition-colors duration-500 ${params.dot}`;
+        text.className = `text-[11px] text-center leading-[1.3] transition-colors duration-500 ${params.text}`;
+      }
+    }
+
+    // Call on load and check constantly (fallback for cross-tab sync issues)
+    document.addEventListener("DOMContentLoaded", () => {
+      initTracker();
+      setInterval(initTracker, 500); 
+    });
+  </script>
 </body>
 </html>

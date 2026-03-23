@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Контейнер 관리 - Админ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#3B82F6",
+            "success": "#10B981",
+            "warning": "#F59E0B",
+            "info": "#3B82F6",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
+          },
+          fontFamily: {
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+            "nav": "0 -1px 12px rgba(15, 23, 42, 0.06)",
+            "btn": "0 4px 14px rgba(59, 130, 246, 0.35)",
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .nav-glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw-admin.js');
+      });
+    }
+  </script>
+</head>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-32">
+  
+  <header class="fixed top-0 w-full z-40 header-blur border-b border-blue-100/50">
+    <div class="px-5 py-3.5 max-w-lg mx-auto">
+      <div class="flex items-center justify-between">
+        <h1 class="text-[20px] font-bold text-gray-900 tracking-tight">Контейнерүүд</h1>
+          <button onclick="openNewContainerModal()" class="flex items-center gap-1.5 pl-3 pr-4 py-2 mr-1 rounded-xl bg-primary text-white shadow-btn hover:bg-blue-600 transition-colors active:scale-95">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            <span class="font-bold text-[13px]">Шинэ</span>
+          </button>
+          <button class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[20px]">search</span>
+          </button>
+          <button onclick="toggleSidebar()" class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-gray-800 hover:bg-slate-50 transition-colors active:scale-95">
+            <span class="material-symbols-outlined text-[24px]">menu</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-[80px] px-4 max-w-lg mx-auto space-y-4">
+    <div id="containers-list" class="space-y-4 pb-10">
+      <!-- Containers dynamically injected here -->
+    </div>
+  </main>
+
+  <!-- New Container Modal -->
+  <div id="new-container-modal" class="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeNewContainerModal()"></div>
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative z-10 transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300" id="new-container-card">
+      <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="text-[18px] font-bold text-gray-900">Шинэ контейнер үүсгэх</h3>
+        <button onclick="closeNewContainerModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-5">
+        <label class="block text-[13px] font-bold text-slate-700 mb-2">Контейнерийн нэр / Дугаар</label>
+        <input type="text" id="container-name" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-[15px] text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all mb-4" placeholder="Жишээ нь: 2024-04-01-A">
+        
+        <button onclick="createContainer()" class="w-full py-3.5 bg-primary text-white font-bold rounded-xl text-[15px] shadow-btn hover:bg-blue-600 transition-colors active:scale-95">Үүсгэх</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Orders Modal -->
+  <div id="assign-orders-modal" class="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeAssignOrdersModal()"></div>
+    <div class="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl relative z-10 transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="assign-orders-card">
+      <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+        <div>
+           <h3 class="text-[18px] font-bold text-gray-900">Захиалга нэмэх</h3>
+           <p class="text-[12px] text-slate-500 mt-0.5" id="assign-container-subtitle">C-001</p>
+        </div>
+        <button onclick="closeAssignOrdersModal()" class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-full bg-white text-slate-500 hover:bg-slate-50 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-4 overflow-y-auto bg-slate-50 flex-1 relative" id="unassigned-orders-list">
+         <!-- Checkboxes list -->
+      </div>
+      <div class="p-4 border-t border-slate-100 bg-white">
+        <button onclick="saveAssignedOrders()" class="w-full py-3.5 bg-gray-900 text-white font-bold rounded-xl text-[15px] shadow-sm hover:bg-gray-800 transition-colors active:scale-95">Сонгосон захиалгуудыг нэмэх</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Admin Bottom Navigation -->
+  <nav class="fixed bottom-0 left-0 w-full nav-glass shadow-nav border-t border-blue-100/40 z-40">
+    <div class="flex justify-around items-center px-4 pb-7 pt-2.5 max-w-lg mx-auto">
+      <a href="admin.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">dashboard</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Самбар</span>
+      </a>
+      <a href="admin-orders.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">list_alt</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Захиалгууд</span>
+      </a>
+      <a href="admin-containers.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+        <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary filled text-[22px]">inventory_2</span>
+        </div>
+        <span class="text-[11px] font-bold text-primary">Контейнер</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[22px]">settings</span>
+        </div>
+        <span class="text-[11px] font-semibold text-slate-500">Тохиргоо</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Sidebar Overlay -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
+  
+  <!-- Sidebar Drawer -->
+  <aside id="sidebar-drawer" class="fixed top-0 right-0 w-[280px] h-full bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col">
+    <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-dark flex items-center justify-center text-white font-bold text-[14px] shadow-sm">
+          АД
+        </div>
+        <div>
+          <h3 class="text-[14px] font-bold text-gray-900 leading-tight">Админ</h3>
+          <p class="text-[11px] text-slate-500 font-medium">nomincargo@admin.mn</p>
+        </div>
+      </div>
+      <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto py-4">
+      <ul class="space-y-1.5 px-3">
+        <li>
+          <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
+            Хяналтын самбар
+          </a>
+        </li>
+        <li>
+          <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">list_alt</span>
+            Захиалгууд
+          </a>
+        </li>
+        <li>
+          <a href="admin-containers.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px] justify-between">
+            <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">inventory_2</span>Контейнер</div>
+          </a>
+        </li>
+        <li>
+          <a href="admin-banners.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">view_carousel</span>
+            Баннер
+          </a>
+        </li>
+        <li>
+          <a href="admin-notifications.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">campaign</span>
+            Мэдэгдэл
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+            Тохиргоо
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="p-5 border-t border-slate-100">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
+        <span class="material-symbols-outlined text-[20px]">logout</span>
+        Гарах
+      </a>
+    </div>
+  </aside>
+
+  <script>
+    function toggleSidebar() {
+      const overlay = document.getElementById('sidebar-overlay');
+      const drawer = document.getElementById('sidebar-drawer');
+      if (drawer.classList.contains('translate-x-full')) {
+        drawer.classList.remove('translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+    // Constants for container statuses
+    const STATUSES = {
+       'checking': 'Шалгаж байна',
+       'picking_up': 'Хаягаар очиж байна',
+       'loaded': 'Контейнерт ачигдлаа',
+       'departed': 'Инчоноос хөдөлсөн',
+       'in_transit': 'Ачаа замдаа явж байна',
+       'arrived': 'Монголд ачаа буусан'
+    };
+    
+    const STATUS_KEYS = Object.keys(STATUSES);
+
+    let containers = [];
+    let currentAssignContainerId = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+       renderContainers();
+    });
+
+    function getOrders() {
+       try { return JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch(e) { return []; }
+    }
+    
+    function setOrders(orders) {
+       localStorage.setItem('nomin_orders', JSON.stringify(orders));
+    }
+
+    function getContainers() {
+       try { return JSON.parse(localStorage.getItem('nomin_containers')) || []; } catch(e) { return []; }
+    }
+
+    function setContainers(cons) {
+       localStorage.setItem('nomin_containers', JSON.stringify(cons));
+    }
+
+    function renderContainers() {
+       containers = getContainers();
+       const list = document.getElementById('containers-list');
+       
+       if (containers.length === 0) {
+          list.innerHTML = `
+            <div class="bg-white rounded-3xl p-8 border border-blue-100/50 shadow-card animate-fade-in-up text-center mt-4">
+              <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+                <span class="material-symbols-outlined text-[32px]">inventory_2</span>
+              </div>
+              <h3 class="text-[16px] font-bold text-gray-900 mb-2">Контейнергүй байна</h3>
+              <p class="text-[13px] text-slate-500 leading-relaxed mb-6">Шинээр контейнер үүсгэж захиалгуудыг багцлан удирдана уу.</p>
+              <button onclick="openNewContainerModal()" class="px-6 py-2.5 bg-primary text-white text-[13px] font-bold rounded-xl shadow-btn hover:bg-blue-600 transition-colors">Эхлэх</button>
+            </div>
+          `;
+          return;
+       }
+
+       let html = '';
+       containers.forEach((c, index) => {
+          const currentStatusLabel = STATUSES[c.status] || STATUSES['checking'];
+          // Render orders inside container
+          const orders = getOrders().filter(o => o.containerId === c.id);
+          const activeIndex = STATUS_KEYS.indexOf(c.status);
+          
+          let ordersHtml = '';
+          if (orders.length === 0) {
+             ordersHtml = `<p class="text-[12px] text-slate-400 italic">Жагсаалт хоосон байна</p>`;
+          } else {
+             ordersHtml = `<div class="flex flex-wrap gap-2">` + 
+                orders.map(o => `<span class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded select-none text-[11px] font-bold shadow-sm">${o.orderId}</span>`).join('') +
+             `</div>`;
+          }
+
+          html += `
+            <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card animate-fade-in-up" style="animation-delay: ${index * 0.05}s; opacity: 0; animation-fill-mode: forwards;">
+              <div class="flex justify-between items-start mb-4">
+                 <div>
+                    <h3 class="text-[18px] font-bold text-gray-900 leading-tight mb-1">${c.name}</h3>
+                    <p class="text-[12px] text-slate-400 font-medium">${c.id}</p>
+                 </div>
+                 <div class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-primary border border-blue-100">
+                    ${orders.length} ачаа
+                 </div>
+              </div>
+              
+              <!-- Status Progress -->
+              <div class="mb-5 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                 <div class="flex justify-between items-center mb-3">
+                    <span class="text-[12px] font-bold text-gray-700">Төлөв</span>
+                    <span class="text-[12px] font-bold text-primary">${currentStatusLabel}</span>
+                 </div>
+                 <select onchange="updateContainerStatus('${c.id}', this.value)" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-[13px] text-gray-800 font-medium focus:outline-none focus:border-primary">
+                    ${STATUS_KEYS.map((k) => `<option value="${k}" ${c.status === k ? 'selected' : ''}>${STATUSES[k]}</option>`).join('')}
+                 </select>
+              </div>
+
+              <!-- Orders in Container -->
+              <div>
+                 <div class="flex justify-between items-center mb-3">
+                    <span class="text-[12px] font-bold text-slate-700">Багцалсан ачаанууд</span>
+                    <button onclick="openAssignOrdersModal('${c.id}')" class="text-[12px] font-bold text-primary hover:underline flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">add_circle</span> Нэмэх</button>
+                 </div>
+                 <div class="bg-slate-50 p-3 rounded-2xl min-h-[60px] border border-slate-100">
+                    ${ordersHtml}
+                 </div>
+              </div>
+            </div>
+          `;
+       });
+       list.innerHTML = html;
+    }
+
+    function openNewContainerModal() {
+       const modal = document.getElementById('new-container-modal');
+       const card = document.getElementById('new-container-card');
+       modal.classList.remove('opacity-0', 'pointer-events-none');
+       card.classList.remove('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+       document.getElementById('container-name').focus();
+    }
+
+    function closeNewContainerModal() {
+       const modal = document.getElementById('new-container-modal');
+       const card = document.getElementById('new-container-card');
+       card.classList.add('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+       setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 300);
+    }
+
+    function createContainer() {
+       const nameInput = document.getElementById('container-name');
+       const name = nameInput.value.trim();
+       if (!name) return alert('Нэр оруулна уу');
+
+       const cId = 'C-' + Date.now().toString().slice(-6);
+       const newC = {
+          id: cId,
+          name: name,
+          date: new Date().toISOString(),
+          status: 'checking'
+       };
+
+       const cons = getContainers();
+       cons.unshift(newC);
+       setContainers(cons);
+       
+       nameInput.value = '';
+       closeNewContainerModal();
+       renderContainers();
+    }
+
+    function updateContainerStatus(cId, newStatus) {
+       let cons = getContainers();
+       let found = cons.find(c => c.id === cId);
+       if(found) {
+          found.status = newStatus;
+          setContainers(cons);
+          // Don't need to re-render everything unless we want to, but letting native select handle the view is cleaner visually.
+          renderContainers(); // To update the text label above it.
+       }
+    }
+
+    function openAssignOrdersModal(cId) {
+       currentAssignContainerId = cId;
+       const cons = getContainers();
+       const container = cons.find(c => c.id === cId);
+       document.getElementById('assign-container-subtitle').textContent = container.name + ' (' + cId + ')';
+
+       const orders = getOrders();
+       const unassigned = orders.filter(o => !o.containerId || o.containerId === cId); // Show unassigned, and ones already mapped here (to allow unmapping easily or just showing them as checked)
+
+       const list = document.getElementById('unassigned-orders-list');
+       if (unassigned.length === 0) {
+          list.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-slate-400"><span class="material-symbols-outlined text-[40px] mb-2 opacity-50">inbox</span><p class="text-[13px] font-medium">Сул ачаа байхгүй байна</p></div>`;
+       } else {
+          list.innerHTML = unassigned.map(o => `
+            <label class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl mb-2 cursor-pointer active:bg-blue-50 transition-colors">
+               <div class="flex flex-col">
+                  <span class="text-[14px] font-bold text-gray-900">${o.orderId}</span>
+                  <span class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">${o.receiver.name} - ${o.item.category}</span>
+               </div>
+               <div class="relative flex items-center">
+                 <input type="checkbox" value="${o.orderId}" class="peer sr-only assign-cb" ${o.containerId === cId ? 'checked' : ''}>
+                 <div class="w-6 h-6 border-2 border-slate-300 rounded peer-checked:bg-primary peer-checked:border-primary flex items-center justify-center transition-all">
+                    <span class="material-symbols-outlined text-white text-[16px] opacity-0 peer-checked:opacity-100 transition-opacity">check</span>
+                 </div>
+               </div>
+            </label>
+          `).join('');
+       }
+
+       const modal = document.getElementById('assign-orders-modal');
+       const card = document.getElementById('assign-orders-card');
+       modal.classList.remove('opacity-0', 'pointer-events-none');
+       card.classList.remove('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+    }
+
+    function closeAssignOrdersModal() {
+       currentAssignContainerId = null;
+       const modal = document.getElementById('assign-orders-modal');
+       const card = document.getElementById('assign-orders-card');
+       card.classList.add('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+       setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 300);
+    }
+
+    function saveAssignedOrders() {
+       if (!currentAssignContainerId) return;
+       const checkboxes = document.querySelectorAll('.assign-cb');
+       const checkedIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+       const uncheckedIds = Array.from(checkboxes).filter(cb => !cb.checked).map(cb => cb.value); // If they unchecked it
+
+       const orders = getOrders();
+       orders.forEach(o => {
+          if (checkedIds.includes(o.orderId)) {
+             o.containerId = currentAssignContainerId;
+          } else if (uncheckedIds.includes(o.orderId) && o.containerId === currentAssignContainerId) {
+             delete o.containerId; // Unassigned
+          }
+       });
+       setOrders(orders);
+
+       closeAssignOrdersModal();
+       renderContainers();
+    }
+  </script>
+</body>
+</html>

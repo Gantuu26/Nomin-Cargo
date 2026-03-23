@@ -7,10 +7,7 @@
   <title>Номин Транс - Солонгосоос Монгол руу ачаа илгээх</title>
   <meta name="description" content="Солонгосоос Монгол руу ачаа илгээх хамгийн хялбар, найдвартай платформ.">
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-light" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
     rel="stylesheet">
   <script>
@@ -19,57 +16,75 @@
       theme: {
         extend: {
           colors: {
-            "primary": "#0050ff",
-            "primary-container": "#0050ff",
+            "primary": "#3B82F6",
+            "primary-dark": "#2563EB",
+            "primary-light": "#DBEAFE",
+            "primary-container": "#3B82F6",
             "on-primary": "#ffffff",
-            "on-primary-container": "#dde1ff",
-            "secondary": "#4559a9",
-            "secondary-container": "#96a9ff",
+            "on-primary-container": "#DBEAFE",
+            "secondary": "#6366F1",
+            "secondary-container": "#C7D2FE",
             "on-secondary": "#ffffff",
-            "tertiary": "#942200",
-            "tertiary-container": "#be2f01",
+            "tertiary": "#F97316",
+            "tertiary-dark": "#EA580C",
+            "tertiary-light": "#FFF7ED",
+            "tertiary-container": "#F97316",
             "on-tertiary": "#ffffff",
-            "error": "#ba1a1a",
-            "error-container": "#ffdad6",
-            "surface": "#ffffff",
-            "surface-container": "#f1f3f5",
-            "surface-container-high": "#e9ecef",
-            "surface-container-highest": "#dee2e6",
-            "surface-container-low": "#ffffff",
+            "error": "#EF4444",
+            "error-container": "#FEE2E2",
+            "surface": "#F0F4FF",
+            "surface-card": "#ffffff",
+            "surface-container": "#E8EDFB",
+            "surface-container-high": "#DCE3F5",
+            "surface-container-highest": "#D0D8EF",
+            "surface-container-low": "#F5F7FF",
             "surface-container-lowest": "#ffffff",
-            "surface-variant": "#e1e3e4",
-            "surface-dim": "#d9dadb",
-            "on-surface": "#191c1d",
-            "on-surface-variant": "#6b7280",
-            "outline": "#737688",
-            "outline-variant": "#c3c5d9",
-            "inverse-surface": "#2e3132",
-            "inverse-on-surface": "#f0f1f2",
-            "inverse-primary": "#b7c4ff",
-            "background": "#ffffff",
-            "on-background": "#191c1d",
+            "surface-variant": "#E2E8F0",
+            "surface-dim": "#D1D9EC",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#64748B",
+            "outline": "#94A3B8",
+            "outline-variant": "#CBD5E1",
+            "inverse-surface": "#1E293B",
+            "inverse-on-surface": "#F1F5F9",
+            "inverse-primary": "#93C5FD",
+            "background": "#F0F4FF",
+            "on-background": "#0F172A",
           },
           fontFamily: {
-            "headline": ["Gilroy", "sans-serif"],
-            "body": ["Gilroy", "sans-serif"],
-            "label": ["Gilroy", "sans-serif"]
+            "sans": ["Inter", "system-ui", "sans-serif"],
+            "headline": ["Inter", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "label": ["Inter", "sans-serif"]
           },
           borderRadius: {
-            "DEFAULT": "0.25rem",
-            "lg": "0.5rem",
-            "xl": "1.5rem",
-            "2xl": "2rem",
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "2xl": "1.25rem",
             "3xl": "1.5rem",
             "full": "9999px"
           },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+            "card-hover": "0 2px 8px rgba(15, 23, 42, 0.06), 0 8px 24px rgba(15, 23, 42, 0.06)",
+            "elevated": "0 4px 16px rgba(15, 23, 42, 0.06), 0 12px 32px rgba(15, 23, 42, 0.04)",
+            "nav": "0 -1px 12px rgba(15, 23, 42, 0.06)",
+            "btn": "0 4px 14px rgba(59, 130, 246, 0.35)",
+            "btn-orange": "0 4px 14px rgba(249, 115, 22, 0.35)",
+          }
         },
       },
     }
   </script>
   <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
-      font-family: 'Gilroy', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
+      background: #F0F4FF;
     }
 
     .material-symbols-outlined {
@@ -79,189 +94,315 @@
     .material-symbols-outlined.filled {
       font-variation-settings: 'FILL' 1;
     }
+
+    /* Smooth gradient header */
+    .header-blur {
+      background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    /* Banner scroll hide scrollbar */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+
+    /* Card glass effect */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* Shipping card hover & selection */
+    .shipping-card {
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .shipping-card:hover {
+      transform: translateY(-2px);
+    }
+    .shipping-card.selected {
+      border-color: #3B82F6 !important;
+      border-width: 2px !important;
+      background: white !important;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15), 0 0 0 1px rgba(59, 130, 246, 0.1);
+    }
+    .shipping-card.selected[data-type="express"] {
+      border-color: #F97316 !important;
+      box-shadow: 0 4px 20px rgba(249, 115, 22, 0.15), 0 0 0 1px rgba(249, 115, 22, 0.1);
+    }
+    .shipping-card.selected .card-check-icon {
+      display: flex !important;
+    }
+    .shipping-card:not(.selected) .card-check-icon {
+      display: none !important;
+    }
+
+    /* Bottom nav glass */
+    .nav-glass {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    /* Pulse animation for notification badge */
+    @keyframes gentle-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Smooth slide up animation */
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    /* Fade in animation */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+      animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+    .delay-200 { animation-delay: 0.2s; opacity: 0; }
+    .delay-300 { animation-delay: 0.3s; opacity: 0; }
+    .delay-400 { animation-delay: 0.4s; opacity: 0; }
   </style>
   <link rel="stylesheet" href="styles.css">
+  <script>
+    // Detect Material Symbols font load to prevent FOUT
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      // Fallback for older browsers
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
 </head>
 
-<body class="bg-surface text-on-surface min-h-screen pb-32">
+<body class="bg-[#F0F4FF] text-on-surface min-h-screen pb-32">
 
   <!-- TopAppBar -->
-  <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-    <div class="flex justify-between items-center px-6 py-4 max-w-lg mx-auto">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary filled text-2xl">package_2</span>
-        <span class="text-xl font-bold text-on-surface tracking-tight">Номин Транс</span>
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="flex justify-between items-center px-5 py-3.5 max-w-lg mx-auto">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-white filled text-[20px]">package_2</span>
+        </div>
+        <span class="text-[18px] font-bold text-on-surface tracking-tight">Номин Транс</span>
       </div>
-      <div
-        class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-gray-200 flex items-center justify-center">
-        <span class="material-symbols-outlined text-on-surface-variant">person</span>
-      </div>
+      <button class="w-10 h-10 rounded-2xl bg-white shadow-card flex items-center justify-center border border-blue-100/60 hover:shadow-card-hover transition-all">
+        <span class="material-symbols-outlined text-on-surface-variant text-[22px]">person</span>
+      </button>
     </div>
   </header>
 
-  <main class="pt-24 px-5 max-w-lg mx-auto">
+  <main class="pt-[72px] px-4 max-w-lg mx-auto">
+
     <!-- Search Bar -->
-    <section class="mb-5 px-1">
+    <section class="mb-4 mt-3 animate-fade-in-up">
       <div class="relative flex items-center">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+          <span class="material-symbols-outlined text-on-surface-variant/70 text-[20px]">search</span>
         </div>
         <input type="text"
-          class="block w-full pl-11 pr-4 py-3.5 bg-surface-container-low border border-gray-100 rounded-2xl text-[15px] placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body"
+          class="block w-full pl-11 pr-4 py-3.5 bg-white border border-blue-100/70 rounded-2xl text-[15px] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-card font-body"
           placeholder="Захиалгаа шалгах">
       </div>
     </section>
 
     <!-- Banner Cards (Horizontal Scroll - Center Focused) -->
-    <section class="mb-5 -mx-5">
-      <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2" id="bannerScroll" style="scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; padding: 0 10%;">
-        <!-- Card 1: Standard Shipping -->
-        <div class="snap-center shrink-0 w-[80%] bg-[#1e2a3a] rounded-2xl p-5 flex flex-col justify-between min-h-[155px] relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-28 h-28 bg-blue-400/10 rounded-full -translate-y-8 translate-x-8"></div>
-          <div class="absolute bottom-0 right-4 opacity-10">
-            <span class="material-symbols-outlined text-[64px] text-blue-300 filled">local_shipping</span>
-          </div>
-          <div class="relative z-10">
-            <div class="flex gap-2 mb-3">
-              <span class="px-2.5 py-1 bg-blue-500/20 text-blue-300 text-[11px] font-semibold rounded-full">#далайн_тээвэр</span>
-              <span class="px-2.5 py-1 bg-blue-500/20 text-blue-300 text-[11px] font-semibold rounded-full">#энгийн</span>
-            </div>
-            <h3 class="text-white text-[17px] font-bold leading-snug mb-2">Солонгосоос Монгол руу<br>найдвартай ачаа илгээлт</h3>
-            <p class="text-gray-400 text-[12px] leading-relaxed">🚢 1,800 вон/кг · Далайн тээвэр · 30~45 хоног</p>
-          </div>
-        </div>
-        <!-- Card 2: Express Shipping -->
-        <div class="snap-center shrink-0 w-[80%] bg-[#2a1a1a] rounded-2xl p-5 flex flex-col justify-between min-h-[155px] relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-28 h-28 bg-orange-400/10 rounded-full -translate-y-8 translate-x-8"></div>
-          <div class="absolute bottom-0 right-4 opacity-10">
-            <span class="material-symbols-outlined text-[64px] text-orange-300 filled">rocket_launch</span>
-          </div>
-          <div class="relative z-10">
-            <div class="flex gap-2 mb-3">
-              <span class="px-2.5 py-1 bg-orange-500/20 text-orange-300 text-[11px] font-semibold rounded-full">#агаарын_тээвэр</span>
-              <span class="px-2.5 py-1 bg-orange-500/20 text-orange-300 text-[11px] font-semibold rounded-full">#экспрэсс</span>
-            </div>
-            <h3 class="text-white text-[17px] font-bold leading-snug mb-2">Экспрэсс ачаа<br>хурдан, найдвартай</h3>
-            <p class="text-gray-400 text-[12px] leading-relaxed">✈️ 5,500 вон/кг · Агаарын тээвэр · 10~14 хоног</p>
-          </div>
-        </div>
-        <!-- Card 3: Promo -->
-        <div class="snap-center shrink-0 w-[80%] bg-[#1a2a2a] rounded-2xl p-5 flex flex-col justify-between min-h-[155px] relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-28 h-28 bg-emerald-400/10 rounded-full -translate-y-8 translate-x-8"></div>
-          <div class="absolute bottom-0 right-4 opacity-10">
-            <span class="material-symbols-outlined text-[64px] text-emerald-300 filled">redeem</span>
-          </div>
-          <div class="relative z-10">
-            <div class="flex gap-2 mb-3">
-              <span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold rounded-full">#урамшуулал</span>
-              <span class="px-2.5 py-1 bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold rounded-full">#шинэ</span>
-            </div>
-            <h3 class="text-white text-[17px] font-bold leading-snug mb-2">Шинэ хэрэглэгчдэд<br>10% хөнгөлөлт</h3>
-            <p class="text-gray-400 text-[12px] leading-relaxed">🎉 Яг одоо бүртгүүлээрэй! Хугацаа хязгаартай</p>
-          </div>
-        </div>
+    <!-- Banner Cards (Horizontal Scroll - Center Focused) -->
+    <section class="mb-4 -mx-4 animate-fade-in-up delay-100">
+      <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 hide-scrollbar" id="bannerScroll" style="-webkit-overflow-scrolling: touch; padding: 0 8%;">
+        <!-- Banners will be rendered here dynamically -->
       </div>
     </section>
 
     <!-- Scrolling Notification Ticker -->
-    <section class="mb-5 overflow-hidden">
-      <div class="flex items-center gap-2 py-2.5 px-1">
-        <div class="shrink-0 flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-full">
-          <span class="material-symbols-outlined text-[14px] filled">campaign</span>
+    <section id="notification-ticker-section" class="mb-5 overflow-hidden animate-fade-in-up delay-200 hidden">
+      <div class="flex items-center gap-2.5 py-2.5 px-4 bg-white rounded-2xl shadow-card border border-blue-100/50">
+        <div class="shrink-0 flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1.5 rounded-xl">
+          <span class="material-symbols-outlined text-[14px] filled" style="animation: gentle-pulse 2s infinite">campaign</span>
           <span class="text-[11px] font-bold">мэдэгдэл</span>
         </div>
         <div class="overflow-hidden flex-1 relative">
-          <div class="ticker-track whitespace-nowrap text-[13px] text-on-surface-variant font-medium">
-            <span class="ticker-item">📦 3сарын 30 нд гарах энгийн болон экспресс ачааны захиалга авсаар байна</span>
-            <span class="ticker-item mx-8 text-gray-300">|</span>
-            <span class="ticker-item">🚢 4сарын 10 нд далайн ачаа гарна. Захиалгаа өгнө үү!</span>
-            <span class="ticker-item mx-8 text-gray-300">|</span>
-            <span class="ticker-item">✈️ Экспресс ачаа 7 хоног бүр гарна</span>
-            <span class="ticker-item mx-8 text-gray-300">|</span>
-            <span class="ticker-item">📦 3сарын 30 нд гарах энгийн болон экспресс ачааны захиалга авсаар байна</span>
-            <span class="ticker-item mx-8 text-gray-300">|</span>
-            <span class="ticker-item">🚢 4сарын 10 нд далайн ачаа гарна. Захиалгаа өгнө үү!</span>
-            <span class="ticker-item mx-8 text-gray-300">|</span>
-            <span class="ticker-item">✈️ Экспресс ачаа 7 хоног бүр гарна</span>
+          <div id="notification-track" class="ticker-track whitespace-nowrap text-[13px] text-on-surface-variant font-medium">
+            <!-- Dynamically populated from admin notifications -->
           </div>
         </div>
       </div>
     </section>
 
     <!-- Shipping Selection -->
-    <section class="mb-8 px-1">
-      <h2 class="text-[17px] font-bold text-gray-900 mb-3 px-1">Ачаа дуудлагаа сонгох</h2>
-      <div class="grid grid-cols-2 gap-3 mb-6" id="shippingCards">
-        <!-- Standard Card -->
-        <button
-          class="shipping-card relative flex flex-col items-start p-5 bg-white border-2 border-primary rounded-3xl text-left transition-all active:scale-[0.97] group selected"
-          data-type="standard" id="cardStandard">
-          <div class="card-check-icon absolute top-4 right-4 bg-primary text-white p-1 rounded-full scale-75">
-            <span class="material-symbols-outlined text-[18px] filled">check</span>
-          </div>
-          <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-primary filled">local_shipping</span>
-          </div>
-          <h3 class="text-[14px] font-bold text-on-surface mb-1">Энгийн ачаа</h3>
-          <p class="text-[18px] font-bold text-primary mb-3">1,800 вон<span
-              class="text-[12px] font-normal text-on-surface-variant">/кг</span></p>
-          <div class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
-            <span class="text-[12px] font-medium text-on-surface-variant">30~45 хоног</span>
-          </div>
-        </button>
+    <section class="mb-6 animate-fade-in-up delay-300">
+      <div class="bg-white rounded-3xl p-5 shadow-card border border-blue-100/40">
+        <h2 class="text-[16px] font-bold text-on-surface mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px] filled">inventory_2</span>
+          Ачаа дуудлагаа сонгох
+        </h2>
+        <div class="grid grid-cols-2 gap-3 mb-5" id="shippingCards">
+          <!-- Standard Card -->
+          <button
+            class="shipping-card relative flex flex-col items-start p-4 bg-blue-50/60 border-2 border-primary rounded-2xl text-left active:scale-[0.97] group selected"
+            data-type="standard" id="cardStandard">
+            <div class="card-check-icon absolute top-3 right-3 bg-primary text-white p-0.5 rounded-full flex items-center justify-center">
+              <span class="material-symbols-outlined text-[16px] filled">check</span>
+            </div>
+            <div class="w-11 h-11 bg-primary/10 rounded-2xl flex items-center justify-center mb-3">
+              <span class="material-symbols-outlined text-primary filled text-[22px]">local_shipping</span>
+            </div>
+            <h3 class="text-[13px] font-bold text-on-surface mb-1">Энгийн ачаа</h3>
+            <p class="text-[18px] font-extrabold text-primary mb-2">1,800<span
+                class="text-[11px] font-medium text-on-surface-variant ml-0.5">вон/кг</span></p>
+            <div class="flex items-center gap-1.5 bg-white/80 px-2 py-1 rounded-lg">
+              <span class="material-symbols-outlined text-[14px] text-on-surface-variant">schedule</span>
+              <span class="text-[11px] font-semibold text-on-surface-variant">30~45 хоног</span>
+            </div>
+          </button>
 
-        <!-- Express Card -->
+          <!-- Express Card -->
+          <button
+            class="shipping-card flex flex-col items-start p-4 bg-white border border-slate-200 rounded-2xl text-left active:scale-[0.97]"
+            data-type="express" id="cardExpress">
+            <div class="card-check-icon absolute top-3 right-3 bg-tertiary text-white p-0.5 rounded-full hidden items-center justify-center">
+              <span class="material-symbols-outlined text-[16px] filled">check</span>
+            </div>
+            <div class="w-11 h-11 bg-tertiary/10 rounded-2xl flex items-center justify-center mb-3">
+              <span class="material-symbols-outlined text-tertiary filled text-[22px]">rocket_launch</span>
+            </div>
+            <h3 class="text-[13px] font-bold text-on-surface mb-1">Экспрэсс ачаа</h3>
+            <p class="text-[18px] font-extrabold text-on-surface mb-2">5,500<span
+                class="text-[11px] font-medium text-on-surface-variant ml-0.5">вон/кг</span></p>
+            <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-lg">
+              <span class="material-symbols-outlined text-[14px] text-on-surface-variant">schedule</span>
+              <span class="text-[11px] font-semibold text-on-surface-variant">10~14 хоног</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Order Button -->
         <button
-          class="shipping-card flex flex-col items-start p-5 bg-surface-container-low border border-gray-100 rounded-3xl text-left transition-all active:scale-[0.97]"
-          data-type="express" id="cardExpress">
-          <div class="card-check-icon absolute top-4 right-4 bg-tertiary text-white p-1 rounded-full scale-75 hidden">
-            <span class="material-symbols-outlined text-[18px] filled">check</span>
-          </div>
-          <div class="w-10 h-10 bg-tertiary/10 rounded-xl flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-tertiary filled">rocket_launch</span>
-          </div>
-          <h3 class="text-[14px] font-bold text-on-surface mb-1">Экспрэсс ачаа</h3>
-          <p class="text-[18px] font-bold text-on-surface mb-3">5,500 вон<span
-              class="text-[12px] font-normal text-on-surface-variant">/кг</span></p>
-          <div class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px] text-on-surface-variant">schedule</span>
-            <span class="text-[12px] font-medium text-on-surface-variant">10~14 хоног</span>
-          </div>
+          class="w-full py-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-2xl font-bold text-[16px] active:scale-[0.98] transition-all shadow-btn hover:shadow-lg"
+          id="orderBtn">
+          Захиалах
         </button>
       </div>
-
-      <!-- Order Button -->
-      <button
-        class="w-full py-4 bg-primary text-white rounded-2xl font-bold text-[17px] active:scale-[0.98] transition-all shadow-lg shadow-primary/20"
-        id="orderBtn">
-        Захиалах
-      </button>
     </section>
 
-    <!-- Info Section -->
-    <section class="mb-10 px-1">
-      <div class="flex items-start gap-4 p-5 bg-surface-container-high/40 rounded-2xl border border-gray-100/30">
-        <span class="material-symbols-outlined text-on-surface-variant shrink-0">info</span>
-        <p class="text-[13px] text-on-surface-variant leading-relaxed">
-          Ачааны жингээс хамаарч үнэ өөрчлөгдөж болно. Экспрэсс ачаа нь 10-14 хоногийн дотор ирдэг.
-        </p>
+    <!-- Services Section -->
+    <section class="mb-8 animate-fade-in-up delay-400">
+      <div class="flex items-center mb-3">
+        <h2 class="text-[16px] font-bold text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px] filled">widgets</span>
+          Бидний үйлчилгээ
+        </h2>
+      </div>
+      <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 hide-scrollbar">
+        <!-- Card 1 -->
+        <div class="snap-start shrink-0 w-[145px] bg-[#E8F0FE] rounded-2xl p-4 border border-blue-100/60 cursor-pointer hover:shadow-card transition-all relative overflow-hidden min-h-[130px]">
+          <div class="flex items-center gap-1 mb-2">
+            <h4 class="text-[13px] font-bold text-on-surface leading-tight">Машин тээвэрлэлт</h4>
+            <span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+          </div>
+          <p class="text-[10.5px] text-slate-500 leading-snug pr-6">Автомашин тээвэрлэх үйлчилгээ</p>
+          <div class="absolute bottom-3 right-3 opacity-30">
+            <span class="material-symbols-outlined text-[32px] text-slate-400">directions_car</span>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="snap-start shrink-0 w-[145px] bg-[#FFF5EE] rounded-2xl p-4 border border-orange-100/60 cursor-pointer hover:shadow-card transition-all relative overflow-hidden min-h-[130px]">
+          <div class="flex items-center gap-1 mb-2">
+            <h4 class="text-[13px] font-bold text-on-surface leading-tight">Контейнер зуучлал</h4>
+            <span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+          </div>
+          <p class="text-[10.5px] text-slate-500 leading-snug pr-6">Контейнер ачаа зуучлах</p>
+          <div class="absolute bottom-3 right-3 opacity-30">
+            <span class="material-symbols-outlined text-[32px] text-orange-300">package_2</span>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="snap-start shrink-0 w-[145px] bg-[#ECFDF5] rounded-2xl p-4 border border-emerald-100/60 cursor-pointer hover:shadow-card transition-all relative overflow-hidden min-h-[130px]">
+          <div class="flex items-center gap-1 mb-2">
+            <h4 class="text-[13px] font-bold text-on-surface leading-tight">Бөөний бараа</h4>
+            <span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+          </div>
+          <p class="text-[10.5px] text-slate-500 leading-snug pr-6">Бөөний худалдааны бараа</p>
+          <div class="absolute bottom-3 right-3 opacity-30">
+            <span class="material-symbols-outlined text-[32px] text-emerald-300">shopping_cart</span>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="snap-start shrink-0 w-[145px] bg-[#F5F3FF] rounded-2xl p-4 border border-purple-100/60 cursor-pointer hover:shadow-card transition-all relative overflow-hidden min-h-[130px]">
+          <div class="flex items-center gap-1 mb-2">
+            <h4 class="text-[13px] font-bold text-on-surface leading-tight">Бизнес ачаа</h4>
+            <span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+          </div>
+          <p class="text-[10.5px] text-slate-500 leading-snug pr-6">Бизнес зориулалтын ачаа</p>
+          <div class="absolute bottom-3 right-3 opacity-30">
+            <span class="material-symbols-outlined text-[32px] text-purple-300">business_center</span>
+          </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="snap-start shrink-0 w-[145px] bg-[#FEF2F2] rounded-2xl p-4 border border-red-100/60 cursor-pointer hover:shadow-card transition-all relative overflow-hidden min-h-[130px]">
+          <div class="flex items-center gap-1 mb-2">
+            <h4 class="text-[13px] font-bold text-on-surface leading-tight">Машин механизм</h4>
+            <span class="material-symbols-outlined text-[14px] text-slate-400">chevron_right</span>
+          </div>
+          <p class="text-[10.5px] text-slate-500 leading-snug pr-6">Механизм тоног төхөөрөмж</p>
+          <div class="absolute bottom-3 right-3 opacity-30">
+            <span class="material-symbols-outlined text-[32px] text-red-300">precision_manufacturing</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Customer Support Section -->
+    <section class="mb-8 animate-fade-in-up delay-400">
+      <h2 class="text-[16px] font-bold text-on-surface mb-3">Харилцагчийн төв</h2>
+      <div class="bg-white rounded-2xl shadow-card border border-slate-100/60 divide-y divide-slate-100">
+        <!-- Салбарын мэдээлэл -->
+        <a href="branches.html" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-primary text-[18px]">apartment</span>
+          </div>
+          <span class="flex-1 text-[14px] font-semibold text-on-surface">Салбарын мэдээлэл</span>
+          <span class="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+        </a>
+        <!-- Хориглох зүйлс -->
+        <a href="prohibited.html" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
+          <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-red-500 text-[18px]">block</span>
+          </div>
+          <span class="flex-1 text-[14px] font-semibold text-on-surface">Хориглох зүйлс</span>
+          <span class="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+        </a>
+        <!-- Түгээмэл асуултууд -->
+        <a href="faq.html" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
+          <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-purple-500 text-[18px]">help</span>
+          </div>
+          <span class="flex-1 text-[14px] font-semibold text-on-surface">Түгээмэл асуултууд</span>
+          <span class="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+        </a>
       </div>
     </section>
 
     <!-- Footer Section -->
-    <footer class="mt-12 mb-6 px-5 pt-8 pb-6 text-center">
-      <div class="flex items-center justify-center gap-2 mb-3">
-        <a href="privacy.html" class="text-[11px] font-bold text-gray-400 hover:text-gray-600 transition-colors">Нууцлалын бодлого</a>
-        <span class="text-gray-300 text-[10px]">|</span>
-        <a href="terms.html" class="text-[11px] font-bold text-gray-400 hover:text-gray-600 transition-colors">Үйлчилгээний нөхцөл</a>
+    <footer class="mt-8 mb-6 px-2 pt-6 pb-4 text-center">
+      <div class="flex items-center justify-center gap-3 mb-3">
+        <a href="privacy.html" class="text-[11px] font-semibold text-slate-400 hover:text-primary transition-colors">Нууцлалын бодлого</a>
+        <span class="text-slate-300 text-[10px]">·</span>
+        <a href="terms.html" class="text-[11px] font-semibold text-slate-400 hover:text-primary transition-colors">Үйлчилгээний нөхцөл</a>
       </div>
       <div class="flex justify-center mb-3">
-        <a href="https://facebook.com/nomincargo" target="_blank" class="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center text-white shadow-sm hover:opacity-90 transition-opacity">
+        <a href="https://facebook.com/nomincargo" target="_blank" class="w-8 h-8 rounded-full bg-[#1877F2] flex items-center justify-center text-white shadow-sm hover:opacity-90 transition-all hover:scale-105">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
         </a>
       </div>
-      <p class="text-[10px] text-gray-300 font-medium">© 2026 Nomin Cargo. Бүх эрх хуулиар хамгаалагдсан.</p>
+      <p class="text-[10px] text-slate-300 font-medium">© 2026 Nomin Cargo. Бүх эрх хуулиар хамгаалагдсан.</p>
     </footer>
   </main>
 
@@ -270,13 +411,13 @@
   <!-- Contact Bottom Sheet Modal -->
   <div id="contactSheet" class="hidden fixed inset-0 z-[100]">
     <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('contactSheet').classList.add('hidden')"></div>
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('contactSheet').classList.add('hidden')"></div>
     
     <!-- Sheet -->
-    <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[28px] max-w-lg mx-auto animate-slide-up" style="animation: slideUp 0.3s ease-out">
+    <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[28px] max-w-lg mx-auto" style="animation: slideUp 0.3s ease-out">
       <!-- Handle -->
       <div class="flex justify-center pt-3 pb-1">
-        <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
+        <div class="w-10 h-1 bg-slate-200 rounded-full"></div>
       </div>
 
       <!-- Header -->
@@ -286,10 +427,10 @@
             <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
               <span class="material-symbols-outlined text-primary text-[20px] filled">support_agent</span>
             </div>
-            <h3 class="text-[16px] font-bold text-gray-900">Холбоо барих</h3>
+            <h3 class="text-[16px] font-bold text-on-surface">Холбоо барих</h3>
           </div>
-          <button onclick="document.getElementById('contactSheet').classList.add('hidden')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
-            <span class="material-symbols-outlined text-[18px] text-gray-500">close</span>
+          <button onclick="document.getElementById('contactSheet').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
+            <span class="material-symbols-outlined text-[18px] text-slate-500">close</span>
           </button>
         </div>
       </div>
@@ -298,34 +439,34 @@
       <div class="px-5 pb-6 space-y-3 max-h-[60vh] overflow-y-auto">
 
         <!-- Branch 1 -->
-        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
           <div class="flex items-center gap-2 mb-2">
             <div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-primary text-[16px] filled">storefront</span>
             </div>
-            <h4 class="text-[13px] font-bold text-gray-900">Салбар 1</h4>
+            <h4 class="text-[13px] font-bold text-on-surface">Салбар 1</h4>
           </div>
-          <p class="text-[11px] text-gray-500 leading-relaxed mb-3 pl-9">Пусан(부산), Кимхэ(김해), Янсан(양산), Пухан(포항), Улсан(울산), Дэжон(대전), Чонан(천안), Андун(안동), Ёнжу(영주), Чан-ён, Чанвон(창원), Бөөрөнхий Чонжү</p>
+          <p class="text-[11px] text-slate-500 leading-relaxed mb-3 pl-9">Пусан(부산), Кимхэ(김해), Янсан(양산), Пухан(포항), Улсан(울산), Дэжон(대전), Чонан(천안), Андун(안동), Ёнжу(영주), Чан-ён, Чанвон(창원), Бөөрөнхий Чонжү</p>
           <div class="space-y-2">
-            <a href="tel:01081384849" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-gray-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
+            <a href="tel:01081384849" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-slate-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px] text-gray-400">person</span>
-                <span class="text-[12px] text-gray-600 font-medium">Одгэрэл</span>
+                <span class="material-symbols-outlined text-[14px] text-slate-400">person</span>
+                <span class="text-[12px] text-slate-600 font-medium">Одгэрэл</span>
               </div>
               <div class="flex items-center gap-1.5">
-                <span class="text-[12px] text-gray-900 font-bold">010-8138-4849</span>
+                <span class="text-[12px] text-on-surface font-bold">010-8138-4849</span>
                 <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <span class="material-symbols-outlined text-[14px] text-primary">call</span>
                 </div>
               </div>
             </a>
-            <a href="tel:01084605703" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-gray-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
+            <a href="tel:01084605703" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-slate-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px] text-gray-400">person</span>
-                <span class="text-[12px] text-gray-600 font-medium">Дүгэрсүрэн</span>
+                <span class="material-symbols-outlined text-[14px] text-slate-400">person</span>
+                <span class="text-[12px] text-slate-600 font-medium">Дүгэрсүрэн</span>
               </div>
               <div class="flex items-center gap-1.5">
-                <span class="text-[12px] text-gray-900 font-bold">010-8460-5703</span>
+                <span class="text-[12px] text-on-surface font-bold">010-8460-5703</span>
                 <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <span class="material-symbols-outlined text-[14px] text-primary">call</span>
                 </div>
@@ -335,34 +476,34 @@
         </div>
 
         <!-- Branch 2 -->
-        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
           <div class="flex items-center gap-2 mb-2">
             <div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-primary text-[16px] filled">storefront</span>
             </div>
-            <h4 class="text-[13px] font-bold text-gray-900">Салбар 2</h4>
+            <h4 class="text-[13px] font-bold text-on-surface">Салбар 2</h4>
           </div>
-          <p class="text-[11px] text-gray-500 leading-relaxed mb-3 pl-9">Мугпу(목포), Том Гуанжу, Сүнчон(순천), Дөрвөлжин Чонжу</p>
+          <p class="text-[11px] text-slate-500 leading-relaxed mb-3 pl-9">Мугпу(목포), Том Гуанжу, Сүнчон(순천), Дөрвөлжин Чонжу</p>
           <div class="space-y-2">
-            <a href="tel:01082562953" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-gray-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
+            <a href="tel:01082562953" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-slate-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px] text-gray-400">person</span>
-                <span class="text-[12px] text-gray-600 font-medium">Оргил</span>
+                <span class="material-symbols-outlined text-[14px] text-slate-400">person</span>
+                <span class="text-[12px] text-slate-600 font-medium">Оргил</span>
               </div>
               <div class="flex items-center gap-1.5">
-                <span class="text-[12px] text-gray-900 font-bold">010-8256-2953</span>
+                <span class="text-[12px] text-on-surface font-bold">010-8256-2953</span>
                 <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <span class="material-symbols-outlined text-[14px] text-primary">call</span>
                 </div>
               </div>
             </a>
-            <a href="tel:01081745995" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-gray-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
+            <a href="tel:01081745995" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-slate-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px] text-gray-400">person</span>
-                <span class="text-[12px] text-gray-600 font-medium">Бооб</span>
+                <span class="material-symbols-outlined text-[14px] text-slate-400">person</span>
+                <span class="text-[12px] text-slate-600 font-medium">Бооб</span>
               </div>
               <div class="flex items-center gap-1.5">
-                <span class="text-[12px] text-gray-900 font-bold">010-8174-5995</span>
+                <span class="text-[12px] text-on-surface font-bold">010-8174-5995</span>
                 <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <span class="material-symbols-outlined text-[14px] text-primary">call</span>
                 </div>
@@ -372,22 +513,22 @@
         </div>
 
         <!-- Branch 3 -->
-        <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
           <div class="flex items-center gap-2 mb-2">
             <div class="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
               <span class="material-symbols-outlined text-primary text-[16px] filled">storefront</span>
             </div>
-            <h4 class="text-[13px] font-bold text-gray-900">Салбар 3</h4>
+            <h4 class="text-[13px] font-bold text-on-surface">Салбар 3</h4>
           </div>
-          <p class="text-[11px] text-gray-500 leading-relaxed mb-3 pl-9">Тэгү(대구), Күмин(구민), Ёнчан, Кёнсан</p>
+          <p class="text-[11px] text-slate-500 leading-relaxed mb-3 pl-9">Тэгү(대구), Күмин(구민), Ёнчан, Кёнсан</p>
           <div class="space-y-2">
-            <a href="tel:01058506206" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-gray-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
+            <a href="tel:01058506206" class="flex items-center justify-between py-2.5 px-3 rounded-xl bg-white border border-slate-100 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group active:scale-[0.98]">
               <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[14px] text-gray-400">person</span>
-                <span class="text-[12px] text-gray-600 font-medium">Пүүжээ</span>
+                <span class="material-symbols-outlined text-[14px] text-slate-400">person</span>
+                <span class="text-[12px] text-slate-600 font-medium">Пүүжээ</span>
               </div>
               <div class="flex items-center gap-1.5">
-                <span class="text-[12px] text-gray-900 font-bold">010-5850-6206</span>
+                <span class="text-[12px] text-on-surface font-bold">010-5850-6206</span>
                 <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <span class="material-symbols-outlined text-[14px] text-primary">call</span>
                 </div>
@@ -404,31 +545,34 @@
   </div>
 
   <!-- Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4 bg-white/95 backdrop-blur-xl z-50 shadow-[0px_-12px_32px_rgba(25,28,29,0.04)]">
-    <a href="index.html" class="flex flex-col items-center justify-center text-primary">
-      <span class="material-symbols-outlined mb-1 filled">home</span>
-      <span class="text-[11px] font-bold">Нүүр</span>
-    </a>
-    <a href="order.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
-      <span class="material-symbols-outlined mb-1">add_box</span>
-      <span class="text-[11px] font-bold">Захиалга</span>
-    </a>
-    <a href="tracking.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
-      <span class="material-symbols-outlined mb-1">local_shipping</span>
-      <span class="text-[11px] font-bold">Хяналт</span>
-    </a>
-    <a href="profile.html" class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity">
-      <span class="material-symbols-outlined mb-1">person</span>
-      <span class="text-[11px] font-bold">Профайл</span>
-    </a>
+  <nav class="fixed bottom-0 left-0 w-full z-50 nav-glass shadow-nav border-t border-blue-100/40">
+    <div class="flex justify-around items-center px-2 pb-7 pt-2.5 max-w-lg mx-auto">
+      <a href="index.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+        <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary filled text-[22px]">home</span>
+        </div>
+        <span class="text-[11px] font-bold text-primary">Нүүр</span>
+      </a>
+      <a href="order.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-surface-variant text-[22px]">add_box</span>
+        </div>
+        <span class="text-[11px] font-semibold text-on-surface-variant">Захиалга</span>
+      </a>
+      <a href="tracking.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-surface-variant text-[22px]">local_shipping</span>
+        </div>
+        <span class="text-[11px] font-semibold text-on-surface-variant">Хяналт</span>
+      </a>
+      <a href="profile.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+        <div class="w-10 h-8 flex items-center justify-center">
+          <span class="material-symbols-outlined text-on-surface-variant text-[22px]">person</span>
+        </div>
+        <span class="text-[11px] font-semibold text-on-surface-variant">Профайл</span>
+      </a>
+    </div>
   </nav>
-
-  <style>
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-  </style>
 
   <script>
     let fabOpen = true;
@@ -447,6 +591,169 @@
   </script>
 
   <script src="app.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Default fallback banners (matches admin defaults)
+      const defaultBanners = [
+        {
+          id: 0,
+          title: 'Солонгосоос Монгол руу найдвартай ачаа илгээлт',
+          subtitle: '🚢 1,800 вон/кг · Далайн тээвэр · 30~45 хоног',
+          link: '#',
+          type: 'standard'
+        },
+        {
+          id: 1,
+          title: 'Экспрэсс ачаа хурдан, найдвартай',
+          subtitle: '✈️ 5,500 вон/кг · Агаарын тээвэр · 10~14 хоног',
+          link: 'https://example.com/express',
+          type: 'express'
+        },
+        {
+          id: 2,
+          title: 'Шинэ жилийн урамшуулал 10% хямдрал',
+          subtitle: '🎉 Яг одоо захиалаад хямдрал эдлээрэй',
+          link: 'https://example.com/promo',
+          type: 'promo'
+        }
+      ];
+
+      // Render Notifications Load
+      const tickerSection = document.getElementById('notification-ticker-section');
+      const tickerTrack = document.getElementById('notification-track');
+      
+      let storedNotifications;
+      try {
+        const notifData = localStorage.getItem('nomin_notifications');
+        // fallback to some default if null, but if it exists but is empty array, it will hide
+        if (notifData) {
+          storedNotifications = JSON.parse(notifData);
+        } else {
+          // If totally empty, maybe show a default one so it doesn't look empty for first time visitors
+          storedNotifications = [
+            { title: "📦 3сарын 30 нд гарах энгийн болон экспресс ачааны захиалга авсаар байна", content: "" },
+            { title: "🚢 4сарын 10 нд далайн ачаа гарна. Захиалгаа өгнө үү!", content: "" }
+          ];
+        }
+      } catch (e) {
+        storedNotifications = [];
+      }
+
+      if (storedNotifications && storedNotifications.length > 0) {
+        let itemsHtml = '';
+        storedNotifications.forEach((n) => {
+           // Display title and content if content exists
+           const text = n.content ? `${n.title} - ${n.content}` : n.title;
+           itemsHtml += `<span class="ticker-item">${text}</span><span class="ticker-item mx-8 text-blue-200">·</span>`;
+        });
+        
+        // Repeat items to ensure smooth scrolling loop
+        tickerTrack.innerHTML = itemsHtml + itemsHtml + itemsHtml + itemsHtml;
+        tickerSection.classList.remove('hidden');
+      } else {
+        if (tickerSection) {
+          tickerSection.classList.add('hidden');
+        }
+      }
+
+      // Read from localStorage
+      let storedBanners;
+      try {
+        const data = localStorage.getItem('nomin_banners');
+        storedBanners = data ? JSON.parse(data) : defaultBanners;
+      } catch (e) {
+        storedBanners = defaultBanners;
+      }
+
+      // Filter active banners only
+      const activeBanners = storedBanners.filter(b => b.active !== false);
+
+      const container = document.getElementById('bannerScroll');
+      
+      if(activeBanners.length === 0) {
+        container.innerHTML = `<div class="w-full text-center py-4 text-slate-400 text-sm">Баннер олдсонгүй</div>`;
+        return;
+      }
+
+      // Check if image is a custom upload (data: URL) vs placeholder
+      const hasCustomImage = (img) => img && (img.startsWith('data:') || (!img.includes('placehold.co')));
+
+      const renderImageBanner = (banner) => {
+        return `<a href="${banner.link || '#'}" class="snap-center shrink-0 w-[82%] rounded-3xl flex flex-col justify-end min-h-[160px] relative overflow-hidden shadow-elevated group">
+          <img src="${banner.image}" alt="${banner.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10"></div>
+          <div class="relative z-10 p-5">
+            <h3 class="text-white text-[17px] font-bold leading-snug mb-1 drop-shadow-md">${banner.title}</h3>
+            <p class="text-white/90 text-[12px] leading-relaxed font-medium drop-shadow-sm">${banner.subtitle}</p>
+          </div>
+        </a>`;
+      };
+
+      const renderBanner = (banner) => {
+        // If admin uploaded a custom image, always show the image banner
+        if (hasCustomImage(banner.image)) {
+          return renderImageBanner(banner);
+        }
+
+        // Fallback: gradient templates for default/placeholder banners
+        if (banner.type === 'standard') {
+          return `<a href="${banner.link || '#'}" class="snap-center shrink-0 w-[82%] bg-gradient-to-br from-[#1E3A5F] to-[#0F2442] rounded-3xl p-5 flex flex-col justify-between min-h-[160px] relative overflow-hidden shadow-elevated">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-400/10 rounded-full -translate-y-10 translate-x-10"></div>
+            <div class="absolute bottom-[-8px] right-3 opacity-[0.08]">
+              <span class="material-symbols-outlined text-[72px] text-blue-200 filled">local_shipping</span>
+            </div>
+            <div class="relative z-10">
+              <div class="flex gap-2 mb-3">
+                <span class="px-2.5 py-1 bg-blue-400/20 text-blue-200 text-[11px] font-semibold rounded-full border border-blue-400/10">#далайн_тээвэр</span>
+                <span class="px-2.5 py-1 bg-blue-400/20 text-blue-200 text-[11px] font-semibold rounded-full border border-blue-400/10">#энгийн</span>
+              </div>
+              <h3 class="text-white text-[17px] font-bold leading-snug mb-2">${banner.title}</h3>
+              <p class="text-blue-200/70 text-[12px] leading-relaxed font-medium">${banner.subtitle}</p>
+            </div>
+          </a>`;
+        } 
+        else if (banner.type === 'express') {
+          return `<a href="${banner.link || '#'}" class="snap-center shrink-0 w-[82%] bg-gradient-to-br from-[#7C2D12] to-[#431407] rounded-3xl p-5 flex flex-col justify-between min-h-[160px] relative overflow-hidden shadow-elevated">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 rounded-full -translate-y-10 translate-x-10"></div>
+            <div class="absolute bottom-[-8px] right-3 opacity-[0.08]">
+              <span class="material-symbols-outlined text-[72px] text-orange-200 filled">rocket_launch</span>
+            </div>
+            <div class="relative z-10">
+              <div class="flex gap-2 mb-3">
+                <span class="px-2.5 py-1 bg-orange-400/20 text-orange-200 text-[11px] font-semibold rounded-full border border-orange-400/10">#агаарын_тээвэр</span>
+                <span class="px-2.5 py-1 bg-orange-400/20 text-orange-200 text-[11px] font-semibold rounded-full border border-orange-400/10">#экспрэсс</span>
+              </div>
+              <h3 class="text-white text-[17px] font-bold leading-snug mb-2">${banner.title}</h3>
+              <p class="text-orange-200/70 text-[12px] leading-relaxed font-medium">${banner.subtitle}</p>
+            </div>
+          </a>`;
+        }
+        else if (banner.type === 'promo') {
+          return `<a href="${banner.link || '#'}" class="snap-center shrink-0 w-[82%] bg-gradient-to-br from-[#134E4A] to-[#042F2E] rounded-3xl p-5 flex flex-col justify-between min-h-[160px] relative overflow-hidden shadow-elevated">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 rounded-full -translate-y-10 translate-x-10"></div>
+            <div class="absolute bottom-[-8px] right-3 opacity-[0.08]">
+              <span class="material-symbols-outlined text-[72px] text-emerald-200 filled">redeem</span>
+            </div>
+            <div class="relative z-10">
+              <div class="flex gap-2 mb-3">
+                <span class="px-2.5 py-1 bg-emerald-400/20 text-emerald-200 text-[11px] font-semibold rounded-full border border-emerald-400/10">#урамшуулал</span>
+                <span class="px-2.5 py-1 bg-emerald-400/20 text-emerald-200 text-[11px] font-semibold rounded-full border border-emerald-400/10">#шинэ</span>
+              </div>
+              <h3 class="text-white text-[17px] font-bold leading-snug mb-2">${banner.title}</h3>
+              <p class="text-emerald-200/70 text-[12px] leading-relaxed font-medium">${banner.subtitle}</p>
+            </div>
+          </a>`;
+        }
+        // Any other type with no image
+        else {
+          return renderImageBanner(banner);
+        }
+      };
+
+      container.innerHTML = activeBanners.map(renderBanner).join('');
+    });
+  </script>
 </body>
 
 </html>

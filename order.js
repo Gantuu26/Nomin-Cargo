@@ -374,34 +374,46 @@ document.addEventListener('DOMContentLoaded', () => {
         },
       };
 
-      // 1. Submit Order to Cloudflare Worker
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
-      const data = await res.json();
+      // 1. Mock API call by saving to localStorage
+      await new Promise(resolve => setTimeout(resolve, 600)); // Simulate delay
       
-      if (!data.success) throw new Error(data.error || 'Server error occurred');
-      const orderId = data.orderId;
+      let existingOrders = [];
+      try {
+        existingOrders = JSON.parse(localStorage.getItem('nomin_orders')) || [];
+      } catch(e) {}
+      
+      let maxNum = 3;
+      existingOrders.forEach(o => {
+         if (o.orderId && o.orderId.toUpperCase().startsWith('MN')) {
+            const num = parseInt(o.orderId.substring(2), 10);
+            if (!isNaN(num) && num > maxNum) maxNum = num;
+         }
+      });
+      const nextNum = maxNum + 1;
+      const orderId = 'MN' + String(nextNum).padStart(2, '0');
 
-      // 2. Upload Images to R2 Bucket
-      if (uploadedImages.length > 0) {
-        const uploadForm = new FormData();
-        uploadForm.append('orderId', orderId);
-        uploadedImages.forEach(img => {
-          uploadForm.append('images', img.file);
+      // Convert uploaded images to Base64
+      const imagePromises = uploadedImages.map(imgData => {
+        return new Promise((resolve) => {
+           const reader = new FileReader();
+           reader.onloadend = () => resolve(reader.result);
+           reader.readAsDataURL(imgData.file);
         });
+      });
+      
+      const base64Images = await Promise.all(imagePromises);
 
-        const uploadRes = await fetch('/api/upload', {
-          method: 'POST',
-          body: uploadForm
-        });
-        const uploadData = await uploadRes.json();
-        if (!uploadData.success) {
-           console.error('Image upload failed:', uploadData.error);
-        }
-      }
+      const newOrder = {
+        ...orderData,
+        orderId: orderId,
+        date: new Date().toISOString(),
+        status: 'pending',
+        images: base64Images
+      };
+
+      // Add new order to the beginning
+      existingOrders.unshift(newOrder);
+      localStorage.setItem('nomin_orders', JSON.stringify(existingOrders));
 
       showSuccess({ ...orderData, orderId: orderId });
     } catch (err) {

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Захиалгын түүх - Номин Транс</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#3B82F6",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
+          },
+          fontFamily: {
+             "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
+</head>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-10">
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="flex items-center justify-between px-4 py-3.5 max-w-lg mx-auto">
+      <a href="profile.html" class="w-10 h-10 flex items-center justify-center -ml-2 rounded-full active:bg-blue-50 transition-colors shrink-0">
+        <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+      </a>
+      <h1 class="text-[17px] font-bold tracking-tight text-center absolute left-1/2 -translate-x-1/2 whitespace-nowrap">Захиалгын түүх</h1>
+      <div class="w-10 shrink-0"></div> <!-- Placeholder for layout balance -->
+    </div>
+  </header>
+
+  <main class="pt-[76px] px-4 max-w-lg mx-auto" id="history-container">
+     <!-- Orders will be injected here -->
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById('history-container');
+      const ordersStr = localStorage.getItem('nomin_orders');
+      let orders = [];
+      try { orders = JSON.parse(ordersStr) || []; } catch(e) {}
+
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl p-8 border border-blue-100/50 shadow-card animate-fade-in-up text-center mt-4">
+            <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+              <span class="material-symbols-outlined text-[32px]">history</span>
+            </div>
+            <h3 class="text-[16px] font-bold text-gray-900 mb-2">Захиалгын түүх хоосон байна</h3>
+            <p class="text-[13px] text-slate-500 mb-6 leading-relaxed">Та одоогоор ямар нэгэн захиалга өгөөгүй байна. Шинэ захиалга өгч Номин Транс-н үйлчилгээг туршаад үзээрэй.</p>
+            <a href="order.html" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white text-[13px] font-bold rounded-xl shadow-sm hover:bg-blue-600 transition-colors">
+              Захиалга өгөх
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      orders.forEach((order, index) => {
+         const typeLabel = order.type === 'standard' ? 'Энгийн ачаа' : 'Экспресс ачаа';
+         
+         const d = new Date(order.date);
+         const dateString = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+         
+         let imagesHtml = '';
+         if (order.images && order.images.length > 0) {
+            imagesHtml = `
+               <div class="mt-4 pt-3 border-t border-slate-100">
+                 <span class="text-[11px] text-slate-400 font-medium block mb-2">Хавсаргасан зураг</span>
+                 <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                   ${order.images.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0">`).join('')}
+                 </div>
+               </div>
+            `;
+         }
+
+         // Status Mapping
+         let statusLabel = 'Шалгаж байна';
+         let statusColor = 'text-warning bg-warning/10';
+         if (order.status === 'in_transit') {
+            statusLabel = 'Тээвэрлэгдэж байна';
+            statusColor = 'text-info bg-info/10';
+         } else if (order.status === 'delivered') {
+            statusLabel = 'Хүргэгдсэн';
+            statusColor = 'text-success bg-success/10';
+         }
+         
+         const manualDemoStatus = localStorage.getItem('nominCargoStatus');
+         if (index === 0 && manualDemoStatus) {
+            if (manualDemoStatus === '1') { statusLabel = 'Шалгаж байна'; statusColor = 'text-warning bg-warning/10'; }
+            if (manualDemoStatus === '2') { statusLabel = 'Хаягаар очиж байна'; statusColor = 'text-info bg-info/10'; }
+            if (manualDemoStatus === '3') { statusLabel = 'Контейнерт ачигдлаа'; statusColor = 'text-success bg-success/10'; }
+         }
+
+         html += `
+           <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card mb-4 animate-fade-in-up" style="animation-delay: ${index * 0.05}s; opacity: 0; animation-fill-mode: forwards;">
+             <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3">
+                <div>
+                   <h3 class="text-[18px] font-bold text-gray-900 flex items-center gap-2 mb-1">${order.orderId}</h3>
+                   <p class="text-[12px] text-slate-400 font-medium tracking-wide">${dateString}</p>
+                </div>
+                <div class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg ${statusColor} whitespace-nowrap">
+                   ${statusLabel}
+                </div>
+             </div>
+             
+             <div class="space-y-4">
+                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
+                   <span class="text-[12px] text-slate-500 font-medium">Тээврийн төрөл</span>
+                   <span class="text-[13px] font-bold text-gray-800">${typeLabel}</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                   <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
+                      <span class="text-[11px] text-slate-400 font-medium block mb-1.5">Илгээгч</span>
+                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.sender.name}</div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">${order.sender.phone}</div>
+                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.sender.address}</div>
+                   </div>
+                   <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
+                      <span class="text-[11px] text-slate-400 font-medium block mb-1.5">Хүлээн авагч</span>
+                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.receiver.name}</div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">${order.receiver.phone}</div>
+                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.receiver.address}</div>
+                   </div>
+                </div>
+                
+                <div class="flex justify-between items-center pt-1 px-1">
+                   <span class="text-[12px] text-slate-500 font-medium block">Бараа</span>
+                   <span class="text-[13px] font-bold text-gray-900">${order.item.category} <span class="ml-1 text-[12px] text-primary bg-primary/10 px-1.5 py-0.5 rounded font-bold border border-primary/20">${order.item.quantity} ш</span></span>
+                </div>
+             </div>
+             ${imagesHtml}
+           </div>
+         `;
+      });
+      container.innerHTML = html;
+    });
+  </script>
+</body>
+</html>

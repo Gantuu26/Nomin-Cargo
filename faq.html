@@ -1,72 +1,184 @@
 <!DOCTYPE html>
 <html lang="mn">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Түгээмэл асуулт - Номин Транс</title>
+  <title>Түгээмэл асуулт - Номин Карго</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.cdnfonts.com/css/gilroy-bold" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-medium" rel="stylesheet">
-  <link href="https://fonts.cdnfonts.com/css/gilroy-regular" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            "primary": "#0050ff",
+            "primary": "#3B82F6",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
           },
           fontFamily: {
-            "body": ["Gilroy", "sans-serif"],
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
           }
         },
       },
     }
   </script>
   <style>
-    body { font-family: 'Gilroy', sans-serif; -webkit-font-smoothing: antialiased; }
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+
+    /* Accordion styles */
+    .faq-item { cursor: pointer; user-select: none; }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.35s ease;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding-top: 12px;
+      padding-bottom: 4px;
+    }
+    .faq-item .faq-chevron {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+    }
+    .faq-item.open .faq-icon-wrap {
+      background: #3B82F6;
+    }
+    .faq-item.open .faq-icon-wrap .material-symbols-outlined {
+      color: white;
+    }
   </style>
   <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
-  <header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-    <div class="flex items-center px-4 py-4 max-w-lg mx-auto relative justify-center">
-      <a href="profile.html" class="absolute left-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors">
-        <span class="material-symbols-outlined">arrow_back</span>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen">
+  <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
+    <div class="flex items-center px-4 py-3.5 max-w-lg mx-auto relative justify-center">
+      <a href="index.html" class="absolute left-4 w-10 h-10 flex items-center justify-center rounded-2xl bg-white shadow-card border border-blue-100/60 hover:shadow-card-hover transition-all text-[#0F172A]">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
       </a>
       <h1 class="text-[17px] font-bold tracking-tight">Түгээмэл асуулт</h1>
     </div>
   </header>
 
-  <main class="pt-24 px-5 pb-12 max-w-lg mx-auto">
-    <div class="space-y-4">
-      
-      <!-- FAQ Item -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h3 class="text-[15px] font-bold mb-2">Ачаа хэзээ ирэх вэ?</h3>
-        <p class="text-[13px] text-gray-600 leading-relaxed">
-          Энгийн ачаа 30-45 хоног, Экспресс ачаа 10-14 хоногийн дотор ирэх болно. Цаг агаарын болон гаалийн нөхцөл байдлаас шалтгаалан өөрчлөгдөх боломжтой.
-        </p>
+  <main class="pt-[76px] px-4 pb-12 max-w-lg mx-auto">
+    <div class="space-y-3 mt-2">
+
+      <!-- FAQ 1 -->
+      <div class="faq-item bg-white rounded-2xl shadow-card border border-blue-100/50 animate-fade-in-up" onclick="toggleFaq(this)">
+        <div class="flex items-center gap-3 px-4 py-4">
+          <div class="faq-icon-wrap w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 transition-colors">
+            <span class="material-symbols-outlined text-primary text-[18px] transition-colors">schedule</span>
+          </div>
+          <h3 class="flex-1 text-[14px] font-bold text-gray-900 leading-snug">Миний ачаа хэзээ ирэх вэ?</h3>
+          <span class="material-symbols-outlined faq-chevron text-[20px] text-slate-400 shrink-0">expand_more</span>
+        </div>
+        <div class="faq-answer px-4 pl-[64px] pr-5">
+          <p class="text-[13px] text-slate-500 leading-relaxed">
+            Энгийн ачаа 30-45 хоног, Экспресс ачаа 10-14 хоногийн дотор ирэх болно. Цаг агаарын болон гаалийн нөхцөл байдлаас шалтгаалан өөрчлөгдөх боломжтой.
+          </p>
+        </div>
       </div>
 
-      <!-- FAQ Item -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h3 class="text-[15px] font-bold mb-2">Төлбөрөө хэрхэн төлөх вэ?</h3>
-        <p class="text-[13px] text-gray-600 leading-relaxed">
-          Ачаа таны гарт очсон үед хүргэлтийн ажилтанд бэлнээр эсвэл дансаар шилжүүлэн төлөх боломжтой.
-        </p>
+      <!-- FAQ 2 -->
+      <div class="faq-item bg-white rounded-2xl shadow-card border border-blue-100/50 animate-fade-in-up delay-100" onclick="toggleFaq(this)">
+        <div class="flex items-center gap-3 px-4 py-4">
+          <div class="faq-icon-wrap w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 transition-colors">
+            <span class="material-symbols-outlined text-primary text-[18px] transition-colors">payments</span>
+          </div>
+          <h3 class="flex-1 text-[14px] font-bold text-gray-900 leading-snug">Төлбөрөө хэрхэн төлөх вэ?</h3>
+          <span class="material-symbols-outlined faq-chevron text-[20px] text-slate-400 shrink-0">expand_more</span>
+        </div>
+        <div class="faq-answer px-4 pl-[64px] pr-5">
+          <p class="text-[13px] text-slate-500 leading-relaxed">
+            Та ачаагаа Монгол руу явуулахаар манай ажилтантай уулзах үедээ бэлэн мөнгөөр болон дансаар шилжүүлэн төлөх боломжтой.
+          </p>
+        </div>
       </div>
 
-      <!-- FAQ Item -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <h3 class="text-[15px] font-bold mb-2">Ачааныхаа явцыг хэрхэн шалгах вэ?</h3>
-        <p class="text-[13px] text-gray-600 leading-relaxed">
-          Та "Хяналт" цэс рүү орж захиалгын дугаараа оруулан ачааныхаа одоогийн төлөвийг харах боломжтой.
-        </p>
+      <!-- FAQ 3 -->
+      <div class="faq-item bg-white rounded-2xl shadow-card border border-blue-100/50 animate-fade-in-up delay-100" onclick="toggleFaq(this)">
+        <div class="flex items-center gap-3 px-4 py-4">
+          <div class="faq-icon-wrap w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 transition-colors">
+            <span class="material-symbols-outlined text-primary text-[18px] transition-colors">travel_explore</span>
+          </div>
+          <h3 class="flex-1 text-[14px] font-bold text-gray-900 leading-snug">Ачааныхаа явцыг хэрхэн шалгах вэ?</h3>
+          <span class="material-symbols-outlined faq-chevron text-[20px] text-slate-400 shrink-0">expand_more</span>
+        </div>
+        <div class="faq-answer px-4 pl-[64px] pr-5">
+          <p class="text-[13px] text-slate-500 leading-relaxed">
+            Та "Хяналт" цэс рүү орж захиалгын дугаараа оруулан ачааныхаа одоогийн төлөвийг харах боломжтой.
+          </p>
+        </div>
+      </div>
+
+      <!-- FAQ 4 -->
+      <div class="faq-item bg-white rounded-2xl shadow-card border border-blue-100/50 animate-fade-in-up delay-100" onclick="toggleFaq(this)">
+        <div class="flex items-center gap-3 px-4 py-4">
+          <div class="faq-icon-wrap w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 transition-colors">
+            <span class="material-symbols-outlined text-primary text-[18px] transition-colors">inventory</span>
+          </div>
+          <h3 class="flex-1 text-[14px] font-bold text-gray-900 leading-snug">Хувь хүн болон байгууллага их хэмжээний бараа тээвэрлүүлэх боломжтой юу?</h3>
+          <span class="material-symbols-outlined faq-chevron text-[20px] text-slate-400 shrink-0">expand_more</span>
+        </div>
+        <div class="faq-answer px-4 pl-[64px] pr-5">
+          <p class="text-[13px] text-slate-500 leading-relaxed">
+            Болно. Номин Транс карго нь хувь хүн болон байгууллагын захиалгын дагуу их хэмжээний бараа бүтээгдэхүүн, тоног төхөөрөмж, сэлбэг хэрэгслийг худалдан авалт хийх, тээвэрлэх зэрэг үйлчилгээг харилцагчийн хүсэлтийн дагуу үзүүлдэг. Хэрэв та болон танай байгууллага хамтран ажиллах сонирхолтой бол Салбар 1 дугаар луу утсаар холбогдож дэлгэрэнгүй мэдээлэл авна уу.
+          </p>
+        </div>
+      </div>
+
+      <!-- FAQ 5 -->
+      <div class="faq-item bg-white rounded-2xl shadow-card border border-blue-100/50 animate-fade-in-up delay-100" onclick="toggleFaq(this)">
+        <div class="flex items-center gap-3 px-4 py-4">
+          <div class="faq-icon-wrap w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0 transition-colors">
+            <span class="material-symbols-outlined text-primary text-[18px] transition-colors">directions_car</span>
+          </div>
+          <h3 class="flex-1 text-[14px] font-bold text-gray-900 leading-snug">Автомашин тээвэрлүүлж болох уу?</h3>
+          <span class="material-symbols-outlined faq-chevron text-[20px] text-slate-400 shrink-0">expand_more</span>
+        </div>
+        <div class="faq-answer px-4 pl-[64px] pr-5">
+          <p class="text-[13px] text-slate-500 leading-relaxed">
+            Манай карго нь автомашин, механизмыг тасралтгүй тээвэрлэж байгаа олон жилийн туршлагатай ууган компаниудын нэг бөгөөд та өөрөө автомашинаа худалдан авч илгээх эсвэл манай компаниар дамжуулан захиалгаа хийлгэж, Монгол руу түргэн шуурхай тээвэрлүүлэх боломжтой.
+          </p>
+        </div>
       </div>
 
     </div>
   </main>
+
+  <script>
+    function toggleFaq(item) {
+      // Close all other items
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        if (el !== item) el.classList.remove('open');
+      });
+      // Toggle current item
+      item.classList.toggle('open');
+    }
+  </script>
 </body>
 </html>
