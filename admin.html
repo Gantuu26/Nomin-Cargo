@@ -476,7 +476,7 @@
       setTimeout(() => document.getElementById('manual-order-modal').classList.add('opacity-0', 'pointer-events-none'), 300);
     }
 
-    function saveManualOrder() {
+    async function saveManualOrder() {
       const sName = document.getElementById('mo-s-name').value;
       const sPhone = document.getElementById('mo-s-phone').value;
       const sAddress = document.getElementById('mo-s-address').value;
@@ -490,60 +490,127 @@
 
       if (!sName || !rName) return alert('Нэр оруулна уу (Name is required)');
 
-      let existingOrders = [];
-      try { existingOrders = JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch (e) { }
+      const btn = document.querySelector('#manual-order-card button.bg-primary');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[16px]">sync</span> Түр хүлээнэ үү...';
+      btn.disabled = true;
 
-      let maxNum = 3;
-      existingOrders.forEach(o => {
-        if (o.orderId && o.orderId.toUpperCase().startsWith('MN')) {
-          const num = parseInt(o.orderId.substring(2), 10);
-          if (!isNaN(num) && num > maxNum) maxNum = num;
-        }
-      });
-      const nextNum = maxNum + 1;
-      const orderId = 'MN' + String(nextNum).padStart(2, '0');
+      // 1. Fetch current max order ID from backend
+      let orderId = 'MN01';
+      try {
+        const res = await fetch('/api/orders');
+        const orders = await res.json();
+        let maxNum = 0;
+        orders.forEach(o => {
+          if (o.order_id && o.order_id.toUpperCase().startsWith('MN')) {
+            const num = parseInt(o.order_id.substring(2), 10);
+            if (!isNaN(num) && num > maxNum) maxNum = num;
+          }
+        });
+        orderId = 'MN' + String(maxNum + 1).padStart(2, '0');
+      } catch (e) { console.error(e); }
 
-      const newOrder = {
+      const newOrderBody = {
         orderId: orderId,
         type: typeOpts,
         branch: branch,
-        date: new Date().toISOString(),
         status: "pending",
         sender: { name: sName, phone: sPhone, address: sAddress },
         receiver: { name: rName, phone: rPhone, address: rAddress },
-        item: { category: iCat, quantity: iQty },
-        images: [],
-        containerId: null
+        items: [{ category: iCat, quantity: iQty }]
       };
 
-      existingOrders.unshift(newOrder); // Add to top
-      localStorage.setItem('nomin_orders', JSON.stringify(existingOrders));
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newOrderBody)
+        });
+        if (res.ok) {
+          closeManualOrderModal();
+          btn.innerHTML = '✔ Амжилттай!';
+          btn.classList.replace('bg-primary', 'bg-success');
+          setTimeout(() => { window.location.href = 'admin-orders.html'; }, 700);
+        } else {
+          alert("Алдаа гарлаа: Сервертэй холбогдоход алдаа гарлаа.");
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      } catch (e) {
+        alert("Холболтын алдаа: " + e.message);
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
 
-      closeManualOrderModal();
+    // Order notification polling state
+    let lastOrderIdMap = new Set();
+    let isPolling = false;
 
-      // Briefly show a success state then redirect to orders page
-      const btn = document.querySelector('#manual-order-card button.bg-primary');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '✔ Амжилттай!';
-      btn.classList.replace('bg-primary', 'bg-success');
+    // Start background polling for native notifications
+    async function startOrderPolling() {
+      if (isPolling) return;
+      isPolling = true;
+      
+      // Check notification permission
+      if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        await Notification.requestPermission();
+      }
 
-      // Optional: Update dashboard counts if needed, but going to orders page is standard
-      setTimeout(() => {
-        window.location.href = 'admin-orders.html';
-      }, 700);
+      setInterval(async () => {
+        try {
+          const res = await fetch('/api/orders');
+          const orders = await res.json();
+          if (!orders || orders.length === 0) return;
+          
+          let newOrdersFound = false;
+          orders.forEach(o => {
+            if (!lastOrderIdMap.has(o.order_id)) { // Found a new order
+              lastOrderIdMap.add(o.order_id);
+              newOrdersFound = true;
+            }
+          });
+
+          if (newOrdersFound && Notification.permission === "granted") {
+            new Notification('Шинэ захиалга ирлээ!', {
+              body: 'Системд шинэ ачааны захиалга бүртгэгдлээ. Шалгана уу.',
+              // Using a simple shipping icon from an open source CDN as placeholder
+              icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135692.png'
+            });
+          }
+          
+          if (newOrdersFound) {
+             // Refresh dashboard data silently if new orders come in
+             loadDashboardData();
+          }
+        } catch (e) {}
+      }, 10000); // Poll every 10 seconds
     }
 
     // Add order notification badges dynamically
     document.addEventListener('DOMContentLoaded', () => {
+       loadDashboardData();
+    });
+
+    async function loadDashboardData() {
       let orders = [];
       let containers = [];
-      try { orders = JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch (e) { }
-      try { containers = JSON.parse(localStorage.getItem('nomin_containers')) || []; } catch (e) { }
+      try { 
+         const [oRes, cRes] = await Promise.all([ fetch('/api/orders'), fetch('/api/containers') ]);
+         orders = await oRes.json();
+         containers = await cRes.json();
+
+         // Initialize tracking map on first load so we don't alert on existing orders
+         if (lastOrderIdMap.size === 0) {
+            orders.forEach(o => lastOrderIdMap.add(o.order_id));
+            startOrderPolling(); 
+         }
+      } catch (e) { console.error('Error fetching data:', e); return; }
 
       // ---- Determine effective status for each order ----
       function getEffectiveStatus(order) {
-        if (order.containerId) {
-          const c = containers.find(x => x.id === order.containerId);
+        if (order.container_id) {
+          const c = containers.find(x => x.id === order.container_id);
           if (c) return c.status;
         }
         return order.status || 'pending';
@@ -600,8 +667,8 @@
           const statusInfo = STATUS_MAP[effStatus] || STATUS_MAP['pending'];
           const typeLabel = order.type === 'express' ? 'Экспресс' : 'Энгийн';
           const typeBadgeClass = order.type === 'express' ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-500';
-          const senderName = order.sender ? order.sender.name : 'Тодорхойгүй';
-          const senderPhone = order.sender ? order.sender.phone : '';
+          const senderName = order.sender_name || 'Тодорхойгүй';
+          const senderPhone = order.sender_phone || '';
 
           html += `
               <div class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card flex items-center justify-between group ${statusInfo.borderHover} transition-colors cursor-pointer animate-fade-in-up" style="animation-delay: ${index * 0.05}s; opacity: 0; animation-fill-mode: forwards;">
@@ -610,7 +677,7 @@
                     <span class="material-symbols-outlined text-[20px]">${statusInfo.icon}</span>
                   </div>
                   <div>
-                    <p class="text-[15px] font-bold text-gray-900 mb-0.5 flex items-center gap-2">${order.orderId} <span class="${typeBadgeClass} px-1.5 py-0.5 rounded-md text-[9px] uppercase tracking-wider font-bold">${typeLabel}</span></p>
+                    <p class="text-[15px] font-bold text-gray-900 mb-0.5 flex items-center gap-2">${order.order_id} <span class="${typeBadgeClass} px-1.5 py-0.5 rounded-md text-[9px] uppercase tracking-wider font-bold">${typeLabel}</span></p>
                     <p class="text-[12px] font-medium text-slate-500">${senderName}${senderPhone ? ' • ' + senderPhone : ''}</p>
                   </div>
                 </div>
@@ -624,6 +691,9 @@
       }
 
       // ---- Notification Badges ----
+      // Remove stale badges first
+      document.querySelectorAll('.order-badge').forEach(e => e.remove());
+      
       if (pendingCount > 0) {
         // 1. Bottom Nav Badge
         const bottomNavs = document.querySelectorAll('nav a[href="admin-orders.html"]');
@@ -632,7 +702,7 @@
           if (iconContainer) {
             iconContainer.classList.add('relative');
             const badge = document.createElement('span');
-            badge.className = 'absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
+            badge.className = 'order-badge absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
             badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
             iconContainer.appendChild(badge);
           }
@@ -645,12 +715,12 @@
             nav.classList.add('justify-between');
           }
           const badge = document.createElement('span');
-          badge.className = 'bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
+          badge.className = 'order-badge bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
           badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
           nav.appendChild(badge);
         });
       }
-    });
+    }
   </script>
 </body>
 
