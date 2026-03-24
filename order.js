@@ -492,6 +492,10 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error('Захиалга үүсгэхэд алдаа гарлаа');
       }
 
+      const resData = await res.json();
+      newOrder.orderId = resData.orderId || newOrder.orderId;
+      newOrder.order_id = newOrder.orderId;
+
       showSuccess(newOrder);
     } catch (err) {
       showCustomAlert('Алдаа гарлаа: ' + err.message);

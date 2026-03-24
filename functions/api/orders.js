@@ -27,6 +27,18 @@ export async function onRequest(context) {
         if (request.method === 'POST') {
             const body = await request.json();
             
+            // Generate auto-incrementing ID
+            const countStmt = env.DB.prepare("SELECT order_id FROM orders WHERE order_id LIKE 'MN%'");
+            const allMNs = await countStmt.all();
+            let maxNum = 0;
+            if (allMNs.results && allMNs.results.length > 0) {
+                 allMNs.results.forEach(row => {
+                      const num = parseInt(row.order_id.substring(2), 10);
+                      if (!isNaN(num) && num > maxNum) maxNum = num;
+                 });
+            }
+            let finalOrderId = 'MN' + String(maxNum + 1).padStart(2, '0');
+
             // Auto-migrate schema to include user_email if it doesn't exist
             try { 
                 await env.DB.prepare('ALTER TABLE orders ADD COLUMN user_email TEXT').run(); 
@@ -40,14 +52,14 @@ export async function onRequest(context) {
                     item_category, item_quantity, user_email
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).bind(
-                body.orderId, body.type, body.branch || '', body.date || new Date().toISOString(), body.status || 'pending', body.containerId || null,
+                finalOrderId, body.type, body.branch || '', body.date || new Date().toISOString(), body.status || 'pending', body.containerId || null,
                 body.sender?.name || '', body.sender?.phone || '', body.sender?.address || '',
                 body.receiver?.name || '', body.receiver?.phone || '', body.receiver?.address || '',
                 body.item?.category || body.items?.[0]?.category || '', body.item?.quantity || body.items?.[0]?.quantity || '', body.user_email || ''
             );
             await stmt.run();
             
-            return new Response(JSON.stringify({ success: true, orderId: body.orderId }), { status: 201, headers: { 'Content-Type': 'application/json' } });
+            return new Response(JSON.stringify({ success: true, orderId: finalOrderId }), { status: 201, headers: { 'Content-Type': 'application/json' } });
         }
 
         if (request.method === 'PUT') {
