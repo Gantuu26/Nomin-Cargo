@@ -32,23 +32,27 @@ document.addEventListener('DOMContentLoaded', () => {
     searchBtn.disabled = true;
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Fetch real data from API
+      const [oRes, cRes] = await Promise.all([
+        fetch('/api/orders'),
+        fetch('/api/containers')
+      ]);
       
-      let orders = [];
-      try { orders = JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch(e){}
-      let containers = [];
-      try { containers = JSON.parse(localStorage.getItem('nomin_containers')) || []; } catch(e){}
+      if (!oRes.ok || !cRes.ok) throw new Error('Мэдээлэл татахад алдаа гарлаа');
 
-      const order = orders.find(o => (o.orderId || '').toUpperCase() === orderId);
+      const orders = await oRes.json();
+      const containers = await cRes.json();
+
+      const order = orders.find(o => (o.order_id || o.orderId || '').toUpperCase() === orderId);
       
       if (!order) {
         throw new Error('Захиалга олдсонгүй (Олдсонгүй).');
       }
 
       let containerStatus = order.status || 'checking'; // Default
-      if (order.containerId) {
-         const c = containers.find(x => x.id === order.containerId);
+      const cId = order.container_id || order.containerId;
+      if (cId) {
+         const c = containers.find(x => x.id === cId);
          if (c) containerStatus = c.status;
       }
 
@@ -66,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
          'checking', 'picking_up', 'loaded', 'departed', 'in_transit', 'arrived', 'delivered'
       ];
 
-      resOrderId.textContent = order.orderId;
+      resOrderId.textContent = order.order_id || order.orderId;
       
       const isComplete = containerStatus === 'delivered' || containerStatus === 'arrived';
       const statusLabel = STATUSES[containerStatus] || 'Шалгаж байна';
@@ -79,9 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
          resBadge.textContent = statusLabel;
       }
 
-      resSender.textContent = order.sender ? order.sender.name : 'Тодорхойгүй';
-      resReceiver.textContent = order.receiver ? order.receiver.name : 'Тодорхойгүй';
-      resItem.textContent = `${order.item ? order.item.category : ''} (${order.item ? order.item.quantity : 1}ш)`;
+      resSender.textContent = order.sender_name || (order.sender ? order.sender.name : 'Тодорхойгүй');
+      resReceiver.textContent = order.receiver_name || (order.receiver ? order.receiver.name : 'Тодорхойгүй');
+      resItem.textContent = `${order.item_category || (order.item ? order.item.category : '')} (${order.item_quantity || (order.item ? order.item.quantity : 1)}ш)`;
       resBranch.textContent = order.branch || 'Улаанбаатар';
 
       // Generate mock logs for ALL statuses
