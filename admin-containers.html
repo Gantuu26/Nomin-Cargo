@@ -254,30 +254,25 @@
     const STATUS_KEYS = Object.keys(STATUSES);
 
     let containers = [];
+    let allOrders = [];
     let currentAssignContainerId = null;
 
     document.addEventListener("DOMContentLoaded", () => {
-       renderContainers();
+       loadDataAndRender();
     });
 
-    function getOrders() {
-       try { return JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch(e) { return []; }
-    }
-    
-    function setOrders(orders) {
-       localStorage.setItem('nomin_orders', JSON.stringify(orders));
-    }
-
-    function getContainers() {
-       try { return JSON.parse(localStorage.getItem('nomin_containers')) || []; } catch(e) { return []; }
-    }
-
-    function setContainers(cons) {
-       localStorage.setItem('nomin_containers', JSON.stringify(cons));
+    async function loadDataAndRender() {
+       try {
+          const [cRes, oRes] = await Promise.all([ fetch('/api/containers'), fetch('/api/orders') ]);
+          containers = await cRes.json();
+          allOrders = await oRes.json();
+       } catch (e) {
+          console.error(e);
+       }
+       renderContainers();
     }
 
     function renderContainers() {
-       containers = getContainers();
        const list = document.getElementById('containers-list');
        
        if (containers.length === 0) {
@@ -298,7 +293,7 @@
        containers.forEach((c, index) => {
           const currentStatusLabel = STATUSES[c.status] || STATUSES['checking'];
           // Render orders inside container
-          const orders = getOrders().filter(o => o.containerId === c.id);
+          const orders = allOrders.filter(o => o.container_id === c.id);
           const activeIndex = STATUS_KEYS.indexOf(c.status);
           
           let ordersHtml = '';
@@ -306,7 +301,7 @@
              ordersHtml = `<p class="text-[12px] text-slate-400 italic">Жагсаалт хоосон байна</p>`;
           } else {
              ordersHtml = `<div class="flex flex-wrap gap-2">` + 
-                orders.map(o => `<span class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded select-none text-[11px] font-bold shadow-sm">${o.orderId}</span>`).join('') +
+                orders.map(o => `<span class="bg-white border border-slate-200 text-slate-600 px-2 py-1 rounded select-none text-[11px] font-bold shadow-sm">${o.order_id}</span>`).join('') +
              `</div>`;
           }
 
@@ -364,47 +359,71 @@
        setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 300);
     }
 
-    function createContainer() {
+    async function createContainer() {
+       const btn = event.currentTarget;
+       const originalText = btn.innerHTML;
+       btn.innerHTML = 'Үүсгэж байна...';
+       btn.disabled = true;
+
        const nameInput = document.getElementById('container-name');
        const name = nameInput.value.trim();
-       if (!name) return alert('Нэр оруулна уу');
+       if (!name) {
+          btn.innerHTML = originalText; btn.disabled = false;
+          return alert('Нэр оруулна уу');
+       }
 
        const cId = 'C-' + Date.now().toString().slice(-6);
        const newC = {
           id: cId,
           name: name,
-          date: new Date().toISOString(),
           status: 'checking'
        };
 
-       const cons = getContainers();
-       cons.unshift(newC);
-       setContainers(cons);
-       
-       nameInput.value = '';
-       closeNewContainerModal();
-       renderContainers();
+       try {
+           const res = await fetch('/api/containers', {
+               method: 'POST',
+               headers: {'Content-Type': 'application/json'},
+               body: JSON.stringify(newC)
+           });
+           if(res.ok) {
+               nameInput.value = '';
+               closeNewContainerModal();
+               await loadDataAndRender();
+           } else {
+               alert('Алдаа гарлаа');
+           }
+       } catch (e) {
+           alert(e.message);
+       }
+       btn.innerHTML = originalText;
+       btn.disabled = false;
     }
 
-    function updateContainerStatus(cId, newStatus) {
-       let cons = getContainers();
-       let found = cons.find(c => c.id === cId);
-       if(found) {
-          found.status = newStatus;
-          setContainers(cons);
-          // Don't need to re-render everything unless we want to, but letting native select handle the view is cleaner visually.
-          renderContainers(); // To update the text label above it.
+    async function updateContainerStatus(cId, newStatus) {
+       try {
+           const res = await fetch('/api/containers', {
+               method: 'PUT',
+               headers: {'Content-Type': 'application/json'},
+               body: JSON.stringify({id: cId, status: newStatus})
+           });
+           if (res.ok) {
+               await loadDataAndRender();
+           } else {
+               alert('Төлөв шинэчлэхэд алдаа гарлаа');
+               loadDataAndRender(); // reset the select via re-render
+           }
+       } catch (e) {
+           alert(e.message);
+           loadDataAndRender();
        }
     }
 
     function openAssignOrdersModal(cId) {
        currentAssignContainerId = cId;
-       const cons = getContainers();
-       const container = cons.find(c => c.id === cId);
+       const container = containers.find(c => c.id === cId);
        document.getElementById('assign-container-subtitle').textContent = container.name + ' (' + cId + ')';
 
-       const orders = getOrders();
-       const unassigned = orders.filter(o => !o.containerId || o.containerId === cId); // Show unassigned, and ones already mapped here (to allow unmapping easily or just showing them as checked)
+       const unassigned = allOrders.filter(o => !o.container_id || o.container_id === cId); 
 
        const list = document.getElementById('unassigned-orders-list');
        if (unassigned.length === 0) {
@@ -413,11 +432,11 @@
           list.innerHTML = unassigned.map(o => `
             <label class="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl mb-2 cursor-pointer active:bg-blue-50 transition-colors">
                <div class="flex flex-col">
-                  <span class="text-[14px] font-bold text-gray-900">${o.orderId}</span>
-                  <span class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">${o.receiver.name} - ${o.item.category}</span>
+                  <span class="text-[14px] font-bold text-gray-900">${o.order_id}</span>
+                  <span class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">${o.receiver_name || ''} - ${o.item_category || ''}</span>
                </div>
                <div class="relative flex items-center">
-                 <input type="checkbox" value="${o.orderId}" class="peer sr-only assign-cb" ${o.containerId === cId ? 'checked' : ''}>
+                 <input type="checkbox" value="${o.order_id}" class="peer sr-only assign-cb" ${o.container_id === cId ? 'checked' : ''}>
                  <div class="w-6 h-6 border-2 border-slate-300 rounded peer-checked:bg-primary peer-checked:border-primary flex items-center justify-center transition-all">
                     <span class="material-symbols-outlined text-white text-[16px] opacity-0 peer-checked:opacity-100 transition-opacity">check</span>
                  </div>
@@ -440,24 +459,37 @@
        setTimeout(() => modal.classList.add('opacity-0', 'pointer-events-none'), 300);
     }
 
-    function saveAssignedOrders() {
+    async function saveAssignedOrders() {
        if (!currentAssignContainerId) return;
+       const btn = event.currentTarget || document.querySelector('#assign-orders-card button');
+       const originalText = btn.innerHTML;
+       btn.innerHTML = 'Нэмж байна...';
+       btn.disabled = true;
+
        const checkboxes = document.querySelectorAll('.assign-cb');
        const checkedIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-       const uncheckedIds = Array.from(checkboxes).filter(cb => !cb.checked).map(cb => cb.value); // If they unchecked it
+       const uncheckedIds = Array.from(checkboxes).filter(cb => !cb.checked).map(cb => cb.value);
 
-       const orders = getOrders();
-       orders.forEach(o => {
-          if (checkedIds.includes(o.orderId)) {
-             o.containerId = currentAssignContainerId;
-          } else if (uncheckedIds.includes(o.orderId) && o.containerId === currentAssignContainerId) {
-             delete o.containerId; // Unassigned
-          }
-       });
-       setOrders(orders);
+       const assignPromises = checkedIds.map(oid => 
+           fetch('/api/orders', { method: 'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({orderId: oid, containerId: currentAssignContainerId}) })
+       );
+       const unassignPromises = uncheckedIds.map(oid => {
+           const oldOrder = allOrders.find(o => o.order_id === oid);
+           if (oldOrder && oldOrder.container_id === currentAssignContainerId) {
+               return fetch('/api/orders', { method: 'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({orderId: oid, containerId: null}) });
+           }
+       }).filter(Boolean);
 
-       closeAssignOrdersModal();
-       renderContainers();
+       try {
+           await Promise.all([...assignPromises, ...unassignPromises]);
+           closeAssignOrdersModal();
+           await loadDataAndRender();
+       } catch (e) {
+           alert("Алдаа гарлаа: " + e.message);
+       }
+
+       btn.innerHTML = originalText;
+       btn.disabled = false;
     }
   </script>
 </body>

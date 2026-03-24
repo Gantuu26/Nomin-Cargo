@@ -172,35 +172,39 @@
     }
 
     let currentFilter = 'all';
+    
+    let allOrders = [];
+    let allContainers = [];
+
+    async function loadDataAndRender() {
+        try {
+            const [oRes, cRes] = await Promise.all([ fetch('/api/orders'), fetch('/api/containers') ]);
+            allOrders = await oRes.json();
+            allContainers = await cRes.json();
+        } catch(e) { console.error('Error fetching data:', e); return; }
+        renderOrders();
+    }
 
     function setFilter(filter) {
        currentFilter = filter;
        renderOrders();
     }
 
-    // Render Orders from localStorage
+    // Render Orders from API data
     function renderOrders() {
       const ordersList = document.getElementById('orders-list');
-      let orders = [];
-      let containers = [];
-      try {
-        const storedOrders = localStorage.getItem('nomin_orders');
-        if (storedOrders) orders = JSON.parse(storedOrders);
-        const storedCons = localStorage.getItem('nomin_containers');
-        if (storedCons) containers = JSON.parse(storedCons);
-      } catch (e) {}
-
+      
       // Determine if order is pending
       const isPending = (o) => {
-         if (!o.containerId) return true;
-         const c = containers.find(x => x.id === o.containerId);
+         if (!o.container_id) return true;
+         const c = allContainers.find(x => x.id === o.container_id);
          if (!c) return true;
          if (['checking', 'picking_up'].includes(c.status)) return true;
          return false; // It's in transit or arrived, so hide from this screen
       };
 
       // Only care about pending orders on this page
-      const pendingOrders = orders.filter(isPending);
+      const pendingOrders = allOrders.filter(isPending);
 
       // Determine the branch tab mapping
       const getBranchCategory = (o) => {
@@ -254,21 +258,9 @@
         
         const typeLabel = order.type === 'standard' ? 'Энгийн ачаа' : 'Экспресс ачаа';
         
-        let imagesHtml = '';
-        if (order.images && order.images.length > 0) {
-           imagesHtml = `
-             <div class="w-full mt-2">
-               <span class="text-[11px] text-slate-400 font-medium block mb-2">Хавсаргасан зураг</span>
-               <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                 ${order.images.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0" onclick="window.open('${img}', '_blank')">`).join('')}
-               </div>
-             </div>
-           `;
-        }
-
         let containerLabel = '';
-        if (order.containerId) {
-           const c = containers.find(x => x.id === order.containerId);
+        if (order.container_id) {
+           const c = allContainers.find(x => x.id === order.container_id);
            if (c) {
               const STATUSES = {
                  'checking': 'Шалгаж байна',
@@ -285,7 +277,17 @@
            containerLabel = `<span class="w-1 h-1 rounded-full bg-slate-300"></span><span class="bg-warning text-white px-2 py-0.5 rounded-md normal-case tracking-normal">Хүлээгдэж буй</span>`;
         }
 
-        // Escape backticks in our HTML generation if needed
+        // Handle mapped DB columns
+        const orderId = order.order_id || 'Тодорхойгүй';
+        const sName = order.sender_name || 'Тодорхойгүй';
+        const sPhone = order.sender_phone || '';
+        const sAddress = order.sender_address || '';
+        const rName = order.receiver_name || 'Тодорхойгүй';
+        const rPhone = order.receiver_phone || '';
+        const rAddress = order.receiver_address || '';
+        const iCat = order.item_category || 'Бусад';
+        const iQty = order.item_quantity || 1;
+
         html += `
         <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card relative animate-fade-in-up">
           <div class="mb-3 border-b border-slate-100 pb-3">
@@ -295,80 +297,79 @@
               <span class="text-primary bg-primary/10 px-2 py-0.5 rounded-md normal-case tracking-normal">${typeLabel}</span>
               ${containerLabel}
             </div>
-            <h3 class="text-[18px] font-bold text-gray-900 leading-tight mb-0.5">${order.orderId}</h3>
+            <h3 class="text-[18px] font-bold text-gray-900 leading-tight mb-0.5">${orderId}</h3>
             <p class="text-[12px] text-slate-400 font-medium tracking-wide">${formattedDate}</p>
           </div>
           
           <!-- Tabs UI -->
           <div class="flex gap-2 border-b border-slate-100 mt-2 relative z-10 w-full overflow-x-auto no-scrollbar">
-             <button onclick="switchTab('${order.orderId}', 'sender')" id="${order.orderId}-tab-sender" class="${order.orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-primary text-primary font-bold text-[13px] transition-colors focus:outline-none">Илгээгч</button>
-             <button onclick="switchTab('${order.orderId}', 'goods')" id="${order.orderId}-tab-goods" class="${order.orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-transparent text-slate-400 font-bold text-[13px] transition-colors focus:outline-none">Бараа</button>
-             <button onclick="switchTab('${order.orderId}', 'receiver')" id="${order.orderId}-tab-receiver" class="${order.orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-transparent text-slate-400 font-bold text-[13px] transition-colors focus:outline-none">Хүлээн авагч</button>
+             <button onclick="switchTab('${orderId}', 'sender')" id="${orderId}-tab-sender" class="${orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-primary text-primary font-bold text-[13px] transition-colors focus:outline-none">Илгээгч</button>
+             <button onclick="switchTab('${orderId}', 'goods')" id="${orderId}-tab-goods" class="${orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-transparent text-slate-400 font-bold text-[13px] transition-colors focus:outline-none">Бараа</button>
+             <button onclick="switchTab('${orderId}', 'receiver')" id="${orderId}-tab-receiver" class="${orderId}-tab flex-1 whitespace-nowrap min-w-max pb-2.5 border-b-2 border-transparent text-slate-400 font-bold text-[13px] transition-colors focus:outline-none">Хүлээн авагч</button>
           </div>
 
           <!-- Tab Contents -->
           <div class="bg-surface-container-low p-4 rounded-2xl border border-blue-100/50 mb-4 min-h-[125px] mt-4">
              <!-- Sender -->
-             <div id="${order.orderId}-content-sender" class="${order.orderId}-content block animate-fade-in">
+             <div id="${orderId}-content-sender" class="${orderId}-content block animate-fade-in">
                <div class="flex flex-wrap justify-between items-start gap-y-3 mb-3">
                  <div class="w-1/2 pr-2">
                    <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Нэр</span>
-                   <span class="text-[14px] font-bold text-gray-900 line-clamp-1">${order.sender.name}</span>
+                   <span class="text-[14px] font-bold text-gray-900 line-clamp-1">${sName}</span>
                  </div>
                  <div class="w-1/2 pl-1">
                    <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Утасны дугаар</span>
-                   <span class="text-[14px] font-bold text-gray-900">${order.sender.phone}</span>
+                   <span class="text-[14px] font-bold text-gray-900">${sPhone}</span>
                  </div>
                </div>
                <div>
                  <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Хаяг</span>
-                 <span class="text-[13px] font-semibold text-gray-800 leading-relaxed block">${order.sender.address}</span>
+                 <span class="text-[13px] font-semibold text-gray-800 leading-relaxed block">${sAddress}</span>
                </div>
              </div>
 
              <!-- Goods -->
-             <div id="${order.orderId}-content-goods" class="${order.orderId}-content hidden animate-fade-in">
+             <div id="${orderId}-content-goods" class="${orderId}-content hidden animate-fade-in">
                <div class="flex flex-wrap justify-between items-start gap-y-3 mb-4">
                  <div class="w-1/2">
                    <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Барааны төрөл</span>
-                   <span class="text-[14px] font-bold text-gray-900 leading-tight block">${order.item.category}</span>
+                   <span class="text-[14px] font-bold text-gray-900 leading-tight block">${iCat}</span>
                  </div>
                  <div class="w-1/2">
                    <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Тоо ширхэг</span>
-                   <div class="inline-block px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-bold text-[12px]">${order.item.quantity} хайрцаг/ш</div>
+                   <div class="inline-block px-2.5 py-1 rounded-lg bg-primary/10 text-primary font-bold text-[12px]">${iQty} хайрцаг/ш</div>
                  </div>
                </div>
-               ${imagesHtml}
              </div>
 
              <!-- Receiver -->
-             <div id="${order.orderId}-content-receiver" class="${order.orderId}-content hidden animate-fade-in">
+             <div id="${orderId}-content-receiver" class="${orderId}-content hidden animate-fade-in">
                <div class="flex flex-wrap justify-between items-start gap-y-3 mb-3">
                  <div class="w-1/2 pr-2">
                    <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Нэр</span>
-                   <span class="text-[14px] font-bold text-gray-900 line-clamp-1">${order.receiver.name}</span>
+                   <span class="text-[14px] font-bold text-gray-900 line-clamp-1">${rName}</span>
                  </div>
                  <div class="w-1/2 pl-1">
                    <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Утасны дугаар</span>
-                   <span class="text-[14px] font-bold text-gray-900">${order.receiver.phone}</span>
+                   <span class="text-[14px] font-bold text-gray-900">${rPhone}</span>
                  </div>
                </div>
                <div>
                  <span class="text-[11px] text-slate-400 font-medium block mb-0.5">Хаяг (Монгол хаяг)</span>
-                 <span class="text-[13px] font-semibold text-gray-800 leading-relaxed block">${order.receiver.address}</span>
+                 <span class="text-[13px] font-semibold text-gray-800 leading-relaxed block">${rAddress}</span>
                </div>
              </div>
           </div>
 
           <div class="flex gap-2.5 mt-2">
-            <a href="tel:${order.sender.phone}" class="flex-[1] py-3 rounded-2xl border border-blue-100/80 bg-white text-gray-700 active:scale-[0.98] transition-all hover:bg-slate-50 flex flex-col items-center justify-center shadow-sm">
+            <a href="tel:${sPhone}" class="flex-[1] py-3 rounded-2xl border border-blue-100/80 bg-white text-gray-700 active:scale-[0.98] transition-all hover:bg-slate-50 flex flex-col items-center justify-center shadow-sm">
               <div class="flex items-center gap-1.5 text-[14px] font-bold mb-0.5">
                 <span class="material-symbols-outlined text-[18px]">phone</span>
                 Залгах
               </div>
-              <span class="text-[10px] text-slate-400 font-semibold tracking-wide">${order.sender.phone}</span>
+              <span class="text-[10px] text-slate-400 font-semibold tracking-wide">${sPhone}</span>
             </a>
-            <a href="admin-order-detail.html" class="flex-[1] py-3 rounded-2xl bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-[14px] shadow-btn active:scale-[0.98] hover:shadow-lg transition-all flex items-center justify-center gap-2">
+            <a href="admin-order-detail.html?id=${orderId}" class="flex-[1] py-3 rounded-2xl bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-[14px] shadow-btn active:scale-[0.98] hover:shadow-lg transition-all flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-[20px]">edit_note</span>
               Дэлгэрэнгүй
             </a>
@@ -377,6 +378,9 @@
         `;
       });
       ordersList.innerHTML = html;
+      
+      // Update notification counts in navigation
+      updateBadges(pendingOrders.length);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -537,7 +541,7 @@
        setTimeout(() => document.getElementById('manual-order-modal').classList.add('opacity-0', 'pointer-events-none'), 300);
     }
     
-    function saveManualOrder() {
+    async function saveManualOrder() {
        const sName = document.getElementById('mo-s-name').value;
        const sPhone = document.getElementById('mo-s-phone').value;
        const sAddress = document.getElementById('mo-s-address').value;
@@ -551,81 +555,108 @@
 
        if(!sName || !rName) return alert('Нэр оруулна уу (Name is required)');
 
-       let existingOrders = [];
-       try { existingOrders = JSON.parse(localStorage.getItem('nomin_orders')) || []; } catch(e) {}
-       
-       let maxNum = 3;
-       existingOrders.forEach(o => {
-          if (o.orderId && o.orderId.toUpperCase().startsWith('MN')) {
-             const num = parseInt(o.orderId.substring(2), 10);
-             if (!isNaN(num) && num > maxNum) maxNum = num;
-          }
-       });
-       const nextNum = maxNum + 1;
-       const orderId = 'MN' + String(nextNum).padStart(2, '0');
+       const btn = document.querySelector('#manual-order-card button.bg-primary');
+       const originalText = btn.innerHTML;
+       btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[16px]">sync</span> Түр хүлээнэ үү...';
+       btn.disabled = true;
 
-       const newOrder = {
+       let orderId = 'MN01';
+       try {
+          const res = await fetch('/api/orders');
+          const orders = await res.json();
+          let maxNum = 0;
+          orders.forEach(o => {
+            if (o.order_id && o.order_id.toUpperCase().startsWith('MN')) {
+              const num = parseInt(o.order_id.substring(2), 10);
+              if (!isNaN(num) && num > maxNum) maxNum = num;
+            }
+          });
+          orderId = 'MN' + String(maxNum + 1).padStart(2, '0');
+       } catch (e) { console.error(e); }
+
+       const newOrderBody = {
           orderId: orderId,
           type: typeOpts,
           branch: branch,
-          addressMode: 'branch',
+          status: "pending",
           sender: { name: sName, phone: sPhone, address: sAddress },
           receiver: { name: rName, phone: rPhone, address: rAddress },
-          item: { category: iCat || 'Бусад', quantity: iQty || 1, value: '' },
-          images: [],
-          date: new Date().toISOString(),
-          status: 'pending' // pending until it gets a container status
+          items: [{ category: iCat || 'Бусад', quantity: iQty || 1 }]
        };
 
-       existingOrders.unshift(newOrder);
-       localStorage.setItem('nomin_orders', JSON.stringify(existingOrders));
-
-       closeManualOrderModal();
-       
-       // Clear inputs
-       ['s-name','s-phone','s-address','r-name','r-phone','r-address','i-category','i-quantity'].forEach(id => {
-          const el = document.getElementById('mo-'+id);
-          if (el) el.value = '';
-       });
-       
-       renderOrders();
+       try {
+          const res = await fetch('/api/orders', {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify(newOrderBody)
+          });
+          if (res.ok) {
+             closeManualOrderModal();
+             // Clear inputs
+             ['s-name','s-phone','s-address','r-name','r-phone','r-address','i-category','i-quantity'].forEach(id => {
+                const el = document.getElementById('mo-'+id);
+                if (el) el.value = '';
+             });
+             btn.innerHTML = originalText;
+             btn.disabled = false;
+             
+             // Refresh data
+             loadDataAndRender();
+          } else {
+             alert('Алдаа гарлаа');
+             btn.innerHTML = originalText;
+             btn.disabled = false;
+          }
+       } catch (e) {
+          alert("Холболтын алдаа: " + e.message);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+       }
     }
 
-    // Add order notification badges dynamically
+    // Initialize list and dynamically update order notification badges
     document.addEventListener('DOMContentLoaded', () => {
-      let pendingCount = 0;
-      try {
-        const orders = JSON.parse(localStorage.getItem('nomin_orders')) || [];
-        pendingCount = orders.filter(o => o.status === 'pending').length;
-      } catch(e) {}
+      loadDataAndRender();
       
+      // Auto-open modal if requested via URL
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('openModal') === 'true') {
+        setTimeout(openManualOrderModal, 100);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+
+    // Badge update logic extracted from DOM Content Loaded
+    function updateBadges(pendingCount) {
+      document.querySelectorAll('.order-badge').forEach(e => e.remove());
+
       if (pendingCount > 0) {
-        // 1. Bottom Nav Badge
+        // Bottom Nav Badge
         const bottomNavs = document.querySelectorAll('nav a[href="admin-orders.html"]');
         bottomNavs.forEach(nav => {
           const iconContainer = nav.querySelector('div');
           if (iconContainer) {
             iconContainer.classList.add('relative');
             const badge = document.createElement('span');
-            badge.className = 'absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
+            badge.className = 'order-badge absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
             badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
             iconContainer.appendChild(badge);
           }
         });
 
-        // 2. Sidebar Badge
+        // Sidebar Badge
         const sidebarNavs = document.querySelectorAll('aside a[href="admin-orders.html"]');
         sidebarNavs.forEach(nav => {
           if (!nav.classList.contains('justify-between')) {
              nav.classList.add('justify-between');
           }
           const badge = document.createElement('span');
-          badge.className = 'bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
+          badge.className = 'order-badge bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
           badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
           nav.appendChild(badge);
         });
       }
-    });
+    }
   </script>
 </body>
 </html>

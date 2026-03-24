@@ -247,10 +247,16 @@
     let lastKnownStep = null;
     let lastKnownOrderId = null;
 
-    function initTracker() {
-      const ordersStr = localStorage.getItem('nomin_orders');
+    async function initTracker() {
       let orders = [];
-      try { orders = JSON.parse(ordersStr) || []; } catch(e) {}
+      try {
+        const res = await fetch('/api/orders');
+        if (res.ok) {
+           orders = await res.json();
+        }
+      } catch (e) {
+        console.error(e);
+      }
       
       const noOrdersCard = document.getElementById('no-orders-card');
       const trackerCard = document.getElementById('user-tracker-card');
@@ -268,16 +274,10 @@
       if (latestOrder.status === 'in_transit') currentStep = '2';
       if (latestOrder.status === 'delivered') currentStep = '3';
       
-      // Override for demo purposes
-      const manualDemoStatus = localStorage.getItem('nominCargoStatus');
-      if (manualDemoStatus) {
-         currentStep = manualDemoStatus;
-      }
-      
-      if (currentStep === lastKnownStep && latestOrder.orderId === lastKnownOrderId) return;
+      if (currentStep === lastKnownStep && latestOrder.order_id === lastKnownOrderId) return;
       
       lastKnownStep = currentStep;
-      lastKnownOrderId = latestOrder.orderId;
+      lastKnownOrderId = latestOrder.order_id;
       
       const data = statuses[currentStep];
       if (!data) return;
@@ -286,7 +286,7 @@
       trackerCard.classList.remove('hidden');
 
       // Update Order ID in Title dynamically
-      document.querySelector('#user-tracker-card h3').textContent = `Миний захиалга (${latestOrder.orderId})`;
+      document.querySelector('#user-tracker-card h3').textContent = `Миний захиалга (${latestOrder.order_id})`;
 
       // Update Top Texts
       document.getElementById('tracker-title').innerHTML = data.title;

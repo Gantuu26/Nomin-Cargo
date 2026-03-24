@@ -63,11 +63,18 @@
   </main>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
       const container = document.getElementById('history-container');
-      const ordersStr = localStorage.getItem('nomin_orders');
+      
       let orders = [];
-      try { orders = JSON.parse(ordersStr) || []; } catch(e) {}
+      try {
+        const res = await fetch('/api/orders');
+        if (res.ok) {
+           orders = await res.json();
+        }
+      } catch(e) {
+        console.error(e);
+      }
 
       if (orders.length === 0) {
         container.innerHTML = `
@@ -114,19 +121,12 @@
             statusLabel = 'Хүргэгдсэн';
             statusColor = 'text-success bg-success/10';
          }
-         
-         const manualDemoStatus = localStorage.getItem('nominCargoStatus');
-         if (index === 0 && manualDemoStatus) {
-            if (manualDemoStatus === '1') { statusLabel = 'Шалгаж байна'; statusColor = 'text-warning bg-warning/10'; }
-            if (manualDemoStatus === '2') { statusLabel = 'Хаягаар очиж байна'; statusColor = 'text-info bg-info/10'; }
-            if (manualDemoStatus === '3') { statusLabel = 'Контейнерт ачигдлаа'; statusColor = 'text-success bg-success/10'; }
-         }
 
          html += `
            <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card mb-4 animate-fade-in-up" style="animation-delay: ${index * 0.05}s; opacity: 0; animation-fill-mode: forwards;">
              <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3">
                 <div>
-                   <h3 class="text-[18px] font-bold text-gray-900 flex items-center gap-2 mb-1">${order.orderId}</h3>
+                   <h3 class="text-[18px] font-bold text-gray-900 flex items-center gap-2 mb-1">${order.order_id}</h3>
                    <p class="text-[12px] text-slate-400 font-medium tracking-wide">${dateString}</p>
                 </div>
                 <div class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg ${statusColor} whitespace-nowrap">
@@ -143,21 +143,21 @@
                 <div class="grid grid-cols-2 gap-3">
                    <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
                       <span class="text-[11px] text-slate-400 font-medium block mb-1.5">Илгээгч</span>
-                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.sender.name}</div>
-                      <div class="text-[11px] text-slate-500 mt-0.5">${order.sender.phone}</div>
-                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.sender.address}</div>
+                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.sender_name || ''}</div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">${order.sender_phone || ''}</div>
+                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.sender_address || ''}</div>
                    </div>
                    <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
                       <span class="text-[11px] text-slate-400 font-medium block mb-1.5">Хүлээн авагч</span>
-                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.receiver.name}</div>
-                      <div class="text-[11px] text-slate-500 mt-0.5">${order.receiver.phone}</div>
-                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.receiver.address}</div>
+                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.receiver_name || ''}</div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">${order.receiver_phone || ''}</div>
+                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.receiver_address || ''}</div>
                    </div>
                 </div>
                 
                 <div class="flex justify-between items-center pt-1 px-1">
                    <span class="text-[12px] text-slate-500 font-medium block">Бараа</span>
-                   <span class="text-[13px] font-bold text-gray-900">${order.item.category} <span class="ml-1 text-[12px] text-primary bg-primary/10 px-1.5 py-0.5 rounded font-bold border border-primary/20">${order.item.quantity} ш</span></span>
+                   <span class="text-[13px] font-bold text-gray-900">${order.item_category || ''} <span class="ml-1 text-[12px] text-primary bg-primary/10 px-1.5 py-0.5 rounded font-bold border border-primary/20">${order.item_quantity || ''} ш</span></span>
                 </div>
              </div>
              ${imagesHtml}

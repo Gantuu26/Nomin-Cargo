@@ -19,8 +19,16 @@ export async function onRequest(context) {
         if (request.method === 'PUT') {
             const body = await request.json();
             if (!body.id) return new Response(JSON.stringify({ error: "Missing id" }), { status: 400 });
-            await env.DB.prepare('UPDATE banners SET active = ? WHERE id = ?')
-                      .bind(body.active, body.id).run();
+
+            if (Object.keys(body).length === 2 && body.active !== undefined) {
+               // Just toggling active status
+               await env.DB.prepare('UPDATE banners SET active = ? WHERE id = ?')
+                         .bind(body.active, body.id).run();
+            } else {
+               // Full edit
+               await env.DB.prepare('UPDATE banners SET title = ?, subtitle = ?, type = ?, imageUrl = ?, linkUrl = ?, active = ? WHERE id = ?')
+                         .bind(body.title || '', body.subtitle || '', body.type || 'standard', body.imageUrl || '', body.linkUrl || '', body.active !== undefined ? body.active : 1, body.id).run();
+            }
             return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
         }
 

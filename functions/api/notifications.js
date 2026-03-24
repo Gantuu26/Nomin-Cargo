@@ -16,6 +16,14 @@ export async function onRequest(context) {
             return new Response(JSON.stringify({ success: true }), { status: 201, headers: { 'Content-Type': 'application/json' } });
         }
 
+        if (request.method === 'PUT') {
+            const body = await request.json();
+            if (!body.id) return new Response(JSON.stringify({ error: "Missing id" }), { status: 400 });
+            await env.DB.prepare('UPDATE notifications SET title = ?, content = ? WHERE id = ?')
+                      .bind(body.title, body.content || '', body.id).run();
+            return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
+        }
+
         if (request.method === 'DELETE') {
             if (!id) return new Response(JSON.stringify({ error: "Missing id" }), { status: 400 });
             await env.DB.prepare('DELETE FROM notifications WHERE id = ?').bind(id).run();

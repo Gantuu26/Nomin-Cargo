@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-amber-50 rounded-xl border border-amber-100 text-[13px] text-amber-900 leading-relaxed font-bold";
-        descriptionContainer.innerHTML = "✈️ Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (5,500 вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>";
+        descriptionContainer.innerHTML = "✈️ Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (2,500 вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>";
       }
     } else {
       if (btnTypeStandard) {
@@ -374,48 +374,76 @@ document.addEventListener('DOMContentLoaded', () => {
         },
       };
 
-      // 1. Mock API call by saving to localStorage
-      await new Promise(resolve => setTimeout(resolve, 600)); // Simulate delay
-      
-      let existingOrders = [];
-      try {
-        existingOrders = JSON.parse(localStorage.getItem('nomin_orders')) || [];
-      } catch(e) {}
-      
-      let maxNum = 3;
-      existingOrders.forEach(o => {
-         if (o.orderId && o.orderId.toUpperCase().startsWith('MN')) {
-            const num = parseInt(o.orderId.substring(2), 10);
-            if (!isNaN(num) && num > maxNum) maxNum = num;
-         }
-      });
-      const nextNum = maxNum + 1;
-      const orderId = 'MN' + String(nextNum).padStart(2, '0');
-
-      // Convert uploaded images to Base64
+      // Compress & Upload images to R2
       const imagePromises = uploadedImages.map(imgData => {
         return new Promise((resolve) => {
-           const reader = new FileReader();
-           reader.onloadend = () => resolve(reader.result);
-           reader.readAsDataURL(imgData.file);
+           const img = new Image();
+           img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 1200;
+              const MAX_HEIGHT = 1200;
+              let width = img.width;
+              let height = img.height;
+
+              if (width > height) {
+                if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH; }
+              } else {
+                if (height > MAX_HEIGHT) { width = Math.round(width * (MAX_HEIGHT / height)); height = MAX_HEIGHT; }
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              
+              canvas.toBlob(async (blob) => {
+                 try {
+                     const fileName = `order_${Date.now()}_${Math.random().toString(36).substring(7)}.webp`;
+                     const res = await fetch('/api/upload?filename=' + fileName, {
+                         method: 'POST',
+                         body: blob
+                     });
+                     if (res.ok) {
+                         const json = await res.json();
+                         resolve(json.url);
+                     } else {
+                         resolve(imgData.dataUrl); // Fallback to base64
+                     }
+                 } catch(e) {
+                     resolve(imgData.dataUrl); // Fallback to base64
+                 }
+              }, 'image/webp', 0.8);
+           };
+           img.onerror = () => resolve(imgData.dataUrl);
+           img.src = imgData.dataUrl;
         });
       });
       
-      const base64Images = await Promise.all(imagePromises);
+      const imageUrls = await Promise.all(imagePromises);
+
+      // Generate a temporary Order ID for UI
+      const orderId = 'MN' + Date.now().toString().slice(-6);
 
       const newOrder = {
         ...orderData,
         orderId: orderId,
         date: new Date().toISOString(),
         status: 'pending',
-        images: base64Images
+        images: imageUrls
       };
 
-      // Add new order to the beginning
-      existingOrders.unshift(newOrder);
-      localStorage.setItem('nomin_orders', JSON.stringify(existingOrders));
+      // Real API Call
+      const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newOrder)
+      });
+      
+      if (!res.ok) {
+          throw new Error('Захиалга үүсгэхэд алдаа гарлаа');
+      }
 
-      showSuccess({ ...orderData, orderId: orderId });
+      showSuccess(newOrder);
     } catch (err) {
       alert('Алдаа гарлаа: ' + err.message);
     } finally {

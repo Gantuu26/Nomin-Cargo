@@ -200,27 +200,17 @@
   </aside>
 
   <script>
-    // Initial Mock Data
-    const defaultNotifications = [
-      {
-        id: 0,
-        title: 'Шинэ салбар нээгдлээ',
-        content: 'Бид хэрэглэгчдийнхээ тав тухыг хангах үүднээс шинэ салбараа амжилттай нээлээ.',
-        date: '2026.03.22'
-      },
-      {
-        id: 1,
-        title: 'Системийн шинэчлэл',
-        content: 'Маргааш буюу 3 сарын 25-ны 23:00 цагаас эхлэн системд шинэчлэл хийгдэх тул та бүхэн анхаарна уу.',
-        date: '2026.03.20'
-      }
-    ];
-
-    let notifications = JSON.parse(localStorage.getItem('nomin_notifications')) || defaultNotifications;
+    let notifications = [];
     let editingId = null;
 
-    function saveToStorage() {
-      localStorage.setItem('nomin_notifications', JSON.stringify(notifications));
+    async function loadNotifications() {
+        try {
+            const res = await fetch('/api/notifications');
+            if (res.ok) {
+                notifications = await res.json();
+            }
+        } catch(e) { console.error(e); }
+        renderNotifications();
     }
 
     // Sidebar Toggle
@@ -310,58 +300,82 @@
       document.getElementById('notification-content').value = '';
     }
 
-    function deleteNotification(id) {
+    async function deleteNotification(id) {
       if (confirm("Энэ мэдэгдлийг устгахдаа итгэлтэй байна уу?")) {
-        notifications = notifications.filter(n => n.id !== id);
-        saveToStorage();
-        renderNotifications();
-        if (editingId === id) cancelEdit();
+        try {
+            const res = await fetch(`/api/notifications?id=${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                await loadNotifications();
+                if (editingId === id) cancelEdit();
+            } else {
+                alert("Устгахад алдаа гарлаа.");
+            }
+        } catch (e) {
+            alert(e.message);
+        }
       }
     }
 
-    function saveNotification() {
+    async function saveNotification() {
+      const btn = document.getElementById('save-btn');
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = 'Уншиж байна...';
+      btn.disabled = true;
+
       const title = document.getElementById('notification-title').value.trim();
       const content = document.getElementById('notification-content').value.trim();
 
       if (!title) {
+        btn.innerHTML = originalHtml; btn.disabled = false;
         alert("Гарчиг оруулна уу.");
         return;
       }
       if (!content) {
+        btn.innerHTML = originalHtml; btn.disabled = false;
         alert("Мэдээлэл оруулна уу.");
         return;
       }
 
-      if (editingId !== null) {
-        // Update existing
-        const notification = notifications.find(n => n.id === editingId);
-        if (notification) {
-          notification.title = title;
-          notification.content = content;
-        }
-      } else {
-        // Add new
-        const today = new Date();
-        const formattedDate = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')}`;
-
-        const newNotification = {
-          id: Date.now(),
-          title: title,
-          content: content,
-          date: formattedDate
-        };
-        // Add to beginning of array
-        notifications.unshift(newNotification);
+      try {
+          if (editingId !== null) {
+            // Update existing
+            const res = await fetch('/api/notifications', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: editingId, title, content })
+            });
+            if (res.ok) {
+                alert("Амжилттай шинэчлэгдлээ!");
+                cancelEdit();
+                await loadNotifications();
+            } else {
+                alert("Шинэчлэх үед алдаа гарлаа");
+            }
+          } else {
+            // Add new
+            const res = await fetch('/api/notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content })
+            });
+            if (res.ok) {
+                alert("Шинэ мэдэгдэл амжилттай нэмэгдлээ!");
+                cancelEdit();
+                await loadNotifications();
+            } else {
+                alert("Хадгалах үед алдаа гарлаа");
+            }
+          }
+      } catch (e) {
+          alert('Алдаа гарлаа: ' + e.message);
       }
-
-      saveToStorage();
-      cancelEdit();
-      renderNotifications();
-      alert(editingId !== null ? "Амжилттай шинэчлэгдлээ!" : "Шинэ мэдэгдэл амжилттай нэмэгдлээ!");
+      
+      btn.innerHTML = originalHtml;
+      btn.disabled = false;
     }
 
     // Initialize list on load
-    document.addEventListener("DOMContentLoaded", renderNotifications);
+    document.addEventListener("DOMContentLoaded", loadNotifications);
     // Add order notification badges dynamically
     document.addEventListener('DOMContentLoaded', () => {
       let pendingCount = 0;
