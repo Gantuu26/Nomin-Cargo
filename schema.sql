@@ -2,6 +2,17 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS containers;
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS pre_alert_configs;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS banners;
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE containers (
     id TEXT PRIMARY KEY,
