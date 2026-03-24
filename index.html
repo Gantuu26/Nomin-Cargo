@@ -749,7 +749,7 @@
 
       const renderImageBanner = (banner) => {
         return `<a href="${banner.link || '#'}" class="snap-center shrink-0 w-[82%] rounded-3xl flex flex-col justify-end min-h-[160px] relative overflow-hidden shadow-elevated group">
-          <img src="${banner.image}" alt="${banner.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+          <img src="${banner.imageUrl}" alt="${banner.title}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10"></div>
           <div class="relative z-10 p-5">
             <h3 class="text-white text-[17px] font-bold leading-snug mb-1 drop-shadow-md">${banner.title}</h3>
@@ -760,7 +760,7 @@
 
       const renderBanner = (banner) => {
         // If admin uploaded a custom image, always show the image banner
-        if (hasCustomImage(banner.image)) {
+        if (hasCustomImage(banner.imageUrl)) {
           return renderImageBanner(banner);
         }
 
