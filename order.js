@@ -7,9 +7,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // ========== CHECK AUTHENTICATION ==========
   const userStr = localStorage.getItem('nomin_user');
   if (!userStr) {
-    alert('Та захиалга өгөхийн тулд эхлээд нэвтэрч орно уу.');
-    window.location.href = 'login.html';
+    showCustomAlert('Та захиалга өгөхийн тулд эхлээд нэвтэрч орно уу.', () => {
+      window.location.href = 'login.html';
+    });
     return;
+  }
+
+  // ========== CUSTOM ALERT ==========
+  function showCustomAlert(message, onConfirm) {
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[999] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300';
+    overlay.innerHTML = `
+      <div class="bg-white rounded-3xl p-6 shadow-elevated max-w-sm w-full text-center relative overflow-hidden transform scale-95 transition-transform duration-300">
+        <div class="w-16 h-16 bg-blue-50 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100/50">
+          <span class="material-symbols-outlined text-[32px] filled">info</span>
+        </div>
+        <h3 class="text-[18px] font-bold text-gray-900 mb-2">Мэдэгдэл</h3>
+        <p class="text-[14px] text-slate-500 mb-6 leading-relaxed">${message}</p>
+        <button type="button" class="w-full py-3.5 bg-primary text-white rounded-xl font-bold text-[15px] shadow-btn hover:shadow-lg active:scale-[0.98] transition-all">
+          Ойлголоо
+        </button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => {
+      overlay.classList.remove('opacity-0');
+      overlay.querySelector('div.bg-white').classList.remove('scale-95');
+    });
+
+    overlay.querySelector('button').addEventListener('click', () => {
+      overlay.classList.add('opacity-0');
+      overlay.querySelector('div.bg-white').classList.add('scale-95');
+      setTimeout(() => {
+        if(document.body.contains(overlay)) document.body.removeChild(overlay);
+        if (onConfirm) onConfirm();
+      }, 300);
+    });
   }
 
   // ========== GET ORDER TYPE FROM URL ==========
@@ -453,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showSuccess(newOrder);
     } catch (err) {
-      alert('Алдаа гарлаа: ' + err.message);
+      showCustomAlert('Алдаа гарлаа: ' + err.message);
     } finally {
       submitBtnEl.innerHTML = originalText;
       submitBtnEl.disabled = false;

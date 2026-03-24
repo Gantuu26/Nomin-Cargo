@@ -317,11 +317,12 @@
 
     // Call on load and check constantly (fallback for cross-tab sync issues)
     document.addEventListener("DOMContentLoaded", () => {
-      initTracker();
-
       // Check User Session
       const userStr = localStorage.getItem('nomin_user');
       if (userStr) {
+        // Logged in user: load their tracker logic
+        initTracker();
+        
         try {
           const user = JSON.parse(userStr);
           // Set user name
@@ -348,6 +349,10 @@
           };
           emailEl.parentElement.appendChild(logoutBtn);
         } catch(e) { console.error('Session error', e); }
+      } else {
+        // Guest user: Just hide the tracker safely
+        document.getElementById('user-tracker-card').classList.add('hidden');
+        document.getElementById('no-orders-card').classList.add('hidden'); // Also skip "no-orders" UI, let Guest just see login prompt
       }
     });
   </script>
