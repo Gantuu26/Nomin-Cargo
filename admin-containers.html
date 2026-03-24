@@ -370,7 +370,7 @@
     }
 
     async function createContainer() {
-       const btn = event.currentTarget;
+       const btn = document.querySelector('#new-container-card button.bg-primary');
        const originalText = btn.innerHTML;
        btn.innerHTML = 'Үүсгэж байна...';
        btn.disabled = true;
@@ -471,7 +471,7 @@
 
     async function saveAssignedOrders() {
        if (!currentAssignContainerId) return;
-       const btn = event.currentTarget || document.querySelector('#assign-orders-card button');
+       const btn = document.querySelector('#assign-orders-card button.bg-gray-900');
        const originalText = btn.innerHTML;
        btn.innerHTML = 'Нэмж байна...';
        btn.disabled = true;
