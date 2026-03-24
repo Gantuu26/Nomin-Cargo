@@ -138,9 +138,18 @@
       const d = new Date(o.date);
       const dateString = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 
-      // Determine current step from container status
+      // Determine current step from container status OR order status
       let currentStep = 1;
       let displayStatus = o.status || 'checking';
+      
+      const setStepFromStatus = (st) => {
+         if (['picking_up'].includes(st)) return 2;
+         if (['loaded','departed','in_transit','arrived','delivered'].includes(st)) return 3;
+         return 1;
+      };
+      
+      currentStep = setStepFromStatus(displayStatus);
+
       if (o.container_id) {
         try {
           const cRes = await fetch('/api/containers');
@@ -148,8 +157,7 @@
           const container = containers.find(c => c.id === o.container_id);
           if (container) {
             displayStatus = container.status || displayStatus;
-            if (['picking_up'].includes(container.status)) currentStep = 2;
-            if (['loaded','departed','in_transit','arrived'].includes(container.status)) currentStep = 3;
+            currentStep = setStepFromStatus(displayStatus);
           }
         } catch(e) {}
       }
@@ -227,7 +235,7 @@
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
               <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төлөв (Статус)</p>
               <select onchange="updateOrderStatus('${o.order_id}', this.value)" class="bg-white border border-slate-200 px-2 py-1.5 rounded-lg text-[13px] font-bold text-gray-900 outline-none focus:border-primary">
-                ${[['pending', 'Хүлээгдэж буй'], ['checking', 'Шалгаж байна'], ['delivered', 'Хүлээлгэж өгсөн']].map(([k, v]) => '<option value="' + k + '"' + ((o.status || 'pending') === k ? ' selected' : '') + '>' + v + '</option>').join('')}
+                ${Object.entries(STATUSES).map(([k, v]) => '<option value="' + k + '"' + (displayStatus === k ? ' selected' : '') + '>' + v + '</option>').join('')}
               </select>
             </div>
             

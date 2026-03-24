@@ -271,9 +271,23 @@
       noOrdersCard.classList.add('hidden');
       
       const latestOrder = orders[0];
+      
+      // Determine effective status
+      let effectiveStatus = latestOrder.status || 'checking';
+      if (latestOrder.container_id || latestOrder.containerId) {
+         try {
+           const cRes = await fetch('/api/containers');
+           if (cRes.ok) {
+              const containers = await cRes.json();
+              const c = containers.find(x => x.id === (latestOrder.container_id || latestOrder.containerId));
+              if (c) effectiveStatus = c.status || effectiveStatus;
+           }
+         } catch(e) {}
+      }
+
       let currentStep = '1';
-      if (latestOrder.status === 'in_transit') currentStep = '2';
-      if (latestOrder.status === 'delivered') currentStep = '3';
+      if (['picking_up'].includes(effectiveStatus)) currentStep = '2';
+      if (['loaded', 'departed', 'in_transit', 'arrived', 'delivered'].includes(effectiveStatus)) currentStep = '3';
       
       if (currentStep === lastKnownStep && latestOrder.order_id === lastKnownOrderId) return;
       
