@@ -140,12 +140,14 @@
 
       // Determine current step from container status
       let currentStep = 1;
+      let displayStatus = o.status || 'checking';
       if (o.container_id) {
         try {
           const cRes = await fetch('/api/containers');
           const containers = await cRes.json();
           const container = containers.find(c => c.id === o.container_id);
           if (container) {
+            displayStatus = container.status || displayStatus;
             if (['picking_up'].includes(container.status)) currentStep = 2;
             if (['loaded','departed','in_transit','arrived'].includes(container.status)) currentStep = 3;
           }
