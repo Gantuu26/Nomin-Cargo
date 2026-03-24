@@ -60,13 +60,13 @@
   <main class="pt-[76px] px-4 max-w-lg mx-auto">
     
     <!-- Profile Card -->
-    <div class="bg-white p-6 rounded-3xl shadow-card border border-blue-100/50 flex items-center gap-5 mb-6 animate-fade-in-up">
+    <div onclick="window.location.href='login.html'" class="bg-white p-6 rounded-3xl shadow-card border border-blue-100/50 flex items-center gap-5 mb-6 animate-fade-in-up cursor-pointer hover:shadow-md transition-all active:scale-[0.98]">
       <div class="w-16 h-16 rounded-2xl bg-blue-50 text-primary flex items-center justify-center shrink-0 border border-blue-100/50">
         <span class="material-symbols-outlined text-[32px] filled">person</span>
       </div>
       <div>
         <h2 class="text-[18px] font-bold text-gray-900 mb-1">Зочин</h2>
-        <p class="text-[13px] text-slate-500 font-medium">Нэвтрэх эсвэл бүртгүүлнэ үү</p>
+        <p class="text-[13px] text-primary font-bold">Нэвтрэх эсвэл бүртгүүлнэ үү ></p>
       </div>
     </div>
 
@@ -318,7 +318,37 @@
     // Call on load and check constantly (fallback for cross-tab sync issues)
     document.addEventListener("DOMContentLoaded", () => {
       initTracker();
-      setInterval(initTracker, 500); 
+
+      // Check User Session
+      const userStr = localStorage.getItem('nomin_user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          // Set user name
+          document.querySelector('.bg-white.p-6.rounded-3xl h2').textContent = user.name;
+          
+          // Set user email instead of "Нэвтрэх..."
+          const emailEl = document.querySelector('.bg-white.p-6.rounded-3xl p');
+          emailEl.textContent = user.email;
+          emailEl.className = 'text-[12px] text-slate-500 font-medium';
+          
+          // Remove click redirect to login
+          const card = document.querySelector('.bg-white.p-6.rounded-3xl');
+          card.onclick = null;
+          card.classList.remove('cursor-pointer', 'hover:shadow-md', 'active:scale-[0.98]');
+
+          // Add a logout button
+          const logoutBtn = document.createElement('button');
+          logoutBtn.className = 'mt-2 text-[12px] font-bold text-red-500 hover:underline px-2 py-1 bg-red-50 rounded-lg';
+          logoutBtn.innerText = 'Гарах';
+          logoutBtn.onclick = (e) => {
+            e.stopPropagation();
+            localStorage.removeItem('nomin_user');
+            window.location.reload();
+          };
+          emailEl.parentElement.appendChild(logoutBtn);
+        } catch(e) { console.error('Session error', e); }
+      }
     });
   </script>
 </body>

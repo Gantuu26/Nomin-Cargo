@@ -207,7 +207,7 @@
         </div>
         <span class="text-[18px] font-bold text-on-surface tracking-tight">Номин Транс</span>
       </div>
-      <button class="w-10 h-10 rounded-2xl bg-white shadow-card flex items-center justify-center border border-blue-100/60 hover:shadow-card-hover transition-all">
+      <button onclick="window.location.href='login.html'" class="w-10 h-10 rounded-2xl bg-white shadow-card flex items-center justify-center border border-blue-100/60 hover:shadow-card-hover transition-all">
         <span class="material-symbols-outlined text-on-surface-variant text-[22px]">person</span>
       </button>
     </div>
@@ -815,6 +815,23 @@
       };
 
       container.innerHTML = activeBanners.map(renderBanner).join('');
+    });
+
+    // Check session on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const userStr = localStorage.getItem('nomin_user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          const profileBtn = document.querySelector('header button');
+          if (profileBtn) {
+            profileBtn.onclick = () => window.location.href = 'profile.html';
+            profileBtn.innerHTML = `<span class="text-primary font-bold text-[18px]">${user.name.charAt(0).toUpperCase()}</span>`;
+          }
+        } catch(e) {
+          console.error('Session error', e);
+        }
+      }
     });
   </script>
 </body>
