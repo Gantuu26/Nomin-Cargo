@@ -84,7 +84,7 @@
         try {
           const user = JSON.parse(userStr);
           if (user.email) {
-            emailQuery = `?user_email=${user.email}`;
+            emailQuery = `?user_email=${encodeURIComponent(user.email)}`;
           }
         } catch(e) {
           console.error("Error parsing user data:", e);

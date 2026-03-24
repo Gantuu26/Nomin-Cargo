@@ -43,7 +43,7 @@ export async function onRequest(context) {
                 body.orderId, body.type, body.branch || '', body.date || new Date().toISOString(), body.status || 'pending', body.containerId || null,
                 body.sender?.name || '', body.sender?.phone || '', body.sender?.address || '',
                 body.receiver?.name || '', body.receiver?.phone || '', body.receiver?.address || '',
-                body.items?.[0]?.category || '', body.items?.[0]?.quantity || '', body.user_email || ''
+                body.item?.category || body.items?.[0]?.category || '', body.item?.quantity || body.items?.[0]?.quantity || '', body.user_email || ''
             );
             await stmt.run();
             

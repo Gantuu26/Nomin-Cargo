@@ -251,7 +251,7 @@
       let orders = [];
       if (!userEmail) return;
       try {
-        const res = await fetch(`/api/orders?user_email=${userEmail}`);
+        const res = await fetch(`/api/orders?user_email=${encodeURIComponent(userEmail)}`);
         if (res.ok) {
            orders = await res.json();
         }
