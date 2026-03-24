@@ -1,11 +1,14 @@
-const CACHE_NAME = 'nomin-admin-v2';
+const CACHE_NAME = 'nomin-admin-v3';
 const ASSETS_TO_CACHE = [
-  './admin.html',
-  './admin-orders.html',
-  './admin-banners.html',
-  './admin-notifications.html',
-  './admin-order-detail.html',
-  './styles.css'
+  '/admin',
+  '/admin-orders',
+  '/admin-banners',
+  '/admin-notifications',
+  '/admin-order-detail',
+  '/admin-login',
+  '/styles.css',
+  '/images/admin-icon-192.png',
+  '/images/admin-icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -13,6 +16,10 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(ASSETS_TO_CACHE))
       .then(() => self.skipWaiting())
+      .catch((err) => {
+        console.warn('Cache addAll failed, skipping:', err);
+        self.skipWaiting();
+      })
   );
 });
 
@@ -30,35 +37,30 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   
-  // Skip data URLs and other schemes
   const url = event.request.url;
   if (!url.startsWith('http')) return;
 
+  // For navigation requests, always go to network first (avoid redirect issues)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // For other resources (CSS, images, etc.), use cache-first strategy
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Return cached response immediately if available, while updating cache in background
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
-          // -----------------------------------------------------------------------------
-          // FIX for Cloudflare Pages Clean URLs (HTML redirects) + Service Worker Bug
-          // Chrome blocks 'redirected: true' responses for 'navigate' requests for security.
-          // If we detect a redirect, we explicitly tell the browser to redirect.
-          // -----------------------------------------------------------------------------
-          if (networkResponse.redirected && event.request.mode === 'navigate') {
-             return Response.redirect(networkResponse.url, 302);
-          }
-
           if (networkResponse && networkResponse.ok) {
             const clonedResponse = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clonedResponse));
           }
           return networkResponse;
         })
-        .catch(() => {
-          // If network fails and no cache, this will still result in an error,
-          // but we'll try to return the cached response if it exists.
-          return cachedResponse;
-        });
+        .catch(() => cachedResponse);
 
       return cachedResponse || fetchPromise;
     })
