@@ -215,11 +215,18 @@
           <h3 class="text-[16px] font-bold text-gray-900 mb-3 px-1">Дэлгэрэнгүй мэдээлэл</h3>
           <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card space-y-5">
             
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
               <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төрөл</p>
               <div class="bg-primary/10 px-2.5 py-1 rounded-lg">
                  <p class="text-[13px] font-bold text-primary">${typeLabel}</p>
               </div>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+              <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төлөв (Статус)</p>
+              <select onchange="updateOrderStatus('${o.order_id}', this.value)" class="bg-white border border-slate-200 px-2 py-1.5 rounded-lg text-[13px] font-bold text-gray-900 outline-none focus:border-primary">
+                ${Object.entries(STATUSES).map(([k, v]) => '<option value="' + k + '"' + (displayStatus === k ? ' selected' : '') + '>' + v + '</option>').join('')}
+              </select>
             </div>
             
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
@@ -302,8 +309,11 @@
         </section>
 
         <!-- Actions -->
-        <div class="flex gap-3 pb-8 animate-fade-in-up delay-200 mt-6">
-           <a href="tel:${o.sender_phone || ''}" class="flex-[1.5] py-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-50 active:scale-[0.98] transition-all">
+        <div class="flex gap-3 pb-8 animate-fade-in-up delay-200 mt-6 flex-wrap">
+           <a href="admin-orders" class="w-[full] sm:w-auto flex-1 py-4 bg-slate-100 border border-slate-200 shadow-sm text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-200 active:scale-[0.98] transition-all">
+             <span class="material-symbols-outlined text-[20px]">arrow_back</span> Буцах
+           </a>
+           <a href="tel:${o.sender_phone || ''}" class="flex-1 py-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-50 active:scale-[0.98] transition-all">
              <span class="material-symbols-outlined text-[20px]">call</span> Залгах
            </a>
            <button onclick="deleteThisOrder('${o.order_id}')" class="flex-1 py-4 bg-red-50 text-red-500 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-red-100 active:scale-[0.98] transition-all">
@@ -313,7 +323,24 @@
       `;
     });
 
-    async function deleteThisOrder(orderId) {
+    window.updateOrderStatus = async function(orderId, newStatus) {
+       try {
+         const res = await fetch('/api/orders', {
+             method: 'PUT',
+             headers: {'Content-Type': 'application/json'},
+             body: JSON.stringify({ orderId: orderId, status: newStatus })
+         });
+         if (res.ok) {
+            window.location.reload();
+         } else {
+            alert('Төлөв өөрчлөх үед алдаа гарлаа');
+         }
+       } catch(e) {
+            alert('Холболтын алдаа: ' + e.message);
+       }
+    };
+
+    window.deleteThisOrder = async function(orderId) {
        if (!confirm('Захиалга "' + orderId + '" устгахдаа итгэлтэй байна уу?')) return;
        try {
          const res = await fetch('/api/orders?id=' + orderId, { method: 'DELETE' });
@@ -325,7 +352,7 @@
        } catch(e) {
          alert('Холболтын алдаа: ' + e.message);
        }
-    }
+    };
   </script>
 </body>
 </html>
