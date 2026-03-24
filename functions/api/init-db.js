@@ -43,6 +43,9 @@ export async function onRequest(context) {
 
     CREATE TABLE banners (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        subtitle TEXT,
+        type TEXT,
         imageUrl TEXT NOT NULL,
         linkUrl TEXT,
         active INTEGER DEFAULT 1,

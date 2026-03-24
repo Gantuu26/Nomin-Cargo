@@ -11,8 +11,8 @@ export async function onRequest(context) {
         
         if (request.method === 'POST') {
             const body = await request.json();
-            await env.DB.prepare('INSERT INTO banners (imageUrl, linkUrl, active) VALUES (?, ?, ?)')
-                      .bind(body.imageUrl, body.linkUrl || '', body.active !== undefined ? body.active : 1).run();
+            await env.DB.prepare('INSERT INTO banners (title, subtitle, type, imageUrl, linkUrl, active) VALUES (?, ?, ?, ?, ?, ?)')
+                      .bind(body.title || '', body.subtitle || '', body.type || 'standard', body.imageUrl, body.linkUrl || '', body.active !== undefined ? body.active : 1).run();
             return new Response(JSON.stringify({ success: true }), { status: 201, headers: { 'Content-Type': 'application/json' } });
         }
 
