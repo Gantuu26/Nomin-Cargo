@@ -227,7 +227,7 @@
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
               <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төлөв (Статус)</p>
               <select onchange="updateOrderStatus('${o.order_id}', this.value)" class="bg-white border border-slate-200 px-2 py-1.5 rounded-lg text-[13px] font-bold text-gray-900 outline-none focus:border-primary">
-                ${Object.entries(STATUSES).map(([k, v]) => '<option value="' + k + '"' + (displayStatus === k ? ' selected' : '') + '>' + v + '</option>').join('')}
+                ${[['pending', 'Хүлээгдэж буй'], ['checking', 'Шалгаж байна'], ['delivered', 'Хүлээлгэж өгсөн']].map(([k, v]) => '<option value="' + k + '"' + ((o.status || 'pending') === k ? ' selected' : '') + '>' + v + '</option>').join('')}
               </select>
             </div>
             
