@@ -439,8 +439,9 @@
 
     async function saveBanner() {
       const btn = document.getElementById('save-btn');
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = 'Уншиж байна...';
+      const textSpan = btn.querySelector('span:nth-child(2)');
+      const originalText = textSpan.textContent;
+      textSpan.textContent = 'Уншиж байна...';
       btn.disabled = true;
 
       const title = document.getElementById('banner-title').value.trim();
@@ -512,7 +513,7 @@
           alert("Алдаа гарлаа: " + err.message);
       }
       
-      btn.innerHTML = originalHtml;
+      textSpan.textContent = originalText;
       btn.disabled = false;
     }
 
