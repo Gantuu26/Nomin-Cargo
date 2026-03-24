@@ -451,12 +451,12 @@
       const isVisible = !document.getElementById('image-preview-container').classList.contains('hidden');
 
       if (!isVisible && !editingId) {
-        btn.innerHTML = originalHtml; btn.disabled = false;
+        textSpan.textContent = originalText; btn.disabled = false;
         alert("Зураг оруулна уу.");
         return;
       }
       if (!title) {
-        btn.innerHTML = originalHtml; btn.disabled = false;
+        textSpan.textContent = originalText; btn.disabled = false;
         alert("Гарчиг оруулна уу.");
         return;
       }
@@ -474,9 +474,14 @@
                 if (uploadRes.ok) {
                     const json = await uploadRes.json();
                     previewImageSrc = json.url;
+                } else {
+                    throw new Error('Зураг серверт хадгалахад алдаа гарлаа');
                 }
              } catch(e) {
                 console.error("Upload failed", e);
+                textSpan.textContent = originalText; btn.disabled = false;
+                alert("Зураг байршуулахад алдаа гарлаа: " + e.message);
+                return;
              }
           }
 
