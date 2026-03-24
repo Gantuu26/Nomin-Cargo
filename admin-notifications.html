@@ -329,7 +329,7 @@
     async function saveNotification() {
       const btn = document.getElementById('save-btn');
       const originalHtml = btn.innerHTML;
-      btn.innerHTML = 'Уншиж байна...';
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">sync</span> Уншиж байна...';
       btn.disabled = true;
 
       const title = document.getElementById('notification-title').value.trim();
@@ -354,6 +354,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: editingId, title, content })
             });
+            
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+
             if (res.ok) {
                 alert("Амжилттай шинэчлэгдлээ!");
                 cancelEdit();
@@ -368,6 +372,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title, content })
             });
+            
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+
             if (res.ok) {
                 alert("Шинэ мэдэгдэл амжилттай нэмэгдлээ!");
                 cancelEdit();
@@ -377,11 +385,10 @@
             }
           }
       } catch (e) {
+          btn.innerHTML = originalHtml;
+          btn.disabled = false;
           alert('Алдаа гарлаа: ' + e.message);
       }
-      
-      btn.innerHTML = originalHtml;
-      btn.disabled = false;
     }
 
     // Initialize list on load
