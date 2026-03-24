@@ -150,24 +150,24 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (i < currentStep) {
         if (indicator) {
-          indicator.className = 'w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-[14px] transition-colors';
+          indicator.className = 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[14px] transition-colors';
           indicator.innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span>';
         }
-        if (label) label.className = 'text-[11px] font-bold text-emerald-500 text-center transition-colors';
-        if (line) line.className = 'flex-1 h-0.5 bg-emerald-500 -mx-4 z-0 relative top-[-10px] transition-colors';
+        if (label) label.className = 'text-[11px] font-bold text-primary text-center transition-colors whitespace-nowrap';
+        if (line) line.className = 'flex-1 h-0.5 bg-primary -mx-4 z-0 relative top-[-10px] transition-colors';
       } else if (i === currentStep) {
         if (indicator) {
           indicator.className = 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-[14px] transition-colors';
           indicator.innerHTML = i;
         }
-        if (label) label.className = 'text-[11px] font-bold text-primary text-center transition-colors';
+        if (label) label.className = 'text-[11px] font-bold text-primary text-center transition-colors whitespace-nowrap';
         if (line) line.className = 'flex-1 h-0.5 bg-gray-200 -mx-4 z-0 relative top-[-10px] transition-colors';
       } else {
         if (indicator) {
           indicator.className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center font-bold text-[14px] transition-colors';
           indicator.innerHTML = i;
         }
-        if (label) label.className = 'text-[11px] font-bold text-gray-400 text-center transition-colors';
+        if (label) label.className = 'text-[11px] font-bold text-gray-400 text-center transition-colors whitespace-nowrap';
         if (line) line.className = 'flex-1 h-0.5 bg-gray-200 -mx-4 z-0 relative top-[-10px] transition-colors';
       }
     }
