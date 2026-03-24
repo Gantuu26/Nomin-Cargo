@@ -37,6 +37,7 @@ export async function onRequest(context) {
     CREATE TABLE notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
+        content TEXT NOT NULL,
         date DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
