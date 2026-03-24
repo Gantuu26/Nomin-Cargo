@@ -15,6 +15,10 @@
         extend: {
           colors: {
             "primary": "#3B82F6",
+            "primary-dark": "#2563EB",
+            "success": "#10B981",
+            "warning": "#F59E0B",
+            "info": "#3B82F6",
             "surface": "#F0F4FF",
             "on-surface": "#0F172A",
           },
@@ -36,6 +40,8 @@
     .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+    .delay-200 { animation-delay: 0.2s; opacity: 0; }
   </style>
   <link rel="stylesheet" href="styles.css">
   <script>
@@ -54,50 +60,39 @@
         <span class="material-symbols-outlined text-[24px]">arrow_back</span>
       </a>
       <h1 class="text-[17px] font-bold tracking-tight text-center absolute left-1/2 -translate-x-1/2 whitespace-nowrap">Захиалгын түүх</h1>
-      <div class="w-10 shrink-0"></div> <!-- Placeholder for layout balance -->
+      <div class="w-10 shrink-0"></div>
     </div>
   </header>
 
-  <main class="pt-[76px] px-4 max-w-lg mx-auto" id="ordersContainer">
-     <!-- Orders will be injected here -->
-     <div id="emptyState" class="bg-white rounded-3xl p-8 border border-blue-100/50 shadow-card animate-fade-in-up text-center mt-4 hidden">
-        <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
-          <span class="material-symbols-outlined text-[32px]">history</span>
-        </div>
-        <h3 class="text-[16px] font-bold text-gray-900 mb-2">Захиалгын түүх хоосон байна</h3>
-        <p class="text-[13px] text-slate-500 mb-6 leading-relaxed">Та одоогоор ямар нэгэн захиалга өгөөгүй байна. Шинэ захиалга өгч Номин Транс-н үйлчилгээг туршаад үзээрэй.</p>
-        <a href="order" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white text-[13px] font-bold rounded-xl shadow-sm hover:bg-blue-600 transition-colors">
-          Захиалга өгөх
-        </a>
-      </div>
+  <main class="pt-[76px] px-4 max-w-lg mx-auto space-y-5" id="ordersContainer">
+     <!-- Loading State -->
+     <div id="loadingState" class="py-12 text-center text-slate-400">
+       <span class="material-symbols-outlined animate-spin text-[40px] mb-2 text-primary">progress_activity</span>
+       <p class="text-[14px] font-medium">Мэдээллийг татаж байна...</p>
+     </div>
   </main>
 
   <script>
-    document.addEventListener("DOMContentLoaded", async function loadOrders() {
+    document.addEventListener("DOMContentLoaded", async function() {
       const container = document.getElementById('ordersContainer');
-      const emptyState = document.getElementById('emptyState');
+      const loadingState = document.getElementById('loadingState');
       
       let orders = [];
-      let phoneQuery = '';
+      let emailQuery = '?user_email=none';
       const userStr = localStorage.getItem('nomin_user');
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
           if (user.email) {
-            phoneQuery = `?user_email=${user.email}`;
-          } else {
-             phoneQuery = `?user_email=none`; 
+            emailQuery = `?user_email=${user.email}`;
           }
         } catch(e) {
-            console.error("Error parsing user data from localStorage:", e);
-            phoneQuery = `?user_email=none`;
+          console.error("Error parsing user data:", e);
         }
-      } else {
-         phoneQuery = `?user_email=none`;
       }
 
       try {
-        const res = await fetch('/api/orders' + phoneQuery);
+        const res = await fetch('/api/orders' + emailQuery);
         if (res.ok) {
            orders = await res.json();
         }
@@ -105,8 +100,10 @@
         console.error(e);
       }
 
+      loadingState.remove();
+
       if (orders.length === 0) {
-        container.innerHTML = `
+        container.innerHTML += `
           <div class="bg-white rounded-3xl p-8 border border-blue-100/50 shadow-card animate-fade-in-up text-center mt-4">
             <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
               <span class="material-symbols-outlined text-[32px]">history</span>
@@ -128,72 +125,151 @@
          const d = new Date(order.date);
          const dateString = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
          
-         let imagesHtml = '';
-         if (order.images && order.images.length > 0) {
-            imagesHtml = `
-               <div class="mt-4 pt-3 border-t border-slate-100">
-                 <span class="text-[11px] text-slate-400 font-medium block mb-2">Хавсаргасан зураг</span>
-                 <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                   ${order.images.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shrink-0">`).join('')}
-                 </div>
-               </div>
-            `;
-         }
-
          // Status Mapping
          let statusLabel = 'Шалгаж байна';
-         let statusColor = 'text-warning bg-warning/10';
-         if (order.status === 'in_transit') {
+         let statusColor = 'text-warning';
+         let statusBg = 'bg-warning/10';
+         if (order.status === 'picking_up') {
+            statusLabel = 'Хаягаар очиж байна';
+            statusColor = 'text-info';
+            statusBg = 'bg-info/10';
+         } else if (order.status === 'loaded' || order.status === 'in_transit' || order.status === 'departed') {
             statusLabel = 'Тээвэрлэгдэж байна';
-            statusColor = 'text-info bg-info/10';
+            statusColor = 'text-info';
+            statusBg = 'bg-info/10';
+         } else if (order.status === 'arrived') {
+            statusLabel = 'Салбарт ирсэн';
+            statusColor = 'text-primary';
+            statusBg = 'bg-primary/10';
          } else if (order.status === 'delivered') {
-            statusLabel = 'Хүргэгдсэн';
-            statusColor = 'text-success bg-success/10';
+            statusLabel = 'Олгогдсон';
+            statusColor = 'text-success';
+            statusBg = 'bg-success/10';
+         }
+
+         // Images HTML
+         let imagesHtml = '';
+         if (order.images && order.images.length > 0) {
+            let parsedImages = order.images;
+            if (typeof order.images === 'string') {
+               try { parsedImages = JSON.parse(order.images); } catch(e) { parsedImages = []; }
+            }
+            if (parsedImages.length > 0) {
+               imagesHtml = `
+                 <div class="pt-2">
+                   <span class="text-[12px] text-slate-500 font-medium block mb-2">Барааны зураг</span>
+                   <div class="flex gap-2.5 overflow-x-auto pb-1">
+                     ${parsedImages.map(img => `<div class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm shrink-0" style="background-image: url('${img}');"></div>`).join('')}
+                   </div>
+                 </div>
+               `;
+            }
          }
 
          html += `
-           <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card mb-4 animate-fade-in-up" style="animation-delay: ${index * 0.05}s; opacity: 0; animation-fill-mode: forwards;">
-             <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-3">
-                <div>
-                   <h3 class="text-[18px] font-bold text-gray-900 flex items-center gap-2 mb-1">${order.order_id}</h3>
-                   <p class="text-[12px] text-slate-400 font-medium tracking-wide">${dateString}</p>
-                </div>
-                <div class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg ${statusColor} whitespace-nowrap">
-                   ${statusLabel}
-                </div>
+         <div class="animate-fade-in-up" style="animation-delay: ${index * 0.08}s; opacity: 0; animation-fill-mode: forwards;">
+           
+           <!-- Order Header Card -->
+           <div class="bg-white rounded-t-3xl px-5 pt-5 pb-4 border border-blue-100/50 border-b-0 shadow-card">
+             <div class="flex justify-between items-start mb-1">
+               <h3 class="text-[20px] font-extrabold text-gray-900 tracking-tight">${order.order_id}</h3>
+               <span class="text-[11px] font-bold ${statusColor} ${statusBg} px-2.5 py-1 rounded-lg whitespace-nowrap">${statusLabel}</span>
              </div>
-             
-             <div class="space-y-4">
-                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
-                   <span class="text-[12px] text-slate-500 font-medium">Тээврийн төрөл</span>
-                   <span class="text-[13px] font-bold text-gray-800">${typeLabel}</span>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3">
-                   <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
-                      <span class="text-[11px] text-slate-400 font-medium block mb-1.5">Илгээгч</span>
-                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.sender_name || ''}</div>
-                      <div class="text-[11px] text-slate-500 mt-0.5">${order.sender_phone || ''}</div>
-                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.sender_address || ''}</div>
-                   </div>
-                   <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
-                      <span class="text-[11px] text-slate-400 font-medium block mb-1.5">Хүлээн авагч</span>
-                      <div class="text-[13px] font-bold text-gray-900 line-clamp-1">${order.receiver_name || ''}</div>
-                      <div class="text-[11px] text-slate-500 mt-0.5">${order.receiver_phone || ''}</div>
-                      <div class="text-[11px] text-slate-600 mt-1 line-clamp-2 leading-relaxed">${order.receiver_address || ''}</div>
-                   </div>
-                </div>
-                
-                <div class="flex justify-between items-center pt-1 px-1">
-                   <span class="text-[12px] text-slate-500 font-medium block">Бараа</span>
-                   <span class="text-[13px] font-bold text-gray-900">${order.item_category || ''} <span class="ml-1 text-[12px] text-primary bg-primary/10 px-1.5 py-0.5 rounded font-bold border border-primary/20">${order.item_quantity || ''} ш</span></span>
-                </div>
-             </div>
-             ${imagesHtml}
+             <p class="text-[12px] text-slate-400 font-medium tracking-wide">${dateString}</p>
            </div>
+
+           <!-- Order Detail Card -->
+           <div class="bg-white rounded-b-3xl px-5 pb-5 border border-blue-100/50 border-t-0 shadow-card space-y-5">
+             
+             <!-- Type & Branch -->
+             <div class="flex justify-between items-center border-b border-slate-100 pb-4 pt-2">
+               <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төрөл</p>
+               <div class="bg-primary/10 px-2.5 py-1 rounded-lg">
+                  <p class="text-[13px] font-bold text-primary">${typeLabel}</p>
+               </div>
+             </div>
+
+             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+               <p class="text-[13px] text-slate-400 font-medium tracking-wide">Бүртгэсэн огноо</p>
+               <p class="text-[14px] font-bold text-gray-900">${dateString}</p>
+             </div>
+
+             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+               <p class="text-[13px] text-slate-400 font-medium tracking-wide">Салбар</p>
+               <p class="text-[14px] font-bold text-primary flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">storefront</span>
+                  ${order.branch || 'Тодорхойгүй'}
+               </p>
+             </div>
+
+             <!-- Sender Info -->
+             <div class="border-b border-slate-100 pb-4">
+               <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                 <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">person</span>
+                 Илгээгчийн мэдээлэл
+               </p>
+               <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
+                  <div class="flex justify-between items-start">
+                    <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
+                    <span class="text-[14px] font-bold text-gray-900">${order.sender_name || ''}</span>
+                  </div>
+                  <div class="flex justify-between items-start">
+                    <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
+                    <span class="text-[14px] font-bold text-gray-900 tracking-wide">${order.sender_phone || ''}</span>
+                  </div>
+                  <div>
+                    <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Солонгос дахь хаяг)</span>
+                    <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${order.sender_address || ''}</span>
+                  </div>
+               </div>
+             </div>
+
+             <!-- Item Info -->
+             <div class="border-b border-slate-100 pb-4">
+               <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                 <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">package</span>
+                 Барааны мэдээлэл
+               </p>
+               <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
+                  <div class="flex justify-between items-start">
+                    <span class="text-[12px] text-slate-500 font-medium">Барааны төрөл</span>
+                    <span class="text-[14px] font-bold text-gray-900">${order.item_category || ''}</span>
+                  </div>
+                  <div class="flex justify-between items-start">
+                    <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
+                    <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${order.item_quantity || ''} ш</span>
+                  </div>
+                  ${imagesHtml}
+               </div>
+             </div>
+
+             <!-- Receiver Info -->
+             <div>
+               <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                 <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">location_on</span>
+                 Хүлээн авагчийн мэдээлэл
+               </p>
+               <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
+                  <div class="flex justify-between items-start">
+                    <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
+                    <span class="text-[14px] font-bold text-gray-900">${order.receiver_name || ''}</span>
+                  </div>
+                  <div class="flex justify-between items-start">
+                    <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
+                    <span class="text-[14px] font-bold text-gray-900 tracking-wide">${order.receiver_phone || ''}</span>
+                  </div>
+                  <div>
+                    <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Монгол хаяг)</span>
+                    <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${order.receiver_address || ''}</span>
+                  </div>
+               </div>
+             </div>
+
+           </div>
+         </div>
          `;
-      });
-      container.innerHTML = html;
+       });
+       container.innerHTML += html;
     });
   </script>
 </body>
