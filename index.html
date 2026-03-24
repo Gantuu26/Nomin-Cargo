@@ -207,7 +207,7 @@
         </div>
         <span class="text-[18px] font-bold text-on-surface tracking-tight">Номин Транс</span>
       </div>
-      <button onclick="window.location.href='login.html'" class="w-10 h-10 rounded-2xl bg-white shadow-card flex items-center justify-center border border-blue-100/60 hover:shadow-card-hover transition-all">
+      <button onclick="window.location.href = 'login'" class="w-10 h-10 rounded-2xl bg-white shadow-card flex items-center justify-center border border-blue-100/60 hover:shadow-card-hover transition-all">
         <span class="material-symbols-outlined text-on-surface-variant text-[22px]">person</span>
       </button>
     </div>
@@ -431,7 +431,7 @@
       <h2 class="text-[16px] font-bold text-on-surface mb-3">Харилцагчийн төв</h2>
       <div class="bg-white rounded-2xl shadow-card border border-slate-100/60 divide-y divide-slate-100">
         <!-- Салбарын мэдээлэл -->
-        <a href="branches.html" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
+        <a href="branches" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
           <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-primary text-[18px]">apartment</span>
           </div>
@@ -439,7 +439,7 @@
           <span class="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
         </a>
         <!-- Хориглох зүйлс -->
-        <a href="prohibited.html" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
+        <a href="prohibited" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
           <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-red-500 text-[18px]">block</span>
           </div>
@@ -447,7 +447,7 @@
           <span class="material-symbols-outlined text-[18px] text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
         </a>
         <!-- Түгээмэл асуултууд -->
-        <a href="faq.html" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
+        <a href="faq" class="flex items-center gap-3.5 px-4 py-3.5 hover:bg-slate-50/60 transition-colors group">
           <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-purple-500 text-[18px]">help</span>
           </div>
@@ -614,25 +614,25 @@
   <!-- Bottom Navigation -->
   <nav class="fixed bottom-0 left-0 w-full z-50 nav-glass shadow-nav border-t border-blue-100/40">
     <div class="flex justify-around items-center px-2 pb-7 pt-2.5 max-w-lg mx-auto">
-      <a href="index.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+      <a href="./" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
         <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center">
           <span class="material-symbols-outlined text-primary filled text-[22px]">home</span>
         </div>
         <span class="text-[11px] font-bold text-primary">Нүүр</span>
       </a>
-      <a href="order.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="order" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-on-surface-variant text-[22px]">add_box</span>
         </div>
         <span class="text-[11px] font-semibold text-on-surface-variant">Захиалга</span>
       </a>
-      <a href="tracking.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="tracking" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-on-surface-variant text-[22px]">local_shipping</span>
         </div>
         <span class="text-[11px] font-semibold text-on-surface-variant">Хяналт</span>
       </a>
-      <a href="profile.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="profile" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-on-surface-variant text-[22px]">person</span>
         </div>
@@ -820,7 +820,7 @@
           const user = JSON.parse(userStr);
           const profileBtn = document.querySelector('header button');
           if (profileBtn) {
-            profileBtn.onclick = () => window.location.href = 'profile.html';
+            profileBtn.onclick = () => window.location.href = 'profile';
             profileBtn.innerHTML = `<span class="text-primary font-bold text-[18px]">${user.name.charAt(0).toUpperCase()}</span>`;
           }
         } catch(e) {

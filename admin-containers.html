@@ -62,12 +62,12 @@
   </script>
   <script>
     if (!localStorage.getItem('admin_session')) {
-      window.location.href = 'admin-login.html';
+      window.location.href = 'admin-login';
     }
     function logoutAdmin(e) {
       if(e) e.preventDefault();
       localStorage.removeItem('admin_session');
-      window.location.href = 'admin-login.html';
+      window.location.href = 'admin-login';
     }
   </script>
 </head>
@@ -144,19 +144,19 @@
   <!-- Admin Bottom Navigation -->
   <nav class="fixed bottom-0 left-0 w-full nav-glass shadow-nav border-t border-blue-100/40 z-40">
     <div class="flex justify-around items-center px-4 pb-7 pt-2.5 max-w-lg mx-auto">
-      <a href="admin.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="admin" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">dashboard</span>
         </div>
         <span class="text-[11px] font-semibold text-slate-500">Самбар</span>
       </a>
-      <a href="admin-orders.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="admin-orders" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">list_alt</span>
         </div>
         <span class="text-[11px] font-semibold text-slate-500">Захиалгууд</span>
       </a>
-      <a href="admin-containers.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+      <a href="admin-containers" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
         <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center">
           <span class="material-symbols-outlined text-primary filled text-[22px]">inventory_2</span>
         </div>
@@ -194,30 +194,30 @@
     <div class="flex-1 overflow-y-auto py-4">
       <ul class="space-y-1.5 px-3">
         <li>
-          <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+          <a href="admin" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
             <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
             Хяналтын самбар
           </a>
         </li>
         <li>
-          <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+          <a href="admin-orders" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
             <span class="material-symbols-outlined text-[20px]">list_alt</span>
             Захиалгууд
           </a>
         </li>
         <li>
-          <a href="admin-containers.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px] justify-between">
+          <a href="admin-containers" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px] justify-between">
             <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">inventory_2</span>Контейнер</div>
           </a>
         </li>
         <li>
-          <a href="admin-banners.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+          <a href="admin-banners" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
             <span class="material-symbols-outlined text-[20px]">view_carousel</span>
             Баннер
           </a>
         </li>
         <li>
-          <a href="admin-notifications.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+          <a href="admin-notifications" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
             <span class="material-symbols-outlined text-[20px]">campaign</span>
             Мэдэгдэл
           </a>

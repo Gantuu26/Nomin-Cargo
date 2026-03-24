@@ -110,7 +110,7 @@
       </div>
       
       <div class="text-center mt-6">
-        <a href="index.html" class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-400 hover:text-primary transition-colors">
+        <a href="./" class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-400 hover:text-primary transition-colors">
           <span class="material-symbols-outlined text-[16px]">arrow_back</span>
           Нүүр хуудас руу буцах
         </a>
@@ -171,7 +171,7 @@
           localStorage.setItem('admin_session', data.token);
           
           setTimeout(() => {
-            window.location.href = 'admin.html';
+            window.location.href = 'admin';
           }, 800);
         } else {
           showCustomAlert(data.error || 'Нэвтрэхэд алдаа гарлаа.', null, true);
@@ -187,7 +187,7 @@
     
     // Auto redirect if already logged in
     if (localStorage.getItem('admin_session')) {
-       window.location.href = 'admin.html';
+       window.location.href = 'admin';
     }
   </script>
 </body>

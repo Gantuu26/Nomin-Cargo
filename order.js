@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const userStr = localStorage.getItem('nomin_user');
   if (!userStr) {
     showCustomAlert('Та захиалга өгөхийн тулд эхлээд нэвтэрч орно уу.', () => {
-      window.location.href = 'login.html';
+      window.location.href = 'login';
     });
     return;
   }

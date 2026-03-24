@@ -60,7 +60,7 @@
   <main class="pt-[76px] px-4 max-w-lg mx-auto">
     
     <!-- Profile Card -->
-    <div onclick="window.location.href='login.html'" class="bg-white p-6 rounded-3xl shadow-card border border-blue-100/50 flex items-center gap-5 mb-6 animate-fade-in-up cursor-pointer hover:shadow-md transition-all active:scale-[0.98]">
+    <div onclick="window.location.href = 'login'" class="bg-white p-6 rounded-3xl shadow-card border border-blue-100/50 flex items-center gap-5 mb-6 animate-fade-in-up cursor-pointer hover:shadow-md transition-all active:scale-[0.98]">
       <div class="w-16 h-16 rounded-2xl bg-blue-50 text-primary flex items-center justify-center shrink-0 border border-blue-100/50">
         <span class="material-symbols-outlined text-[32px] filled">person</span>
       </div>
@@ -77,7 +77,7 @@
       </div>
       <h3 class="text-[15px] font-bold text-gray-900 mb-1">Таны захиалга одоогоор алга байна</h3>
       <p class="text-[12px] text-slate-500 mb-4">Та шинэ захиалга өгөх бол доорх товчийг дарна уу.</p>
-      <a href="order.html" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-primary/10 text-primary text-[13px] font-bold rounded-xl transition-colors hover:bg-primary/20">
+      <a href="order" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-primary/10 text-primary text-[13px] font-bold rounded-xl transition-colors hover:bg-primary/20">
         <span class="material-symbols-outlined text-[18px]">add_circle</span>
         Захиалга өгөх
       </a>
@@ -87,7 +87,7 @@
     <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card animate-fade-in-up mb-6 delay-100 hidden" id="user-tracker-card" style="animation-delay: 0.1s; animation-fill-mode: forwards;">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-[15px] font-bold text-gray-900">Миний захиалга (MN03)</h3>
-        <a href="order-history.html" class="text-[12px] font-semibold text-primary focus:outline-none hover:underline">Илүү дэлгэрэнгүй</a>
+        <a href="order-history" class="text-[12px] font-semibold text-primary focus:outline-none hover:underline">Илүү дэлгэрэнгүй</a>
       </div>
 
       <!-- Top Title and Subtitle -->
@@ -141,7 +141,7 @@
 
     <!-- Menus -->
     <div class="bg-white rounded-3xl shadow-card border border-blue-100/50 overflow-hidden mb-6 animate-fade-in-up" style="animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards;">
-      <a href="order-history.html" class="flex items-center justify-between p-5 border-b border-slate-100 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
+      <a href="order-history" class="flex items-center justify-between p-5 border-b border-slate-100 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl bg-[#F5F7FF] flex items-center justify-center text-primary">
             <span class="material-symbols-outlined text-[20px]">history</span>
@@ -151,7 +151,7 @@
         <span class="material-symbols-outlined text-slate-300">chevron_right</span>
       </a>
 
-      <a href="faq.html" class="flex items-center justify-between p-5 border-b border-slate-100 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
+      <a href="faq" class="flex items-center justify-between p-5 border-b border-slate-100 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl bg-[#F5F7FF] flex items-center justify-center text-primary">
             <span class="material-symbols-outlined text-[20px]">help_center</span>
@@ -161,7 +161,7 @@
         <span class="material-symbols-outlined text-slate-300">chevron_right</span>
       </a>
       
-      <a href="contact.html" class="flex items-center justify-between p-5 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
+      <a href="contact" class="flex items-center justify-between p-5 hover:bg-[#F5F7FF] transition-colors active:bg-blue-50/50">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 rounded-xl bg-[#F5F7FF] flex items-center justify-center text-primary">
             <span class="material-symbols-outlined text-[20px]">support_agent</span>
@@ -177,25 +177,25 @@
   <!-- Bottom Navigation -->
   <nav class="fixed bottom-0 left-0 w-full z-50 nav-glass shadow-nav border-t border-blue-100/40">
     <div class="flex justify-around items-center px-2 pb-7 pt-2.5 max-w-lg mx-auto">
-      <a href="index.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="./" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">home</span>
         </div>
         <span class="text-[11px] font-semibold">Нүүр</span>
       </a>
-      <a href="order.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="order" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">add_box</span>
         </div>
         <span class="text-[11px] font-semibold">Захиалга</span>
       </a>
-      <a href="tracking.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
+      <a href="tracking" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
           <span class="material-symbols-outlined text-[22px]">local_shipping</span>
         </div>
         <span class="text-[11px] font-semibold">Хяналт</span>
       </a>
-      <a href="profile.html" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
+      <a href="profile" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px]">
         <div class="w-10 h-8 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
           <span class="material-symbols-outlined text-primary filled text-[22px]">person</span>
         </div>

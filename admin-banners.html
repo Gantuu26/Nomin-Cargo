@@ -73,12 +73,12 @@
   </script>
   <script>
     if (!localStorage.getItem('admin_session')) {
-      window.location.href = 'admin-login.html';
+      window.location.href = 'admin-login';
     }
     function logoutAdmin(e) {
       if(e) e.preventDefault();
       localStorage.removeItem('admin_session');
-      window.location.href = 'admin-login.html';
+      window.location.href = 'admin-login';
     }
   </script>
 </head>
@@ -89,7 +89,7 @@
   <header class="fixed top-0 w-full z-50 header-blur border-b border-blue-100/50">
     <div class="px-5 py-3 max-w-lg mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <a href="admin.html" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200/50 active:scale-95 transition-all text-slate-700">
+        <a href="admin" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200/50 active:scale-95 transition-all text-slate-700">
           <span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span>
         </a>
         <h1 class="text-[18px] font-bold text-gray-900 tracking-tight">Баннер удирдлага</h1>
@@ -203,25 +203,25 @@
     <div class="flex-1 overflow-y-auto py-4">
       <ul class="space-y-1.5 px-3">
         <li>
-          <a href="admin.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+          <a href="admin" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
             <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
             Хяналтын самбар
           </a>
         </li>
         <li>
-          <a href="admin-orders.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+          <a href="admin-orders" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
             <span class="material-symbols-outlined text-[20px]">list_alt</span>
             Захиалгууд
           </a>
         </li>
         <li>
-          <a href="admin-banners.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px]">
+          <a href="admin-banners" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px]">
             <span class="material-symbols-outlined text-[20px]">view_carousel</span>
             Баннер
           </a>
         </li>
         <li>
-          <a href="admin-notifications.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
+          <a href="admin-notifications" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
             <span class="material-symbols-outlined text-[20px]">campaign</span>
             Мэдэгдэл
           </a>
@@ -544,7 +544,7 @@
       
       if (pendingCount > 0) {
         // 1. Bottom Nav Badge
-        const bottomNavs = document.querySelectorAll('nav a[href="admin-orders.html"]');
+        const bottomNavs = document.querySelectorAll('nav a[href="admin-orders"]');
         bottomNavs.forEach(nav => {
           const iconContainer = nav.querySelector('div');
           if (iconContainer) {
@@ -557,7 +557,7 @@
         });
 
         // 2. Sidebar Badge
-        const sidebarNavs = document.querySelectorAll('aside a[href="admin-orders.html"]');
+        const sidebarNavs = document.querySelectorAll('aside a[href="admin-orders"]');
         sidebarNavs.forEach(nav => {
           if (!nav.classList.contains('justify-between')) {
              nav.classList.add('justify-between');

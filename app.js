@@ -117,7 +117,7 @@ window.showCustomAlert = function(message, onConfirm, isError = false) {
     const userStr = localStorage.getItem('nomin_user');
     if (!userStr) {
       showCustomAlert('Та захиалга өгөхийн тулд эхлээд нэвтэрч орно уу.', () => {
-        window.location.href = 'login.html';
+        window.location.href = 'login';
       });
       return;
     }
@@ -130,13 +130,13 @@ window.showCustomAlert = function(message, onConfirm, isError = false) {
   }
 
   // Nav links for order
-  document.querySelectorAll('a[href="order.html"], a[href^="order.html?"], .nav-link[data-action="order"]').forEach(link => {
+  document.querySelectorAll('a[href="order"], a[href^="order.html?"], .nav-link[data-action="order"]').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const userStr = localStorage.getItem('nomin_user');
       if (!userStr) {
         showCustomAlert('Та захиалга өгөхийн тулд эхлээд нэвтэрч орно уу.', () => {
-          window.location.href = 'login.html';
+          window.location.href = 'login';
         });
         return;
       }
