@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nomin-admin-v1';
+const CACHE_NAME = 'nomin-admin-v2';
 const ASSETS_TO_CACHE = [
   './admin.html',
   './admin-orders.html',
@@ -39,6 +39,15 @@ self.addEventListener('fetch', (event) => {
       // Return cached response immediately if available, while updating cache in background
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
+          // -----------------------------------------------------------------------------
+          // FIX for Cloudflare Pages Clean URLs (HTML redirects) + Service Worker Bug
+          // Chrome blocks 'redirected: true' responses for 'navigate' requests for security.
+          // If we detect a redirect, we explicitly tell the browser to redirect.
+          // -----------------------------------------------------------------------------
+          if (networkResponse.redirected && event.request.mode === 'navigate') {
+             return Response.redirect(networkResponse.url, 302);
+          }
+
           if (networkResponse && networkResponse.ok) {
             const clonedResponse = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clonedResponse));
