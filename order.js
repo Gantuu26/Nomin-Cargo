@@ -4,6 +4,14 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // ========== CHECK AUTHENTICATION ==========
+  const userStr = localStorage.getItem('nomin_user');
+  if (!userStr) {
+    alert('Та захиалга өгөхийн тулд эхлээд нэвтэрч орно уу.');
+    window.location.href = 'login.html';
+    return;
+  }
+
   // ========== GET ORDER TYPE FROM URL ==========
   const urlParams = new URLSearchParams(window.location.search);
   const orderType = urlParams.get('type') || 'standard'; // default to standard
