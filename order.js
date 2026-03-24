@@ -553,4 +553,24 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // Handle mobile keyboard overlap by hiding bottom nav when inputs are focused
+  const bottomNav = document.querySelector('nav.fixed.bottom-0');
+  if (bottomNav) {
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        if (window.innerWidth < 768) {
+          bottomNav.style.display = 'none';
+        }
+      });
+      input.addEventListener('blur', () => {
+        setTimeout(() => {
+          const activeTag = document.activeElement ? document.activeElement.tagName : '';
+          if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA' && activeTag !== 'SELECT') {
+            bottomNav.style.display = '';
+          }
+        }, 50);
+      });
+    });
+  }
 });
