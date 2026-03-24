@@ -5,8 +5,20 @@ export async function onRequest(context) {
 
     try {
         if (request.method === 'GET') {
-            // Include basic selection
-            const { results } = await env.DB.prepare('SELECT * FROM orders ORDER BY date DESC').all();
+            const phone = url.searchParams.get('phone');
+            let results;
+            if (phone && phone !== 'none') {
+                 // For security and privacy, only return orders where sender_phone matches the logged in user
+                 const stmt = env.DB.prepare('SELECT * FROM orders WHERE sender_phone = ? ORDER BY date DESC').bind(phone);
+                 results = (await stmt.all()).results;
+            } else if (phone === 'none') {
+                 // Explicitly requested no orders
+                 results = [];
+            } else {
+                 // Admin panel without phone filter
+                 const stmt = env.DB.prepare('SELECT * FROM orders ORDER BY date DESC');
+                 results = (await stmt.all()).results;
+            }
             return new Response(JSON.stringify(results), { headers: { 'Content-Type': 'application/json' } });
         }
         

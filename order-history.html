@@ -58,17 +58,48 @@
     </div>
   </header>
 
-  <main class="pt-[76px] px-4 max-w-lg mx-auto" id="history-container">
+  <main class="pt-[76px] px-4 max-w-lg mx-auto" id="ordersContainer">
      <!-- Orders will be injected here -->
+     <div id="emptyState" class="bg-white rounded-3xl p-8 border border-blue-100/50 shadow-card animate-fade-in-up text-center mt-4 hidden">
+        <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+          <span class="material-symbols-outlined text-[32px]">history</span>
+        </div>
+        <h3 class="text-[16px] font-bold text-gray-900 mb-2">Захиалгын түүх хоосон байна</h3>
+        <p class="text-[13px] text-slate-500 mb-6 leading-relaxed">Та одоогоор ямар нэгэн захиалга өгөөгүй байна. Шинэ захиалга өгч Номин Транс-н үйлчилгээг туршаад үзээрэй.</p>
+        <a href="order.html" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white text-[13px] font-bold rounded-xl shadow-sm hover:bg-blue-600 transition-colors">
+          Захиалга өгөх
+        </a>
+      </div>
   </main>
 
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const container = document.getElementById('history-container');
+    document.addEventListener("DOMContentLoaded", async function loadOrders() {
+      const container = document.getElementById('ordersContainer');
+      const emptyState = document.getElementById('emptyState');
       
       let orders = [];
+      let phoneQuery = '';
+      const userStr = localStorage.getItem('nomin_user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user.phone) {
+            phoneQuery = `?phone=${user.phone}`;
+          } else {
+             // Handle guest or no phone - maybe empty state directly?
+             // Let's allow empty query so we don't fetch all orders for a blank user
+             phoneQuery = `?phone=none`; 
+          }
+        } catch(e) {
+            console.error("Error parsing user data from localStorage:", e);
+            phoneQuery = `?phone=none`;
+        }
+      } else {
+         phoneQuery = `?phone=none`;
+      }
+
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch('/api/orders' + phoneQuery);
         if (res.ok) {
            orders = await res.json();
         }
