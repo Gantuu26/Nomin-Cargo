@@ -28,21 +28,24 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  // Only handle GET requests and skip data: URLs or other non-http schemes
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) return;
   
   // Stale-while-revalidate strategy for admin app to ensure fresh data
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
-        // Cache the new response if it's an asset
-        if (event.request.url.includes('.html') || event.request.url.includes('.css')) {
+        // Cache the new response if it's a valid successful response and is an asset
+        if (networkResponse && networkResponse.ok && (event.request.url.includes('.html') || event.request.url.includes('.css') || event.request.url.includes('.js'))) {
            const clonedResponse = networkResponse.clone();
            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
         }
         return networkResponse;
-      }).catch(() => {
-         // Network failed, rely purely on cache.
-         return cachedResponse;
+      }).catch((err) => {
+         // Network failed, if we have a cache, use it.
+         if (cachedResponse) return cachedResponse;
+         // If no cache and network fails, we must throw or return a valid error response
+         throw err;
       });
       return cachedResponse || fetchPromise;
     })
