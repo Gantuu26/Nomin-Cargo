@@ -2,7 +2,7 @@ export async function onRequestPost({ request, env }) {
   try {
     // === AUTO SETUP DATABASE ===
     // This safely ensures the tables exist without dropping data or failing on Windows wrangler execute
-    await env.DB.exec(`
+    await env.DB.prepare(`
       CREATE TABLE IF NOT EXISTS users (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
@@ -10,18 +10,18 @@ export async function onRequestPost({ request, env }) {
           phone TEXT NOT NULL,
           password_hash TEXT NOT NULL,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+      );
+    `).run();
     
-    await env.DB.exec(`
+    await env.DB.prepare(`
       CREATE TABLE IF NOT EXISTS banners (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           image_url TEXT NOT NULL,
           link_url TEXT,
           active INTEGER DEFAULT 1,
           created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+      );
+    `).run();
 
     const { name, email, phone, password } = await request.json();
 
