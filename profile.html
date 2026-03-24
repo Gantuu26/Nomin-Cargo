@@ -247,10 +247,11 @@
     let lastKnownStep = null;
     let lastKnownOrderId = null;
 
-    async function initTracker() {
+    async function initTracker(userEmail) {
       let orders = [];
+      if (!userEmail) return;
       try {
-        const res = await fetch('/api/orders');
+        const res = await fetch(`/api/orders?user_email=${userEmail}`);
         if (res.ok) {
            orders = await res.json();
         }
@@ -321,10 +322,9 @@
       const userStr = localStorage.getItem('nomin_user');
       if (userStr) {
         // Logged in user: load their tracker logic
-        initTracker();
-        
         try {
           const user = JSON.parse(userStr);
+          initTracker(user.email);
           // Set user name
           document.querySelector('.bg-white.p-6.rounded-3xl h2').textContent = user.name;
           

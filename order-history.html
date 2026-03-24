@@ -83,19 +83,17 @@
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
-          if (user.phone) {
-            phoneQuery = `?phone=${user.phone}`;
+          if (user.email) {
+            phoneQuery = `?user_email=${user.email}`;
           } else {
-             // Handle guest or no phone - maybe empty state directly?
-             // Let's allow empty query so we don't fetch all orders for a blank user
-             phoneQuery = `?phone=none`; 
+             phoneQuery = `?user_email=none`; 
           }
         } catch(e) {
             console.error("Error parsing user data from localStorage:", e);
-            phoneQuery = `?phone=none`;
+            phoneQuery = `?user_email=none`;
         }
       } else {
-         phoneQuery = `?phone=none`;
+         phoneQuery = `?user_email=none`;
       }
 
       try {

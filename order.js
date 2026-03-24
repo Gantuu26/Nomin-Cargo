@@ -466,12 +466,19 @@ document.addEventListener('DOMContentLoaded', () => {
       // Generate a temporary Order ID for UI
       const orderId = 'MN' + Date.now().toString().slice(-6);
 
+      let userEmail = '';
+      try {
+          const uStr = localStorage.getItem('nomin_user');
+          if (uStr) userEmail = JSON.parse(uStr).email || '';
+      } catch(e) {}
+
       const newOrder = {
         ...orderData,
         orderId: orderId,
         date: new Date().toISOString(),
         status: 'pending',
-        images: imageUrls
+        images: imageUrls,
+        user_email: userEmail
       };
 
       // Real API Call

@@ -5,17 +5,19 @@ export async function onRequest(context) {
 
     try {
         if (request.method === 'GET') {
-            const phone = url.searchParams.get('phone');
+            const email = url.searchParams.get('user_email');
             let results;
-            if (phone && phone !== 'none') {
-                 // For security and privacy, only return orders where sender_phone matches the logged in user
-                 const stmt = env.DB.prepare('SELECT * FROM orders WHERE sender_phone = ? ORDER BY date DESC').bind(phone);
+            if (email && email !== 'none') {
+                 // Try adding the column just in case it's an old DB
+                 try { await env.DB.prepare('ALTER TABLE orders ADD COLUMN user_email TEXT').run(); } catch(e){}
+                 
+                 const stmt = env.DB.prepare('SELECT * FROM orders WHERE user_email = ? ORDER BY date DESC').bind(email);
                  results = (await stmt.all()).results;
-            } else if (phone === 'none') {
+            } else if (email === 'none') {
                  // Explicitly requested no orders
                  results = [];
             } else {
-                 // Admin panel without phone filter
+                 // Admin panel without user filter
                  const stmt = env.DB.prepare('SELECT * FROM orders ORDER BY date DESC');
                  results = (await stmt.all()).results;
             }
@@ -25,18 +27,23 @@ export async function onRequest(context) {
         if (request.method === 'POST') {
             const body = await request.json();
             
+            // Auto-migrate schema to include user_email if it doesn't exist
+            try { 
+                await env.DB.prepare('ALTER TABLE orders ADD COLUMN user_email TEXT').run(); 
+            } catch(e) { /* ignore */ }
+            
             const stmt = env.DB.prepare(`
                 INSERT INTO orders (
                     order_id, type, branch, date, status, container_id,
                     sender_name, sender_phone, sender_address,
                     receiver_name, receiver_phone, receiver_address,
-                    item_category, item_quantity
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    item_category, item_quantity, user_email
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).bind(
                 body.orderId, body.type, body.branch || '', body.date || new Date().toISOString(), body.status || 'pending', body.containerId || null,
                 body.sender?.name || '', body.sender?.phone || '', body.sender?.address || '',
                 body.receiver?.name || '', body.receiver?.phone || '', body.receiver?.address || '',
-                body.items?.[0]?.category || '', body.items?.[0]?.quantity || ''
+                body.items?.[0]?.category || '', body.items?.[0]?.quantity || '', body.user_email || ''
             );
             await stmt.run();
             
