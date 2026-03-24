@@ -1,0 +1,11 @@
+name = "nomin-cargo"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nomin-cargo-db"
+database_id = "802ee440-3664-4be6-a05e-a6122d10f845"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "nomin-cargo-images"
