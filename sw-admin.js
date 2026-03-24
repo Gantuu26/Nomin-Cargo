@@ -40,6 +40,9 @@ self.addEventListener('fetch', (event) => {
   const url = event.request.url;
   if (!url.startsWith('http')) return;
 
+  // NEVER cache API calls - always go to network
+  if (url.includes('/api/')) return;
+
   // For navigation requests, always go to network first (avoid redirect issues)
   if (event.request.mode === 'navigate') {
     event.respondWith(

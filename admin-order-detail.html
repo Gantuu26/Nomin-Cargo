@@ -16,9 +16,9 @@
           colors: {
             "primary": "#3B82F6",
             "primary-dark": "#2563EB",
-            "success": "#10B981",    // Green for delivered/success
-            "warning": "#F59E0B",    // Orange/Yellow for pending
-            "info": "#3B82F6",       // Blue for in transit
+            "success": "#10B981",
+            "warning": "#F59E0B",
+            "info": "#3B82F6",
             "surface": "#F0F4FF",
             "on-surface": "#0F172A",
           },
@@ -39,51 +39,14 @@
     body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
-    
-    /* Hide scrollbar for IE, Edge and Firefox */
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
     .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-    .nav-glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
-    
-    .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     .delay-100 { animation-delay: 0.1s; opacity: 0; }
     .delay-200 { animation-delay: 0.2s; opacity: 0; }
-    
-    @media print {
-      body { background-color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      header, .print-hide, #sms-modal { display: none !important; }
-      main { margin-top: 0 !important; padding-top: 0 !important; box-shadow: none !important; }
-      * { border-color: #f1f5f9 !important; }
-    }
   </style>
   <link rel="stylesheet" href="styles.css">
-  <script>
-    if (document.fonts) {
-      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
-    } else {
-      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
-    }
-  </script>
-
-  <!-- PWA Manifest for Admin -->
-  <link rel="manifest" href="admin-manifest.json">
-  <link rel="apple-touch-icon" href="https://placehold.co/192x192/3B82F6/ffffff.png?text=N.T">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Админ">
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw-admin.js')
-          .then(reg => console.log('Admin SW registered!', reg))
-          .catch(err => console.log('Admin SW failed:', err));
-      });
-    }
-  </script>
   <script>
     if (!localStorage.getItem('admin_session')) {
       window.location.href = 'admin-login';
@@ -104,13 +67,10 @@
       <a href="admin-orders" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200/50 active:scale-95 transition-all text-slate-700">
         <span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span>
       </a>
-      <h1 class="text-[18px] font-bold text-gray-900 tracking-tight absolute left-1/2 -translate-x-1/2">Захиалга MN03</h1>
+      <h1 id="page-title" class="text-[18px] font-bold text-gray-900 tracking-tight absolute left-1/2 -translate-x-1/2">Захиалга</h1>
       <div class="flex items-center gap-1 absolute right-4">
-        <button onclick="window.print()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-50 active:scale-95 transition-all text-primary" title="Хэвлэх (인쇄)">
+        <button onclick="window.print()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-50 active:scale-95 transition-all text-primary" title="Хэвлэх">
           <span class="material-symbols-outlined text-[24px]">print</span>
-        </button>
-        <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-200/50 active:scale-95 transition-all text-slate-700">
-          <span class="material-symbols-outlined text-[24px]">menu</span>
         </button>
       </div>
     </div>
@@ -118,495 +78,254 @@
 
   <main class="pt-[88px] px-4 max-w-lg mx-auto space-y-6">
     
-    <!-- Baemin-style Status Tracker (Interactive) -->
-    <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card animate-fade-in-up">
-      <!-- Top Title and Subtitle -->
-      <div class="flex justify-between items-start mb-6">
-        <div>
-          <h2 id="tracker-title" class="text-[20px] font-extrabold text-gray-900 flex items-center gap-2 mb-1">
-            Шалгаж байна <span class="text-[22px]">📦</span>
-          </h2>
-          <p id="tracker-subtitle" class="text-[12px] text-slate-500 font-medium tracking-wide">Ачааны мэдээллийг шалгаж байна</p>
-        </div>
-        <div id="tracker-badge" class="bg-warning/10 text-warning px-3 py-1.5 rounded-xl flex flex-col items-center justify-center transition-colors">
-          <span class="text-[10px] uppercase font-bold tracking-wider mb-0.5">Одоогийн төлөв</span>
-          <span id="tracker-step-text" class="text-[13px] font-bold">Алхам 1</span>
-        </div>
-      </div>
-
-      <!-- Center Graphic Container -->
-      <div class="flex justify-center mb-8 relative">
-        <div class="w-28 h-28 bg-gradient-to-tr from-blue-50 to-blue-100 border-4 border-white rounded-full flex items-center justify-center relative shadow-sm animate-pulse">
-           <span id="tracker-icon" class="material-symbols-outlined text-[56px] text-primary transition-all duration-300" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
-           <div class="absolute top-1 right-1 w-3 h-3 rounded-full bg-blue-300"></div>
-           <div class="absolute bottom-3 left-2 w-2 h-2 rounded-full bg-blue-200"></div>
-        </div>
-      </div>
-
-      <!-- Progress Bar Tracker -->
-      <div class="relative px-2">
-        <!-- Lines wrapper -->
-        <div class="absolute top-3.5 left-[16.666%] right-[16.666%] h-[4px]">
-          <!-- Background line -->
-          <div class="absolute inset-0 bg-slate-100 rounded-full z-0"></div>
-          <!-- Active line -->
-          <div id="tracker-progress" class="absolute top-0 left-0 h-full bg-primary rounded-full z-0 transition-all duration-500" style="width: 0%"></div>
-        </div>
-
-        <!-- Steps -->
-        <div class="relative z-10 flex justify-between">
-          <!-- Step 1: Шалгаж байна (Active) -->
-          <button onclick="updateStatus(1)" class="flex-1 flex flex-col items-center gap-2 active:scale-95 transition-transform group focus:outline-none">
-            <div id="step-1-dot" class="w-8 h-8 rounded-full bg-primary border-4 border-white shadow-sm flex items-center justify-center transition-colors"></div>
-            <span id="step-1-text" class="text-[11px] font-bold text-primary text-center leading-[1.3] transition-colors">Шалгаж<br>байна</span>
-          </button>
-          
-          <!-- Step 2: Хаягаар очиж байна (Inactive) -->
-          <button onclick="updateStatus(2)" class="flex-1 flex flex-col items-center gap-2 active:scale-95 transition-transform group hover:opacity-80 focus:outline-none">
-            <div id="step-2-dot" class="w-8 h-8 rounded-full bg-slate-200 border-4 border-white shadow-sm group-hover:bg-slate-300 transition-colors"></div>
-            <span id="step-2-text" class="text-[11px] font-medium text-slate-400 text-center leading-[1.3] transition-colors">Хаягаар<br>очиж байна</span>
-          </button>
-
-          <!-- Step 3: Контейнерт ачигдлаа (Inactive) -->
-          <button onclick="updateStatus(3)" class="flex-1 flex flex-col items-center gap-2 active:scale-95 transition-transform group hover:opacity-80 focus:outline-none">
-            <div id="step-3-dot" class="w-8 h-8 rounded-full bg-slate-200 border-4 border-white shadow-sm group-hover:bg-slate-300 transition-colors"></div>
-            <span id="step-3-text" class="text-[11px] font-medium text-slate-400 text-center leading-[1.3] transition-colors">Контейнерт<br>ачигдлаа</span>
-          </button>
-        </div>
-      </div>
-      
-      <!-- Small instruction for Admin -->
-      <div class="mt-8 text-center bg-slate-50 rounded-xl py-3 border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer" onclick="updateStatus(1)">
-        <p class="text-[11px] text-slate-500 font-medium flex items-center justify-center gap-1.5">
-          <span class="material-symbols-outlined text-[14px]">touch_app</span>
-          Төлөв өөрчлөхийн тулд дээрх алхмууд дээр дарна уу
-        </p>
-      </div>
+    <!-- Loading -->
+    <div id="loadingState" class="py-12 text-center text-slate-400">
+       <span class="material-symbols-outlined animate-spin text-[40px] mb-2 text-primary">progress_activity</span>
+       <p class="text-[14px] font-medium">Мэдээллийг татаж байна...</p>
     </div>
 
-    <!-- Order Details -->
-    <section class="animate-fade-in-up delay-200">
-      <h3 class="text-[16px] font-bold text-gray-900 mb-3 px-1">Дэлгэрэнгүй мэдээлэл</h3>
-      <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card space-y-5">
-        
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-          <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төрөл</p>
-          <div class="bg-primary/10 px-2.5 py-1 rounded-lg">
-             <p class="text-[13px] font-bold text-primary">Энгийн ачаа</p>
-          </div>
-        </div>
-        
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-          <p class="text-[13px] text-slate-400 font-medium tracking-wide">Бүртгэсэн огноо</p>
-          <p class="text-[14px] font-bold text-gray-900">2026.03.22 14:30</p>
-        </div>
-
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-          <p class="text-[13px] text-slate-400 font-medium tracking-wide">Салбар</p>
-          <p class="text-[14px] font-bold text-primary flex items-center gap-1">
-             <span class="material-symbols-outlined text-[16px]">storefront</span>
-             Салбар 1 (Одгэрэл)
-          </p>
-        </div>
-
-        <!-- Илгээгчийн мэдээлэл -->
-        <div class="border-b border-slate-100 pb-4">
-          <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">person</span>
-            Илгээгчийн мэдээлэл
-          </p>
-          <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
-             <div class="flex justify-between items-start">
-               <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
-               <span class="text-[14px] font-bold text-gray-900">О. Гантулга</span>
-             </div>
-             <div class="flex justify-between items-start">
-               <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
-               <span class="text-[14px] font-bold text-gray-900 tracking-wide">010-1234-5678</span>
-             </div>
-             <div>
-               <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Солонгос дахь хаяг)</span>
-               <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">Сөүл хот, Тундэмун дүүрэг, 2-р гудамж 15 тоот</span>
-             </div>
-          </div>
-        </div>
-
-        <!-- Барааны мэдээлэл -->
-        <div class="border-b border-slate-100 pb-4">
-          <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">package</span>
-            Барааны мэдээлэл
-          </p>
-          <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
-             <div class="flex justify-between items-start">
-               <span class="text-[12px] text-slate-500 font-medium">Барааны төрөл</span>
-               <span class="text-[14px] font-bold text-gray-900">Энгийн ачаа, Хувцас</span>
-             </div>
-             <div class="flex justify-between items-start">
-               <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
-               <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">2 хайрцаг</span>
-             </div>
-             <div>
-               <span class="text-[12px] text-slate-500 font-medium block mb-1">Нэмэлт тайлбар</span>
-               <span class="text-[13px] text-slate-600 italic block leading-relaxed">"Хэврэг ачаа тул анхааралтай харьцана уу"</span>
-             </div>
-             <div class="pt-2">
-               <span class="text-[12px] text-slate-500 font-medium block mb-2">Барааны зураг</span>
-               <div class="flex gap-2.5">
-                  <div class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm" style="background-image: url('https://placehold.co/100x100/e2e8f0/64748b?text=IMG1');"></div>
-                  <div class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm" style="background-image: url('https://placehold.co/100x100/e2e8f0/64748b?text=IMG2');"></div>
-               </div>
-             </div>
-          </div>
-        </div>
-
-        <!-- Хүлээн авагчийн мэдээлэл -->
-        <div>
-          <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">location_on</span>
-            Хүлээн авагчийн мэдээлэл
-          </p>
-          <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
-             <div class="flex justify-between items-start">
-               <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
-               <span class="text-[14px] font-bold text-gray-900">Б. Сараа</span>
-             </div>
-             <div class="flex justify-between items-start">
-               <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
-               <span class="text-[14px] font-bold text-gray-900 tracking-wide">+976 8811-2233</span>
-             </div>
-             <div>
-               <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Монгол хаяг)</span>
-               <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">Улаанбаатар хот, БЗД, Парк вью хотхон 702 тоот</span>
-             </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Actions -->
-    <div class="flex gap-3 print-hide pb-8 animate-fade-in-up delay-200 mt-6">
-       <button onclick="document.getElementById('sms-modal').classList.remove('hidden')" class="flex-[1.5] py-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-50 active:scale-[0.98] transition-all">
-         <span class="material-symbols-outlined text-[20px]">sms</span> Мессеж 
-       </button>
-       <button class="flex-1 py-4 bg-red-50 text-red-500 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-red-100 active:scale-[0.98] transition-all">
-         <span class="material-symbols-outlined text-[20px]">delete</span> Устгах
-       </button>
-    </div>
+    <!-- Dynamic Content Container -->
+    <div id="orderContent" class="space-y-6 hidden"></div>
 
   </main>
 
-  <!-- SMS Modal -->
-  <div id="sms-modal" class="fixed inset-0 z-[100] hidden bg-slate-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center">
-    <!-- Modal Content -->
-    <div class="bg-white w-full max-w-lg sm:rounded-3xl rounded-t-[32px] h-[85vh] sm:h-[80vh] flex flex-col shadow-2xl animate-slide-up">
-      <!-- Drag handle for mobile feel -->
-      <div class="w-full flex justify-center py-3 sm:hidden shrink-0">
-        <div class="w-12 h-1.5 bg-slate-200 rounded-full"></div>
-      </div>
-      
-      <!-- Header -->
-      <div class="flex items-center justify-between px-5 pb-4 pt-2 sm:pt-5 border-b border-slate-100 shrink-0">
-        <div class="flex items-center gap-2 text-success">
-          <span class="material-symbols-outlined text-[24px]">sms</span>
-          <h2 class="text-[18px] font-bold text-gray-900">SMS мессеж илгээх</h2>
-        </div>
-        <button onclick="document.getElementById('sms-modal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors">
-          <span class="material-symbols-outlined text-[20px]">close</span>
-        </button>
-      </div>
-      
-      <!-- Body -->
-      <div class="p-5 overflow-y-auto no-scrollbar flex-1 pb-10">
-        <p class="text-[13px] text-slate-500 mb-4 font-medium">Доорх мессежийг хуулж, харилцагчид илгээнэ үү</p>
-        
-        <!-- Customer Info Card -->
-        <div class="bg-surface rounded-2xl p-4 mb-5 border border-blue-100/50">
-          <div class="flex items-center gap-3 mb-2 text-[15px] font-bold text-gray-900">
-             О. Гантулга
-          </div>
-          <div class="flex items-center gap-2 text-[14px] text-primary font-bold mb-3">
-            <span class="material-symbols-outlined text-[18px] opacity-70">call</span> 010-1234-5678
-          </div>
-          <div class="flex justify-between items-center pt-3 border-t border-slate-200">
-            <span class="text-[13px] text-slate-500 font-medium">Захиалга: <span class="text-gray-900 font-bold">#MN03</span></span>
-            <span class="text-[12px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-md">Энгийн ачаа</span>
-          </div>
-        </div>
-
-        <h3 class="text-[14px] font-bold text-gray-900 mb-3">Мессеж сонгох:</h3>
-        
-        <div class="space-y-3">
-          <!-- Template 1 -->
-          <div class="border border-success bg-success/5 rounded-2xl p-4 relative shadow-sm">
-             <div class="flex justify-between items-start mb-2">
-               <span class="text-[13px] font-bold text-gray-900">Захиалга баталгаажсан</span>
-               <span class="text-[10px] font-bold bg-success text-white px-2 py-0.5 rounded-md uppercase tracking-wider">Одоогийн төлөв</span>
-             </div>
-             <p class="text-[13.5px] text-slate-700 leading-relaxed mb-4">
-               [Nomin Cargo] Таны MN03 дугаартай захиалга амжилттай бүртгэгдлээ. Тээвэрт гарах үед дахин мэдэгдэх болно.
-             </p>
-             <div class="flex justify-between items-center pt-3 border-t border-success/20">
-               <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-medium">
-                 <span class="material-symbols-outlined text-[16px]">smartphone</span> 010-1234-5678
-               </div>
-               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 дугаартай захиалга амжилттай бүртгэгдлээ. Тээвэрт гарах үед дахин мэдэгдэх болно." class="flex items-center gap-1 text-[13px] font-bold text-success hover:text-green-700 transition-colors bg-success/10 px-3 py-1.5 rounded-xl">
-                 <span class="material-symbols-outlined text-[18px]">send</span> Дарж илгээх
-               </a>
-             </div>
-          </div>
-
-          <!-- Template 2 -->
-          <div class="border border-slate-200 bg-white rounded-2xl p-4 relative">
-             <div class="mb-2">
-               <span class="text-[13px] font-bold text-gray-900">Төлбөр хүлээгдэж байна</span>
-             </div>
-             <p class="text-[13.5px] text-slate-700 leading-relaxed mb-4">
-               [Nomin Cargo] Таны MN03 дугаартай захиалгын төлбөр хүлээгдэж байна. Төлбөрөө баталгаажуулна уу.
-             </p>
-             <div class="flex justify-between items-center pt-3 border-t border-slate-100">
-               <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-medium">
-                 <span class="material-symbols-outlined text-[16px]">smartphone</span> 010-1234-5678
-               </div>
-               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 дугаартай захиалгын төлбөр хүлээгдэж байна. Төлбөрөө баталгаажуулна уу." class="flex items-center gap-1 text-[13px] font-bold text-success hover:text-green-700 transition-colors bg-success/10 px-3 py-1.5 rounded-xl">
-                 <span class="material-symbols-outlined text-[18px]">send</span> Дарж илгээх
-               </a>
-             </div>
-          </div>
-
-          <!-- Template 3 -->
-          <div class="border border-slate-200 bg-white rounded-2xl p-4 relative">
-             <div class="mb-2">
-               <span class="text-[13px] font-bold text-gray-900">Тээвэрт гарсан</span>
-             </div>
-             <p class="text-[13.5px] text-slate-700 leading-relaxed mb-4">
-               [Nomin Cargo] Таны MN03 дугаартай захиалга Улаанбаатар руу тээвэрт гарлаа. Удахгүй очно.
-             </p>
-             <div class="flex justify-between items-center pt-3 border-t border-slate-100">
-               <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-medium">
-                 <span class="material-symbols-outlined text-[16px]">smartphone</span> 010-1234-5678
-               </div>
-               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 дугаартай захиалга Улаанбаатар руу тээвэрт гарлаа. Удахгүй очно." class="flex items-center gap-1 text-[13px] font-bold text-success hover:text-green-700 transition-colors bg-success/10 px-3 py-1.5 rounded-xl">
-                 <span class="material-symbols-outlined text-[18px]">send</span> Дарж илгээх
-               </a>
-             </div>
-          </div>
-
-          <!-- Template 4 -->
-          <div class="border border-slate-200 bg-white rounded-2xl p-4 relative">
-             <div class="mb-2">
-               <span class="text-[13px] font-bold text-gray-900">Салбарт ирсэн</span>
-             </div>
-             <p class="text-[13.5px] text-slate-700 leading-relaxed mb-4">
-               [Nomin Cargo] Таны MN03 захиалга Салбар 1-т ирлээ. Ажлын цагаар ирж авна уу. Баярлалаа.
-             </p>
-             <div class="flex justify-between items-center pt-3 border-t border-slate-100">
-               <div class="flex items-center gap-1.5 text-[12px] text-slate-500 font-medium">
-                 <span class="material-symbols-outlined text-[16px]">smartphone</span> 010-1234-5678
-               </div>
-               <a href="sms:01012345678?body=[Nomin Cargo] Таны MN03 захиалга Салбар 1-т ирлээ. Ажлын цагаар ирж авна уу. Баярлалаа." class="flex items-center gap-1 text-[13px] font-bold text-success hover:text-green-700 transition-colors bg-success/10 px-3 py-1.5 rounded-xl">
-                 <span class="material-symbols-outlined text-[18px]">send</span> Дарж илгээх
-               </a>
-             </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
-    const statuses = {
-      1: {
-        title: 'Шалгаж байна <span class="text-[22px]">📦</span>',
-        subtitle: 'Ачааны мэдээллийг шалгаж байна',
-        icon: 'inventory_2',
-        progress: '0%',
-        badgeClass: 'bg-warning/10 text-warning',
-        stepParams: [
-          { dot: 'bg-primary border-4 border-white shadow-sm hover:opacity-90', text: 'font-bold text-primary' },
-          { dot: 'bg-slate-200 border-4 border-white shadow-sm group-hover:bg-slate-300', text: 'font-medium text-slate-400' },
-          { dot: 'bg-slate-200 border-4 border-white shadow-sm group-hover:bg-slate-300', text: 'font-medium text-slate-400' }
-        ]
-      },
-      2: {
-        title: 'Хаягаар очиж байна <span class="text-[22px]">🚚</span>',
-        subtitle: 'Таны оруулсан хаягаар ачаагаа авахаар очиж байна',
-        icon: 'local_shipping',
-        progress: '50%',
-        badgeClass: 'bg-info/10 text-info',
-        stepParams: [
-          { dot: 'bg-primary border-4 border-white shadow-sm hover:opacity-90', text: 'font-bold text-primary' },
-          { dot: 'bg-primary border-4 border-white shadow-sm hover:opacity-90', text: 'font-bold text-primary' },
-          { dot: 'bg-slate-200 border-4 border-white shadow-sm group-hover:bg-slate-300', text: 'font-medium text-slate-400' }
-        ]
-      },
-      3: {
-        title: 'Контейнерт ачигдлаа <span class="text-[22px]">🚢</span>',
-        subtitle: 'Захиалга амжилттай чингэлэгт ачигдсан',
-        icon: 'directions_boat',
-        progress: '100%',
-        badgeClass: 'bg-success/10 text-success',
-        stepParams: [
-          { dot: 'bg-primary border-4 border-white shadow-sm hover:opacity-90', text: 'font-bold text-primary' },
-          { dot: 'bg-primary border-4 border-white shadow-sm hover:opacity-90', text: 'font-bold text-primary' },
-          { dot: 'bg-primary border-4 border-white shadow-sm hover:opacity-90', text: 'font-bold text-primary' }
-        ]
-      }
+    const STATUSES = {
+       'checking': 'Шалгаж байна',
+       'picking_up': 'Хаягаар очиж байна',
+       'loaded': 'Контейнерт ачигдлаа',
+       'departed': 'Инчоноос хөдөлсөн',
+       'in_transit': 'Ачаа замдаа явж байна',
+       'arrived': 'Монголд ачаа буусан'
     };
+    const STATUS_KEYS = Object.keys(STATUSES);
+    const EMOJIS = { 1: '📦', 2: '🚚', 3: '🚢' };
+    const ICONS = { 1: 'inventory_2', 2: 'local_shipping', 3: 'directions_boat' };
 
-    function updateStatus(step) {
-      const data = statuses[step];
-      if (!data) return;
-      
-      // Save to localStorage for cross-page sync
-      localStorage.setItem('nominCargoStatus', step);
-      
-      // Update Top Texts
-      document.getElementById('tracker-title').innerHTML = data.title;
-      document.getElementById('tracker-subtitle').textContent = data.subtitle;
-      document.getElementById('tracker-step-text').textContent = 'Алхам ' + step;
-      
-      // Update Badge Color
-      const badge = document.getElementById('tracker-badge');
-      badge.className = `px-3 py-1.5 rounded-xl flex flex-col items-center justify-center transition-colors duration-500 ${data.badgeClass}`;
-      
-      // Update Middle Icon with a smooth transition
-      const icon = document.getElementById('tracker-icon');
-      icon.style.opacity = 0;
-      icon.style.transform = 'scale(0.8)';
-      setTimeout(() => {
-        icon.textContent = data.icon;
-        icon.style.opacity = 1;
-        icon.style.transform = 'scale(1)';
-      }, 200);
+    let currentOrder = null;
 
-      // Update Progress Bar
-      document.getElementById('tracker-progress').style.width = data.progress;
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('id');
 
-      // Update Dots and Text styling
-      for (let i = 1; i <= 3; i++) {
-        const dot = document.getElementById(`step-${i}-dot`);
-        const text = document.getElementById(`step-${i}-text`);
-        const params = data.stepParams[i - 1];
-        
-        dot.className = `w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-500 ${params.dot}`;
-        text.className = `text-[11px] text-center leading-[1.3] transition-colors duration-500 ${params.text}`;
+      if (!orderId) {
+        document.getElementById('loadingState').innerHTML = '<p class="text-[14px] font-medium text-red-400">Захиалгын дугаар олдсонгүй</p>';
+        return;
       }
-    }
-  </script>
 
-  <!-- Sidebar Overlay -->
-  <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
-  
-  <!-- Sidebar Drawer -->
-  <aside id="sidebar-drawer" class="fixed top-0 right-0 w-[280px] h-full bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col">
-    <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-dark flex items-center justify-center text-white font-bold text-[14px] shadow-sm">
-          АД
-        </div>
-        <div>
-          <h3 class="text-[14px] font-bold text-gray-900 leading-tight">Админ</h3>
-          <p class="text-[11px] text-slate-500 font-medium">nomincargo@admin.mn</p>
-        </div>
-      </div>
-      <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">
-        <span class="material-symbols-outlined text-[20px]">close</span>
-      </button>
-    </div>
-    
-    <div class="flex-1 overflow-y-auto py-4">
-      <ul class="space-y-1.5 px-3">
-        <li>
-          <a href="admin" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
-            Хяналтын самбар
-          </a>
-        </li>
-        <li>
-          <a href="admin-orders" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">list_alt</span>
-            Захиалгууд
-          </a>
-        </li>
-        <li>
-          <a href="admin-banners" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">view_carousel</span>
-            Баннер
-          </a>
-        </li>
-        <li>
-          <a href="admin-notifications" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">campaign</span>
-            Мэдэгдэл
-          </a>
-        </li>
-        <li>
-          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">settings</span>
-            Тохиргоо
-          </a>
-        </li>
-      </ul>
-    </div>
-    
-    <div class="p-5 border-t border-slate-100">
-      <a href="#" onclick="logoutAdmin(event)" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
-        <span class="material-symbols-outlined text-[20px]">logout</span>
-        Гарах
-      </a>
-    </div>
-  </aside>
+      document.getElementById('page-title').textContent = `Захиалга ${orderId}`;
 
-  <script>
-    function toggleSidebar() {
-      const overlay = document.getElementById('sidebar-overlay');
-      const drawer = document.getElementById('sidebar-drawer');
-      if (drawer.classList.contains('translate-x-full')) {
-        drawer.classList.remove('translate-x-full');
-        overlay.classList.remove('opacity-0', 'pointer-events-none');
-      } else {
-        drawer.classList.add('translate-x-full');
-        overlay.classList.add('opacity-0', 'pointer-events-none');
-      }
-    }
-    // Add order notification badges dynamically
-    document.addEventListener('DOMContentLoaded', () => {
-      let pendingCount = 0;
       try {
-        const orders = JSON.parse(localStorage.getItem('nomin_orders')) || [];
-        pendingCount = orders.filter(o => o.status === 'pending').length;
-      } catch(e) {}
-      
-      if (pendingCount > 0) {
-        // 1. Bottom Nav Badge
-        const bottomNavs = document.querySelectorAll('nav a[href="admin-orders"]');
-        bottomNavs.forEach(nav => {
-          const iconContainer = nav.querySelector('div');
-          if (iconContainer) {
-            iconContainer.classList.add('relative');
-            const badge = document.createElement('span');
-            badge.className = 'absolute -top-1 -right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-1 border border-white z-10 shadow-sm animate-fade-in-up';
-            badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
-            iconContainer.appendChild(badge);
-          }
-        });
-
-        // 2. Sidebar Badge
-        const sidebarNavs = document.querySelectorAll('aside a[href="admin-orders"]');
-        sidebarNavs.forEach(nav => {
-          if (!nav.classList.contains('justify-between')) {
-             nav.classList.add('justify-between');
-          }
-          const badge = document.createElement('span');
-          badge.className = 'bg-red-500 text-white text-[10px] font-bold rounded-full px-2 py-0.5 min-w-[20px] text-center shadow-sm ml-auto animate-fade-in-up';
-          badge.textContent = pendingCount > 99 ? '99+' : pendingCount;
-          nav.appendChild(badge);
-        });
+        const res = await fetch('/api/orders');
+        if (!res.ok) throw new Error('API error');
+        const allOrders = await res.json();
+        currentOrder = allOrders.find(o => o.order_id === orderId);
+      } catch(e) {
+        console.error(e);
       }
+
+      document.getElementById('loadingState').classList.add('hidden');
+      const content = document.getElementById('orderContent');
+      content.classList.remove('hidden');
+
+      if (!currentOrder) {
+        content.innerHTML = '<div class="bg-white rounded-3xl p-8 text-center border border-blue-100/50 shadow-card"><p class="text-[14px] text-slate-500 font-medium">Захиалга олдсонгүй</p></div>';
+        return;
+      }
+
+      const o = currentOrder;
+      const typeLabel = o.type === 'standard' ? 'Энгийн ачаа' : 'Экспресс ачаа';
+      const d = new Date(o.date);
+      const dateString = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+      // Determine current step from container status
+      let currentStep = 1;
+      if (o.container_id) {
+        try {
+          const cRes = await fetch('/api/containers');
+          const containers = await cRes.json();
+          const container = containers.find(c => c.id === o.container_id);
+          if (container) {
+            if (['picking_up'].includes(container.status)) currentStep = 2;
+            if (['loaded','departed','in_transit','arrived'].includes(container.status)) currentStep = 3;
+          }
+        } catch(e) {}
+      }
+
+      // Images
+      let imagesHtml = '';
+      if (o.images) {
+        let imgs = o.images;
+        if (typeof imgs === 'string') { try { imgs = JSON.parse(imgs); } catch(e) { imgs = []; } }
+        if (Array.isArray(imgs) && imgs.length > 0) {
+          imagesHtml = `
+            <div class="pt-2">
+              <span class="text-[12px] text-slate-500 font-medium block mb-2">Барааны зураг</span>
+              <div class="flex gap-2.5">
+                ${imgs.map(img => `<div class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm" style="background-image: url('${img}');"></div>`).join('')}
+              </div>
+            </div>`;
+        }
+      }
+
+      content.innerHTML = `
+        <!-- Status Tracker -->
+        <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card animate-fade-in-up">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <h2 class="text-[20px] font-extrabold text-gray-900 flex items-center gap-2 mb-1">
+                ${STATUSES[STATUS_KEYS[currentStep-1]] || 'Шалгаж байна'} <span class="text-[22px]">${EMOJIS[currentStep]}</span>
+              </h2>
+              <p class="text-[12px] text-slate-500 font-medium tracking-wide">${o.order_id} • ${dateString}</p>
+            </div>
+            <div class="bg-primary/10 text-primary px-3 py-1.5 rounded-xl flex flex-col items-center">
+              <span class="text-[10px] uppercase font-bold tracking-wider mb-0.5">Төлөв</span>
+              <span class="text-[13px] font-bold">Алхам ${currentStep}</span>
+            </div>
+          </div>
+          <div class="flex justify-center mb-8">
+            <div class="w-28 h-28 bg-gradient-to-tr from-blue-50 to-blue-100 border-4 border-white rounded-full flex items-center justify-center shadow-sm">
+               <span class="material-symbols-outlined text-[56px] text-primary" style="font-variation-settings: 'FILL' 1;">${ICONS[currentStep]}</span>
+            </div>
+          </div>
+          <div class="relative px-2">
+            <div class="absolute top-3.5 left-[16.666%] right-[16.666%] h-[4px]">
+              <div class="absolute inset-0 bg-slate-100 rounded-full z-0"></div>
+              <div class="absolute top-0 left-0 h-full bg-primary rounded-full z-0 transition-all" style="width: ${currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%'}"></div>
+            </div>
+            <div class="relative z-10 flex justify-between">
+              <div class="flex-1 flex flex-col items-center gap-2">
+                <div class="w-8 h-8 rounded-full ${currentStep >= 1 ? 'bg-primary' : 'bg-slate-200'} border-4 border-white shadow-sm"></div>
+                <span class="text-[11px] ${currentStep >= 1 ? 'font-bold text-primary' : 'font-medium text-slate-400'} text-center leading-[1.3]">Шалгаж<br>байна</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-2">
+                <div class="w-8 h-8 rounded-full ${currentStep >= 2 ? 'bg-primary' : 'bg-slate-200'} border-4 border-white shadow-sm"></div>
+                <span class="text-[11px] ${currentStep >= 2 ? 'font-bold text-primary' : 'font-medium text-slate-400'} text-center leading-[1.3]">Хаягаар<br>очиж байна</span>
+              </div>
+              <div class="flex-1 flex flex-col items-center gap-2">
+                <div class="w-8 h-8 rounded-full ${currentStep >= 3 ? 'bg-primary' : 'bg-slate-200'} border-4 border-white shadow-sm"></div>
+                <span class="text-[11px] ${currentStep >= 3 ? 'font-bold text-primary' : 'font-medium text-slate-400'} text-center leading-[1.3]">Контейнерт<br>ачигдлаа</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Details -->
+        <section class="animate-fade-in-up delay-200">
+          <h3 class="text-[16px] font-bold text-gray-900 mb-3 px-1">Дэлгэрэнгүй мэдээлэл</h3>
+          <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card space-y-5">
+            
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+              <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төрөл</p>
+              <div class="bg-primary/10 px-2.5 py-1 rounded-lg">
+                 <p class="text-[13px] font-bold text-primary">${typeLabel}</p>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+              <p class="text-[13px] text-slate-400 font-medium tracking-wide">Бүртгэсэн огноо</p>
+              <p class="text-[14px] font-bold text-gray-900">${dateString}</p>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+              <p class="text-[13px] text-slate-400 font-medium tracking-wide">Салбар</p>
+              <p class="text-[14px] font-bold text-primary flex items-center gap-1">
+                 <span class="material-symbols-outlined text-[16px]">storefront</span>
+                 ${o.branch || 'Тодорхойгүй'}
+              </p>
+            </div>
+
+            <!-- Sender -->
+            <div class="border-b border-slate-100 pb-4">
+              <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">person</span>
+                Илгээгчийн мэдээлэл
+              </p>
+              <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
+                 <div class="flex justify-between items-start">
+                   <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
+                   <span class="text-[14px] font-bold text-gray-900">${o.sender_name || '-'}</span>
+                 </div>
+                 <div class="flex justify-between items-start">
+                   <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
+                   <span class="text-[14px] font-bold text-gray-900 tracking-wide">${o.sender_phone || '-'}</span>
+                 </div>
+                 <div>
+                   <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Солонгос дахь хаяг)</span>
+                   <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${o.sender_address || '-'}</span>
+                 </div>
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div class="border-b border-slate-100 pb-4">
+              <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">package</span>
+                Барааны мэдээлэл
+              </p>
+              <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
+                 <div class="flex justify-between items-start">
+                   <span class="text-[12px] text-slate-500 font-medium">Барааны төрөл</span>
+                   <span class="text-[14px] font-bold text-gray-900">${o.item_category || '-'}</span>
+                 </div>
+                 <div class="flex justify-between items-start">
+                   <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
+                   <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${o.item_quantity || '-'} ш</span>
+                 </div>
+                 ${imagesHtml}
+              </div>
+            </div>
+
+            <!-- Receiver -->
+            <div>
+              <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">location_on</span>
+                Хүлээн авагчийн мэдээлэл
+              </p>
+              <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
+                 <div class="flex justify-between items-start">
+                   <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
+                   <span class="text-[14px] font-bold text-gray-900">${o.receiver_name || '-'}</span>
+                 </div>
+                 <div class="flex justify-between items-start">
+                   <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
+                   <span class="text-[14px] font-bold text-gray-900 tracking-wide">${o.receiver_phone || '-'}</span>
+                 </div>
+                 <div>
+                   <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Монгол хаяг)</span>
+                   <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${o.receiver_address || '-'}</span>
+                 </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pb-8 animate-fade-in-up delay-200 mt-6">
+           <a href="tel:${o.sender_phone || ''}" class="flex-[1.5] py-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-50 active:scale-[0.98] transition-all">
+             <span class="material-symbols-outlined text-[20px]">call</span> Залгах
+           </a>
+           <button onclick="deleteThisOrder('${o.order_id}')" class="flex-1 py-4 bg-red-50 text-red-500 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-red-100 active:scale-[0.98] transition-all">
+             <span class="material-symbols-outlined text-[20px]">delete</span> Устгах
+           </button>
+        </div>
+      `;
     });
+
+    async function deleteThisOrder(orderId) {
+       if (!confirm('Захиалга "' + orderId + '" устгахдаа итгэлтэй байна уу?')) return;
+       try {
+         const res = await fetch('/api/orders?id=' + orderId, { method: 'DELETE' });
+         if (res.ok) {
+            window.location.href = 'admin-orders';
+         } else {
+            alert('Устгахад алдаа гарлаа');
+         }
+       } catch(e) {
+         alert('Холболтын алдаа: ' + e.message);
+       }
+    }
   </script>
 </body>
 </html>
