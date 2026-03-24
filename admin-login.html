@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Админ нэвтрэх - Номин Транс</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#3B82F6",
+            "primary-dark": "#2563EB",
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
+          },
+          fontFamily: {
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+             "card": "0 10px 40px -10px rgba(59, 130, 246, 0.15)",
+             "btn": "0 4px 14px rgba(59, 130, 246, 0.35)",
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    
+    /* Background Pattern */
+    .bg-pattern {
+      background-image: radial-gradient(#3B82F6 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0.1;
+    }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+  </style>
+  <script src="alert.js"></script>
+</head>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen flex items-center justify-center relative overflow-hidden px-4">
+  
+  <div class="absolute inset-0 bg-pattern z-0 pointer-events-none"></div>
+  
+  <!-- Decorative blurred blobs -->
+  <div class="absolute top-1/4 -left-20 w-80 h-80 bg-primary/20 rounded-full blur-3xl pointer-events-none z-0"></div>
+  <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+  <!-- Login Card -->
+  <div class="w-full max-w-sm bg-white/90 backdrop-blur-xl rounded-[32px] shadow-card border border-white/50 p-8 relative z-10 animate-fade-in-up">
+    
+    <!-- Logo area -->
+    <div class="flex flex-col items-center mb-8">
+      <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-primary to-primary-dark shadow-btn flex items-center justify-center mb-4 transform -rotate-6">
+        <span class="material-symbols-outlined text-white text-[32px]">admin_panel_settings</span>
+      </div>
+      <h1 class="text-[24px] font-black text-gray-900 tracking-tight text-center">Удирдлагын хэсэг</h1>
+      <p class="text-[13px] text-slate-500 font-medium text-center mt-1">Зөвхөн админ нэвтрэх эрхтэй</p>
+    </div>
+
+    <!-- Login Form -->
+    <form id="adminLoginForm" class="space-y-4">
+      
+      <div>
+        <label class="block text-[12px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider pl-1">Админ ID</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+            <span class="material-symbols-outlined text-[20px]">badge</span>
+          </div>
+          <input type="text" id="adminId" required
+            class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 rounded-2xl text-[15px] font-medium transition-all outline-none placeholder:text-slate-400" 
+            placeholder="Админ ID оруулна уу">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[12px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider pl-1">Нууц үг</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+            <span class="material-symbols-outlined text-[20px]">lock</span>
+          </div>
+          <input type="password" id="adminPassword" required
+            class="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 rounded-2xl text-[15px] font-medium transition-all outline-none placeholder:text-slate-400" 
+            placeholder="Нууц үгээ оруулна уу">
+          <button type="button" id="togglePasswordBtn" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-primary transition-colors focus:outline-none">
+            <span class="material-symbols-outlined text-[20px]" id="eyeIcon">visibility_off</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-4">
+        <button type="submit" id="loginBtn" class="w-full py-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-2xl font-bold text-[16px] shadow-btn hover:shadow-lg active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+          <span>Нэвтрэх</span>
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+        </button>
+      </div>
+      
+      <div class="text-center mt-6">
+        <a href="index.html" class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-400 hover:text-primary transition-colors">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          Нүүр хуудас руу буцах
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Password visibility toggle
+    document.getElementById('togglePasswordBtn').addEventListener('click', function() {
+      const passwordInput = document.getElementById('adminPassword');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.textContent = 'visibility';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.textContent = 'visibility_off';
+      }
+    });
+
+    // Form submission
+    const loginForm = document.getElementById('adminLoginForm');
+    const loginBtn = document.getElementById('loginBtn');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const adminId = document.getElementById('adminId').value.trim();
+      const password = document.getElementById('adminPassword').value.trim();
+      
+      if (!adminId || !password) return;
+
+      const originalBtnHtml = loginBtn.innerHTML;
+      loginBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> <span>Уншиж байна...</span>';
+      loginBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: adminId, password: password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Success
+          loginBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">check_circle</span> <span>Амжилттай</span>';
+          loginBtn.classList.replace('from-primary', 'from-green-500');
+          loginBtn.classList.replace('to-primary-dark', 'to-green-600');
+          loginBtn.classList.replace('shadow-btn', 'shadow-green-500/30');
+          
+          // Save session
+          localStorage.setItem('admin_session', data.token);
+          
+          setTimeout(() => {
+            window.location.href = 'admin.html';
+          }, 800);
+        } else {
+          showCustomAlert(data.error || 'Нэвтрэхэд алдаа гарлаа.', null, true);
+          loginBtn.innerHTML = originalBtnHtml;
+          loginBtn.disabled = false;
+        }
+      } catch (error) {
+        showCustomAlert('Сервертэй холбогдоход алдаа гарлаа.', null, true);
+        loginBtn.innerHTML = originalBtnHtml;
+        loginBtn.disabled = false;
+      }
+    });
+    
+    // Auto redirect if already logged in
+    if (localStorage.getItem('admin_session')) {
+       window.location.href = 'admin.html';
+    }
+  </script>
+</body>
+</html>

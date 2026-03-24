@@ -60,6 +60,16 @@
       });
     }
   </script>
+  <script>
+    if (!localStorage.getItem('admin_session')) {
+      window.location.href = 'admin-login.html';
+    }
+    function logoutAdmin(e) {
+      if(e) e.preventDefault();
+      localStorage.removeItem('admin_session');
+      window.location.href = 'admin-login.html';
+    }
+  </script>
 </head>
 
 <body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-32">
@@ -222,7 +232,7 @@
     </div>
     
     <div class="p-5 border-t border-slate-100">
-      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
+      <a href="#" onclick="logoutAdmin(event)" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
         <span class="material-symbols-outlined text-[20px]">logout</span>
         Гарах
       </a>
