@@ -38,7 +38,8 @@ CREATE TABLE orders (
     receiver_address TEXT,
     
     item_category TEXT,
-    item_quantity TEXT
+    item_quantity TEXT,
+    images TEXT
 );
 
 CREATE TABLE notifications (
