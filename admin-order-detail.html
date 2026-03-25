@@ -418,9 +418,9 @@
             <a href="tel:${o.sender_phone || o.receiver_phone || ''}" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">call</span> Залгах
             </a>
-            <a href="sms:${o.sender_phone || o.receiver_phone || ''}" class="flex-1 p-4 bg-white border border-green-100 shadow-sm text-green-600 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-green-50 active:scale-[0.98] transition-all">
+            <button onclick="sendSms(event, '${o.sender_phone || o.receiver_phone || ''}')" class="flex-1 p-4 bg-white border border-green-100 shadow-sm text-green-600 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-green-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">sms</span> Мессеж
-            </a>
+            </button>
             <button onclick="deleteThisOrder('${o.order_id}')" class="flex-1 p-4 bg-red-50 border border-red-100/50 shadow-sm text-red-500 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-red-100 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">delete</span> Устгах
             </button>
@@ -457,6 +457,19 @@
        } catch(e) {
          alert('Холболтын алдаа: ' + e.message);
        }
+    };
+
+    window.sendSms = function(e, phone) {
+      e.preventDefault();
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = 'sms:' + phone;
+      } else {
+        navigator.clipboard.writeText(phone).then(() => {
+          alert('전화번호가 복사되었습니다: ' + phone + '\\n(PC 데스크탑 환경에서는 기본 문자 앱이 없어 클립보드에 복사됩니다.)');
+        }).catch(err => {
+          alert('복사 실패. 전화번호: ' + phone);
+        });
+      }
     };
   </script>
 </body>
