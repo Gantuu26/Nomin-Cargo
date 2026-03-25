@@ -251,6 +251,7 @@
           }
         } catch(e) {}
       }
+      window.lastKnownStatus = displayStatus;
 
       // Images
       let imagesHtml = '';
@@ -418,7 +419,7 @@
             <a href="tel:${o.sender_phone || o.receiver_phone || ''}" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">call</span> Залгах
             </a>
-            <button onclick="sendSms(event, '${o.sender_phone || o.receiver_phone || ''}')" class="flex-1 p-4 bg-white border border-green-100 shadow-sm text-green-600 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-green-50 active:scale-[0.98] transition-all">
+            <button onclick="openSmsModal(event, '${o.order_id}', '${o.sender_phone || o.receiver_phone || ''}', '${o.sender_name || o.receiver_name || ''}')" class="flex-1 p-4 bg-white border border-green-100 shadow-sm text-green-600 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-green-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">sms</span> Мессеж
             </button>
             <button onclick="deleteThisOrder('${o.order_id}')" class="flex-1 p-4 bg-red-50 border border-red-100/50 shadow-sm text-red-500 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-red-100 active:scale-[0.98] transition-all">
@@ -459,18 +460,117 @@
        }
     };
 
-    window.sendSms = function(e, phone) {
-      e.preventDefault();
+    const SMS_TEMPLATES = [
+      { id: 'checking', title: 'Шалгаж байна', text: '[Номин Транс] Таны захиалгыг шалгаж байна. Захиалга: {orderId}' },
+      { id: 'picking_up', title: 'Очиж байна', text: '[Номин Транс] Таны ачааг хаягаар очиж авахаар явлаа. Захиалга: {orderId}' },
+      { id: 'loaded', title: 'Ачигдсан', text: '[Номин Транс] Таны ачаа контейнерт ачигдлаа. Захиалга: {orderId}' },
+      { id: 'departed', title: 'Хөдөлсөн', text: '[Номин Транс] Таны ачаа Солонгосоос хөдөллөө. Захиалга: {orderId}' },
+      { id: 'in_transit', title: 'Замын-Үүдэд', text: '[Номин Транс] Таны ачаа Замын-Үүдэд ирлээ. Захиалга: {orderId}' },
+      { id: 'arrived', title: 'Монголд ирсэн', text: '[Номин Транс] Таны ачаа Монголд ирлээ, удахгүй олгогдоно. Захиалга: {orderId}' },
+      { id: 'delivered', title: 'Хүргэгдсэн', text: '[Номин Транс] Таны ачаа амжилттай олгогдлоо. Үйлчлүүлсэн танд баярлалаа!' }
+    ];
+
+    let currentSmsPhone = '';
+
+    function openSmsModal(e, orderId, phone, name) {
+       if(e) e.preventDefault();
+       currentSmsPhone = phone;
+       document.getElementById('sms-modal-name').textContent = name || 'Тодорхойгүй';
+       document.getElementById('sms-modal-phone').textContent = phone || 'Тодорхойгүй';
+       document.getElementById('sms-modal-order').textContent = orderId || '';
+
+       let activeStatus = window.lastKnownStatus || 'checking';
+
+       const list = document.getElementById('sms-templates-list');
+       if (list) {
+         list.innerHTML = SMS_TEMPLATES.map(t => {
+            const isActive = t.id === activeStatus;
+            const bgClass = isActive ? 'bg-green-50/50 border-green-400 shadow-sm' : 'bg-white border-slate-200';
+            const titleClass = isActive ? 'text-green-700' : 'text-slate-500';
+            const badge = isActive ? '<span class="px-2 py-0.5 bg-green-500 text-white text-[10px] rounded-md font-bold uppercase tracking-wider">Одоогийн төлөв</span>' : '';
+            
+            const fullMessage = t.text.replace('{orderId}', orderId);
+            
+            return `
+            <div class="rounded-xl border ${bgClass} p-4 transition-all">
+               <div class="flex justify-between items-center mb-1.5">
+                  <span class="text-[12px] font-medium ${titleClass}">${t.title}</span>
+                  ${badge}
+               </div>
+               <p class="text-[13px] text-gray-800 leading-relaxed font-semibold mb-3">${fullMessage}</p>
+               <div class="flex justify-between items-center">
+                  <div class="flex items-center gap-1.5 text-[11px] font-bold text-primary">
+                     <span class="material-symbols-outlined text-[14px]">phone_iphone</span> ${phone}
+                  </div>
+                  <button onclick="sendTemplateSms('${fullMessage.replace(/'/g, "\\'")}')" class="flex items-center gap-1 text-[13px] font-bold text-green-600 hover:text-green-700 active:scale-95 transition-all">
+                     <span class="material-symbols-outlined text-[18px]">send</span> Дарж илгээх
+                  </button>
+               </div>
+            </div>
+            `;
+         }).join('');
+       }
+
+       document.getElementById('sms-modal').classList.remove('opacity-0', 'pointer-events-none');
+       document.getElementById('sms-modal-card').classList.remove('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+    }
+
+    function closeSmsModal() {
+       document.getElementById('sms-modal-card').classList.add('translate-y-full', 'sm:translate-y-0', 'sm:scale-95');
+       setTimeout(() => document.getElementById('sms-modal').classList.add('opacity-0', 'pointer-events-none'), 300);
+    }
+
+    function sendTemplateSms(message) {
       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        window.location.href = 'sms:' + phone;
+        window.location.href = 'sms:' + currentSmsPhone + '?body=' + encodeURIComponent(message);
       } else {
-        navigator.clipboard.writeText(phone).then(() => {
-          alert('전화번호가 복사되었습니다: ' + phone + '\\n(PC 데스크탑 환경에서는 기본 문자 앱이 없어 클립보드에 복사됩니다.)');
+        const fullCopy = currentSmsPhone + '\\n\\n' + message;
+        navigator.clipboard.writeText(fullCopy).then(() => {
+          alert('Мессеж хуулагдлаа! (PC)\\n\\n' + fullCopy);
         }).catch(err => {
-          alert('복사 실패. 전화번호: ' + phone);
+          alert('Хуулахад алдаа гарлаа');
         });
       }
-    };
+    }
   </script>
+
+  <!-- SMS Message Modal -->
+  <div id="sms-modal" class="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeSmsModal()"></div>
+    <div class="bg-[#F0F4FF] rounded-t-3xl sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl relative z-10 transform translate-y-full sm:translate-y-0 sm:scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="sms-modal-card">
+      <div class="p-5 border-b border-slate-200/60 bg-white flex justify-between items-center z-10 sticky top-0">
+        <div class="flex items-center gap-2 text-green-600">
+           <span class="material-symbols-outlined text-[24px] filled">sms</span>
+           <h3 class="text-[17px] font-bold text-gray-900">SMS мессеж илгээх</h3>
+        </div>
+        <button onclick="closeSmsModal()" class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-full bg-white text-slate-500 hover:bg-slate-50 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <div class="p-5 overflow-y-auto w-full no-scrollbar flex-1 relative">
+         <p class="text-[13px] text-slate-500 mb-4 px-1">Доорх мессежийг хуулж, харилцагчид илгээнэ үү</p>
+         
+         <div class="bg-white rounded-2xl p-4 border border-blue-100/50 mb-4 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+               <span class="material-symbols-outlined text-[18px] text-slate-400">person</span>
+               <span id="sms-modal-name" class="font-bold text-[14px] text-gray-900">Нэр</span>
+            </div>
+            <div class="flex items-center gap-2 mb-2">
+               <span class="material-symbols-outlined text-[18px] text-slate-400">call</span>
+               <span id="sms-modal-phone" class="font-bold text-[14px] text-primary tracking-wide">Утас</span>
+            </div>
+            <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+               <span class="text-[12px] text-slate-500">Захиалга: <span id="sms-modal-order" class="font-semibold text-gray-700">#ORD</span></span>
+            </div>
+         </div>
+
+         <h4 class="text-[13px] font-bold text-gray-900 mb-3 px-1 mt-6">Мессеж сонгох:</h4>
+         
+         <div class="space-y-3" id="sms-templates-list">
+            <!-- Templates injected via JS -->
+         </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
