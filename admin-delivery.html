@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="mn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Монгол хүргэлт - Админ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#3B82F6",
+            "primary-dark": "#2563EB",
+            "success": "#10B981",    
+            "warning": "#F59E0B",    
+            "info": "#3B82F6",       
+            "surface": "#F0F4FF",
+            "on-surface": "#0F172A",
+          },
+          fontFamily: {
+            "body": ["Inter", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            "card": "0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04)",
+            "nav": "0 -1px 12px rgba(15, 23, 42, 0.06)",
+            "btn": "0 4px 14px rgba(59, 130, 246, 0.35)",
+          }
+        },
+      },
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; background: #F0F4FF; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .header-blur { background: linear-gradient(180deg, rgba(240, 244, 255, 0.97) 0%, rgba(240, 244, 255, 0.92) 100%); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .nav-glass { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+    .animate-fade-in { animation: fadeIn 0.25s ease-in-out forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .delay-100 { animation-delay: 0.1s; opacity: 0; }
+  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    if (document.fonts) {
+      document.fonts.ready.then(() => { document.documentElement.classList.add('fonts-loaded'); });
+    } else {
+      window.addEventListener('load', () => { document.documentElement.classList.add('fonts-loaded'); });
+    }
+    if (!localStorage.getItem('admin_session')) {
+      window.location.href = 'admin-login';
+    }
+    function logoutAdmin(e) {
+      if(e) e.preventDefault();
+      localStorage.removeItem('admin_session');
+      window.location.href = 'admin-login';
+    }
+  </script>
+</head>
+
+<body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-32">
+  
+  <!-- Admin Header -->
+  <header class="fixed top-0 w-full lg:w-[calc(100%-260px)] lg:ml-[260px] z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
+    <div class="flex items-center justify-between px-5 py-3 lg:px-8 mx-auto h-16">
+      <div class="lg:hidden">
+        <h1 class="text-[18px] font-bold text-gray-900 tracking-tight leading-tight">Монгол хүргэлт</h1>
+      </div>
+      <div class="hidden lg:flex items-center relative w-full max-w-md">
+         <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[20px]">search</span>
+         <input type="text" placeholder="Захиалга хайх..." class="w-full bg-slate-50 text-slate-700 text-[13px] rounded-full pl-10 pr-4 py-2 outline-none focus:ring-1 focus:ring-slate-200">
+      </div>
+      <div class="flex items-center gap-3 lg:gap-5 ml-auto">
+        
+        <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-800 active:scale-95">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="pt-[84px] px-4 lg:px-8 lg:ml-[260px] max-w-7xl mx-auto space-y-4">
+    
+    <!-- Top Action Bar (Desktop only) -->
+    <div class="hidden lg:flex justify-between items-end mb-4">
+       <div>
+         <h1 class="text-[24px] font-bold text-gray-900">Монгол хүргэлт</h1>
+       </div>
+    </div>
+
+    <!-- Filters Bar (Moved from Header) -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-2 lg:p-3 mb-4 flex flex-wrap gap-3 items-center shadow-sm">
+      <div class="flex-1 min-w-[200px] relative">
+         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+         <input type="text" id="searchInput" placeholder="Хайх (Утас, Нэр, ID)..." onkeyup="renderDeliveryOrders()" class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl pl-9 pr-3 py-2.5 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+      </div>
+      <div class="w-[140px]">
+         <select id="statusFilter" onchange="renderDeliveryOrders()" class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2.5 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-slate-700 font-medium cursor-pointer">
+            <option value="all">Бүгд</option>
+            <option value="pending" selected>Хүлээгдэж буй</option>
+            <option value="delivered">Олгогдсон</option>
+         </select>
+      </div>
+      <button onclick="loadDeliveryData()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-primary transition-colors active:scale-95">
+         <span class="material-symbols-outlined text-[20px]">refresh</span>
+      </button>
+    </div>
+    
+    <div class="bg-white rounded-3xl p-5 md:p-6 border border-blue-100/50 shadow-card animate-fade-in-up">
+       <h2 class="text-lg font-bold text-gray-900 mb-6 px-1">Захиалгын жагсаалт</h2>
+       
+       <!-- Desktop Header -->
+       <div class="hidden lg:grid grid-cols-[110px_1fr_120px_100px_160px_100px_80px] gap-4 px-5 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-100">
+          <div>Захиалгын ID</div>
+          <div>Харилцагч</div>
+          <div>Утас</div>
+          <div>Төрөл</div>
+          <div>Төлөв</div>
+          <div>Огноо</div>
+          <div class="text-right">Үйлдэл</div>
+       </div>
+
+       <!-- Data List -->
+       <div id="delivery-list" class="space-y-3 lg:space-y-2">
+          <!-- Dynamic delivery rows will appear here -->
+       </div>
+    </div>
+
+  </main>
+
+  <!-- Sidebar Overlay -->
+  <div id="sidebar-overlay"
+    class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm lg:hidden"
+    onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar Drawer -->
+  <aside id="sidebar-drawer"
+    class="fixed top-0 left-0 w-[260px] h-full bg-[#fdfdfd] z-[70] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 lg:shadow-none shadow-2xl flex flex-col border-r border-slate-100">
+    <!-- Sidebar Header (Logo) -->
+    <div class="h-16 flex items-center px-6 border-b border-transparent lg:border-slate-100/0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+        </div>
+        <span class="text-[18px] font-black tracking-tight text-gray-900">LogiFlow</span>
+      </div>
+      <button onclick="toggleSidebar()" class="lg:hidden ml-auto w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+    <!-- Sidebar Links -->
+    <div class="flex-1 overflow-y-auto py-6 px-4">
+      <ul class="space-y-1">
+        <li>
+          <a href="admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span> Самбар
+          </a>
+        </li>
+        <li>
+          <a href="admin-orders" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">inventory_2</span> Захиалгууд
+          </a>
+        </li>
+        <li>
+          <a href="admin-delivery" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white text-primary font-bold text-[13px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 justify-between">
+             <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] filled">local_shipping</span> Монгол хүргэлт</div>
+          </a>
+        </li>
+        <li>
+          <a href="admin-containers" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">view_in_ar</span> Контейнер
+          </a>
+        </li>
+        <li>
+          <a href="admin-banners" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">map</span> Баннер нэмэх
+          </a>
+        </li>
+        <li>
+          <a href="admin-notifications" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">campaign</span> Мэдэгдэл
+          </a>
+        </li>
+        <li class="pt-2">
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">settings</span> Тохиргоо
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- Sidebar Footer Action -->
+    <div class="px-4 pb-6 mt-auto">
+       <div class="mt-4 flex items-center justify-end px-2">
+         <a href="#" onclick="logoutAdmin(event)" class="flex items-center gap-2 text-slate-400 hover:text-red-500 transition-colors text-[12px] font-semibold">
+            <span class="material-symbols-outlined text-[18px]">logout</span> Гарах
+         </a>
+       </div>
+    </div>
+  </aside>
+
+  <script>
+    let allOrders = [];
+    let allContainers = [];
+
+    async function loadDeliveryData() {
+        const list = document.getElementById('delivery-list');
+        list.innerHTML = `<div class="py-10 text-center text-slate-400 flex flex-col items-center"><span class="material-symbols-outlined animate-spin text-[32px] text-primary mb-2">progress_activity</span>Ачаалж байна...</div>`;
+        
+        try {
+            const [oRes, cRes] = await Promise.all([ fetch('/api/orders'), fetch('/api/containers') ]);
+            allOrders = await oRes.json();
+            allContainers = await cRes.json();
+        } catch(e) { 
+            console.error(e); 
+            list.innerHTML = `<div class="py-10 text-center text-red-400">Алдаа гарлаа. Дахин оролдоно уу.</div>`;
+            return;
+        }
+        renderDeliveryOrders();
+    }
+
+    function renderDeliveryOrders() {
+        const list = document.getElementById('delivery-list');
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const statFilter = document.getElementById('statusFilter').value;
+
+        // Filter out orders that haven't arrived in Mongolia yet (unless they are already delivered, in which case we display them in 'delivered' tab)
+        const eligibleOrders = allOrders.filter(o => {
+            let effectiveStatus = o.status || 'checking';
+            if (o.container_id) {
+               const c = allContainers.find(x => x.id === o.container_id);
+               if (c) {
+                  effectiveStatus = c.status || effectiveStatus;
+               }
+            }
+            if (o.status === 'delivered') effectiveStatus = 'delivered'; // ultimate override
+
+            // For delivery management, we care about 'arrived' or 'delivered'
+            if (effectiveStatus !== 'arrived' && effectiveStatus !== 'delivered') return false;
+
+            // Apply dropdown filter
+            if (statFilter === 'pending' && effectiveStatus === 'delivered') return false;
+            if (statFilter === 'delivered' && effectiveStatus !== 'delivered') return false;
+
+            // Apply search filter
+            if (q) {
+               const term = q.trim();
+               if (!((o.order_id && o.order_id.toLowerCase().includes(term)) ||
+                     (o.receiver_name && o.receiver_name.toLowerCase().includes(term)) ||
+                     (o.receiver_phone && o.receiver_phone.includes(term)) ||
+                     (o.sender_name && o.sender_name.toLowerCase().includes(term)))) {
+                   return false;
+               }
+            }
+            return true;
+        });
+
+        if (eligibleOrders.length === 0) {
+           list.innerHTML = `<div class="text-center py-10 text-slate-400 text-[14px] font-medium border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">Жагсаалт хоосон байна</div>`;
+           return;
+        }
+
+        let html = '';
+        eligibleOrders.forEach(o => {
+            const t = new Date(o.date);
+            const dateStr = `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, '0')}.${String(t.getDate()).padStart(2, '0')}`;
+            const typeLabel = o.type === 'standard' ? 'Энгийн' : 'Экспресс';
+            
+            // Current local status
+            const isDelivered = o.status === 'delivered';
+
+            // Desktop layout (Grid row) / Mobile layout (Card) hybrid using tailwind utility classes
+            html += `
+            <div class="group border border-slate-200 hover:border-primary/40 bg-white rounded-2xl transition-all overflow-hidden shadow-sm hover:shadow relative">
+               
+               <!-- Visible Header (Row) -->
+               <div class="p-4 lg:p-0 cursor-pointer lg:grid lg:grid-cols-[110px_1fr_120px_100px_160px_100px_80px] lg:gap-4 lg:items-center lg:px-5 lg:py-3" onclick="toggleRow('${o.order_id}')">
+                  
+                  <!-- ID -->
+                  <div class="font-bold text-gray-900 mb-1 lg:mb-0 text-[15px] lg:text-[14px]">
+                     <span class="lg:hidden text-[11px] text-slate-400 font-medium block mb-0.5">ID</span>
+                     #${o.order_id}
+                  </div>
+
+                  <!-- Customer -->
+                  <div class="font-semibold text-slate-700 mb-2 lg:mb-0 text-[14px]">
+                     <span class="lg:hidden text-[11px] text-slate-400 font-medium block mb-0.5">Хүлээн авагч</span>
+                     ${o.receiver_name || '-'}
+                  </div>
+
+                  <!-- Phone -->
+                  <div class="text-slate-600 font-medium tracking-wide mb-3 lg:mb-0 text-[13px] lg:text-[14px] flex items-center justify-between lg:block">
+                     <div>
+                        <span class="lg:hidden text-[11px] text-slate-400 font-medium block mb-0.5">Утас</span>
+                        ${o.receiver_phone || '-'}
+                     </div>
+                     <a href="tel:${o.receiver_phone}" onclick="event.stopPropagation()" class="lg:hidden w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center border border-green-100">
+                        <span class="material-symbols-outlined text-[16px]">call</span>
+                     </a>
+                  </div>
+
+                  <!-- Type -->
+                  <div class="mb-3 lg:mb-0 hidden sm:block">
+                     <span class="bg-primary/10 text-primary px-2.5 py-1 rounded-md text-[11px] font-bold">${typeLabel}</span>
+                  </div>
+
+                  <!-- Status Select -->
+                  <div class="mb-3 lg:mb-0" onclick="event.stopPropagation()">
+                     <span class="lg:hidden text-[11px] text-slate-400 font-medium block mb-1">Төлөв</span>
+                     <div class="relative w-full lg:w-36">
+                        <select onchange="updateOrderStatus('${o.order_id}', this.value)" class="w-full appearance-none bg-slate-50 border ${isDelivered ? 'border-success/30 text-success' : 'border-warning/30 text-warning'} text-[13px] font-bold rounded-lg pl-3 pr-8 py-2 outline-none focus:border-primary transition-colors cursor-pointer">
+                           <option value="checking" ${!isDelivered ? 'selected' : ''}>Салбарт ирсэн</option>
+                           <option value="delivered" ${isDelivered ? 'selected' : ''}>Олгогдсон</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[16px] pointer-events-none ${isDelivered ? 'text-success' : 'text-warning'}">arrow_drop_down</span>
+                     </div>
+                  </div>
+
+                  <!-- Date -->
+                  <div class="text-slate-400 text-[12px] font-medium hidden lg:block">
+                     ${dateStr}
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="hidden lg:flex justify-end gap-1" onclick="event.stopPropagation()">
+                     <button onclick="toggleRow('${o.order_id}')" class="text-primary hover:bg-blue-50 px-2 py-1.5 rounded-lg text-[13px] font-bold transition-colors">Харах</button>
+                     <a href="tel:${o.receiver_phone}" class="text-green-600 hover:bg-green-50 w-8 h-8 rounded-lg flex items-center justify-center transition-colors shadow-sm border border-transparent hover:border-green-100">
+                        <span class="material-symbols-outlined text-[18px]">call</span>
+                     </a>
+                  </div>
+               </div>
+
+               <!-- Expandable Content Region -->
+               <div id="expand-${o.order_id}" class="hidden border-t border-slate-100 bg-slate-50/50 p-4 lg:p-5">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                     
+                     <!-- SENDER -->
+                     <div>
+                        <h4 class="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
+                           <span class="material-symbols-outlined text-[16px]">person</span> Илгээгч
+                        </h4>
+                        <div class="space-y-2">
+                           <div class="flex justify-between">
+                              <span class="text-[12px] text-slate-500">Нэр</span>
+                              <span class="text-[13px] font-bold text-gray-900">${o.sender_name || '-'}</span>
+                           </div>
+                           <div class="flex justify-between">
+                              <span class="text-[12px] text-slate-500">Утас</span>
+                              <span class="text-[13px] font-bold text-gray-900">${o.sender_phone || '-'}</span>
+                           </div>
+                           <div class="pt-1">
+                              <span class="text-[12px] text-slate-500 block mb-0.5">Хаяг</span>
+                              <span class="text-[13px] font-medium text-gray-800 leading-snug">${o.sender_address || '-'}</span>
+                           </div>
+                        </div>
+                     </div>
+
+                     <!-- RECEIVER DETAILS -->
+                     <div class="border-t border-slate-200 md:border-t-0 pt-4 md:pt-0">
+                        <h4 class="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
+                           <span class="material-symbols-outlined text-[16px]">location_on</span> Хүлээн авагч хаяг
+                        </h4>
+                        <div class="pt-1">
+                           <span class="text-[13px] font-medium text-gray-800 leading-snug">${o.receiver_address || 'Хаяг бүртгэгдээгүй байна.'}</span>
+                        </div>
+                     </div>
+
+                     <!-- ITEMS -->
+                     <div class="border-t border-slate-200 md:border-t-0 pt-4 md:pt-0">
+                        <h4 class="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1">
+                           <span class="material-symbols-outlined text-[16px]">package</span> Бараа
+                        </h4>
+                        <div class="space-y-2">
+                           <div class="flex justify-between">
+                              <span class="text-[12px] text-slate-500">Төрөл</span>
+                              <span class="text-[13px] font-bold text-gray-900">${o.item_category || '-'}</span>
+                           </div>
+                           <div class="flex justify-between">
+                              <span class="text-[12px] text-slate-500">Тоо ширхэг</span>
+                              <span class="text-[13px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">${o.item_quantity || '-'} ш</span>
+                           </div>
+                        </div>
+                     </div>
+
+                  </div>
+                  
+                  <!-- Internal Navigation Button to go to full details if needed -->
+                  <div class="mt-5 flex justify-end">
+                     <a href="admin-order-detail?id=${o.order_id}" class="text-[12px] font-bold text-slate-500 flex items-center gap-1 hover:text-primary transition-colors">
+                        Бүрэн мэдээлэл харах <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                     </a>
+                  </div>
+               </div>
+            </div>
+            `;
+        });
+        list.innerHTML = html;
+    }
+
+    function toggleRow(orderId) {
+       const el = document.getElementById('expand-' + orderId);
+       if (el.classList.contains('hidden')) {
+           el.classList.remove('hidden');
+           el.classList.add('animate-fade-in');
+       } else {
+           el.classList.add('hidden');
+           el.classList.remove('animate-fade-in');
+       }
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+       try {
+           const res = await fetch('/api/orders', {
+               method: 'PUT',
+               headers: {'Content-Type': 'application/json'},
+               body: JSON.stringify({ orderId: orderId, status: newStatus })
+           });
+           if (res.ok) {
+              loadDeliveryData(); 
+           } else {
+              alert('Төлөв шинэчлэхэд алдаа гарлаа');
+           }
+       } catch (e) {
+           alert('Алдаа: ' + e.message);
+       }
+    }
+
+    function toggleSidebar() {
+      const overlay = document.getElementById('sidebar-overlay');
+      const drawer = document.getElementById('sidebar-drawer');
+      if (drawer.classList.contains('-translate-x-full')) {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadDeliveryData);
+  </script>
+</body>
+</html>

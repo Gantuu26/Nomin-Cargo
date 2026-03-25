@@ -64,20 +64,27 @@
 
 <body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-24">
   
-  <!-- Header -->
-  <header class="fixed top-0 left-0 w-full z-50 header-blur border-b border-blue-100/50 h-[60px] flex items-center justify-center">
-    <div class="w-full max-w-lg mx-auto relative h-full flex items-center justify-center">
-      <a href="admin-orders" class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-slate-200/50 active:scale-95 transition-all text-slate-700 absolute left-2 z-10 bg-white shadow-sm border border-slate-100">
-        <span class="material-symbols-outlined text-[22px] -ml-1">arrow_back_ios_new</span>
-      </a>
-      <h1 id="page-title" class="text-[18px] font-bold text-gray-900 tracking-tight">Захиалга</h1>
-      <button onclick="window.print()" class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-blue-50 active:scale-95 transition-all text-primary absolute right-2 z-10 bg-white shadow-sm border border-slate-100" title="Хэвлэх">
-        <span class="material-symbols-outlined text-[24px]">print</span>
-      </button>
+  <!-- Admin Header -->
+  <header class="fixed top-0 left-0 w-full lg:w-[calc(100%-260px)] lg:ml-[260px] z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
+    <div class="flex items-center justify-between px-5 py-3 lg:px-8 mx-auto h-16">
+      <div class="flex items-center gap-3">
+        <a href="admin-orders" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-600 transition-colors bg-white shadow-sm border border-slate-100">
+          <span class="material-symbols-outlined text-[20px] ml-0.5">arrow_back_ios_new</span>
+        </a>
+        <h1 id="page-title" class="text-[18px] font-bold text-gray-900 tracking-tight leading-tight">Захиалга</h1>
+      </div>
+      <div class="flex items-center gap-3 ml-auto">
+        <button onclick="window.print()" class="w-9 h-9 flex items-center justify-center rounded-full bg-blue-50 text-primary hover:bg-blue-100 transition-colors shadow-sm" title="Хэвлэх">
+          <span class="material-symbols-outlined text-[20px]">print</span>
+        </button>
+        <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-800 active:scale-95">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="pt-[88px] px-4 max-w-lg mx-auto space-y-6">
+  <main class="pt-[84px] px-4 lg:px-8 lg:ml-[260px] max-w-7xl mx-auto space-y-6">
     
     <!-- Loading -->
     <div id="loadingState" class="py-12 text-center text-slate-400">
@@ -90,7 +97,89 @@
 
   </main>
 
+  <!-- Sidebar Overlay -->
+  <div id="sidebar-overlay"
+    class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm lg:hidden"
+    onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar Drawer -->
+  <aside id="sidebar-drawer"
+    class="fixed top-0 left-0 w-[260px] h-full bg-[#fdfdfd] z-[70] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 lg:shadow-none shadow-2xl flex flex-col border-r border-slate-100">
+    <!-- Sidebar Header (Logo) -->
+    <div class="h-16 flex items-center px-6 border-b border-transparent lg:border-slate-100/0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">local_shipping</span>
+        </div>
+        <span class="text-[18px] font-black tracking-tight text-gray-900">LogiFlow</span>
+      </div>
+      <button onclick="toggleSidebar()" class="lg:hidden ml-auto w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+    <!-- Sidebar Links -->
+    <div class="flex-1 overflow-y-auto py-6 px-4">
+      <ul class="space-y-1">
+        <li>
+          <a href="admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span> Самбар
+          </a>
+        </li>
+        <li>
+          <a href="admin-orders" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white text-primary font-bold text-[13px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 justify-between">
+            <span class="material-symbols-outlined text-[20px] filled">inventory_2</span> Захиалгууд
+          </a>
+        </li>
+        <li>
+          <a href="admin-delivery" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+             <span class="material-symbols-outlined text-[20px]">local_shipping</span> Монгол хүргэлт
+          </a>
+        </li>
+        <li>
+          <a href="admin-containers" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">view_in_ar</span> Контейнер
+          </a>
+        </li>
+        <li>
+          <a href="admin-banners" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">map</span> Баннер нэмэх
+          </a>
+        </li>
+        <li>
+          <a href="admin-notifications" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">campaign</span> Мэдэгдэл
+          </a>
+        </li>
+        <li class="pt-2">
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">settings</span> Тохиргоо
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- Sidebar Footer Action -->
+    <div class="px-4 pb-6 mt-auto">
+       <div class="mt-4 flex items-center justify-end px-2">
+         <a href="#" onclick="logoutAdmin(event)" class="flex items-center gap-2 text-slate-400 hover:text-red-500 transition-colors text-[12px] font-semibold">
+            <span class="material-symbols-outlined text-[18px]">logout</span> Гарах
+         </a>
+       </div>
+    </div>
+  </aside>
+
   <script>
+    function toggleSidebar() {
+      const overlay = document.getElementById('sidebar-overlay');
+      const drawer = document.getElementById('sidebar-drawer');
+      if (drawer.classList.contains('-translate-x-full')) {
+        drawer.classList.remove('-translate-x-full');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+      } else {
+        drawer.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+      }
+    }
+
     const STATUSES = {
        'checking': 'Шалгаж байна',
        'picking_up': 'Хаягаар очиж байна',
@@ -224,91 +313,97 @@
         <!-- Order Details -->
         <section class="animate-fade-in-up delay-200">
           <h3 class="text-[16px] font-bold text-gray-900 mb-3 px-1">Дэлгэрэнгүй мэдээлэл</h3>
-          <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card space-y-5">
+          <div class="bg-white rounded-3xl p-5 md:p-7 border border-blue-100/50 shadow-card">
             
-             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-              <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төрөл</p>
-              <div class="bg-primary/10 px-2.5 py-1 rounded-lg">
-                 <p class="text-[13px] font-bold text-primary">${typeLabel}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              <!-- General Info & Items -->
+              <div class="space-y-4">
+                 <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <p class="text-[13px] text-slate-400 font-medium tracking-wide">Төрөл</p>
+                  <div class="bg-primary/10 px-2.5 py-1 rounded-lg">
+                     <p class="text-[13px] font-bold text-primary">${typeLabel}</p>
+                  </div>
+                </div>
+                
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <p class="text-[13px] text-slate-400 font-medium tracking-wide">Бүртгэсэн огноо</p>
+                  <p class="text-[14px] font-bold text-gray-900">${dateString}</p>
+                </div>
+
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                  <p class="text-[13px] text-slate-400 font-medium tracking-wide">Салбар</p>
+                  <p class="text-[14px] font-bold text-primary flex items-center gap-1">
+                     <span class="material-symbols-outlined text-[16px]">storefront</span>
+                     ${o.branch || 'Тодорхойгүй'}
+                  </p>
+                </div>
+
+                <!-- Items -->
+                <div class="pt-2">
+                  <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">package</span>
+                    Барааны мэдээлэл
+                  </p>
+                  <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
+                     <div class="flex justify-between items-start">
+                       <span class="text-[12px] text-slate-500 font-medium">Барааны төрөл</span>
+                       <span class="text-[14px] font-bold text-gray-900">${o.item_category || '-'}</span>
+                     </div>
+                     <div class="flex justify-between items-start">
+                       <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
+                       <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${o.item_quantity || '-'} ш</span>
+                     </div>
+                     ${imagesHtml}
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-              <p class="text-[13px] text-slate-400 font-medium tracking-wide">Бүртгэсэн огноо</p>
-              <p class="text-[14px] font-bold text-gray-900">${dateString}</p>
-            </div>
 
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-              <p class="text-[13px] text-slate-400 font-medium tracking-wide">Салбар</p>
-              <p class="text-[14px] font-bold text-primary flex items-center gap-1">
-                 <span class="material-symbols-outlined text-[16px]">storefront</span>
-                 ${o.branch || 'Тодорхойгүй'}
-              </p>
-            </div>
-
-            <!-- Sender -->
-            <div class="border-b border-slate-100 pb-4">
-              <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">person</span>
-                Илгээгчийн мэдээлэл
-              </p>
-              <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
-                 <div class="flex justify-between items-start">
-                   <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
-                   <span class="text-[14px] font-bold text-gray-900">${o.sender_name || '-'}</span>
-                 </div>
-                 <div class="flex justify-between items-start">
-                   <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
-                   <span class="text-[14px] font-bold text-gray-900 tracking-wide">${o.sender_phone || '-'}</span>
-                 </div>
-                 <div>
-                   <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Солонгос дахь хаяг)</span>
-                   <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${o.sender_address || '-'}</span>
-                 </div>
+              <!-- Sender -->
+              <div class="border-t border-slate-100 pt-6 md:border-t-0 md:pt-0">
+                <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">person</span>
+                  Илгээгчийн мэдээлэл
+                </p>
+                <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3 h-full">
+                   <div class="flex justify-between items-start">
+                     <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
+                     <span class="text-[14px] font-bold text-gray-900">${o.sender_name || '-'}</span>
+                   </div>
+                   <div class="flex justify-between items-start">
+                     <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
+                     <span class="text-[14px] font-bold text-gray-900 tracking-wide">${o.sender_phone || '-'}</span>
+                   </div>
+                   <div>
+                     <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Солонгос дахь хаяг)</span>
+                     <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${o.sender_address || '-'}</span>
+                   </div>
+                </div>
               </div>
-            </div>
 
-            <!-- Items -->
-            <div class="border-b border-slate-100 pb-4">
-              <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">package</span>
-                Барааны мэдээлэл
-              </p>
-              <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
-                 <div class="flex justify-between items-start">
-                   <span class="text-[12px] text-slate-500 font-medium">Барааны төрөл</span>
-                   <span class="text-[14px] font-bold text-gray-900">${o.item_category || '-'}</span>
-                 </div>
-                 <div class="flex justify-between items-start">
-                   <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
-                   <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${o.item_quantity || '-'} ш</span>
-                 </div>
-                 ${imagesHtml}
+              <!-- Receiver -->
+              <div class="border-t border-slate-100 pt-6 md:border-t-0 md:pt-0">
+                <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">location_on</span>
+                  Хүлээн авагчийн мэдээлэл
+                </p>
+                <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3 h-full">
+                   <div class="flex justify-between items-start">
+                     <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
+                     <span class="text-[14px] font-bold text-gray-900">${o.receiver_name || '-'}</span>
+                   </div>
+                   <div class="flex justify-between items-start">
+                     <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
+                     <span class="text-[14px] font-bold text-gray-900 tracking-wide">${o.receiver_phone || '-'}</span>
+                   </div>
+                   <div>
+                     <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Монгол хаяг)</span>
+                     <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${o.receiver_address || '-'}</span>
+                   </div>
+                </div>
               </div>
-            </div>
 
-            <!-- Receiver -->
-            <div>
-              <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">location_on</span>
-                Хүлээн авагчийн мэдээлэл
-              </p>
-              <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3">
-                 <div class="flex justify-between items-start">
-                   <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
-                   <span class="text-[14px] font-bold text-gray-900">${o.receiver_name || '-'}</span>
-                 </div>
-                 <div class="flex justify-between items-start">
-                   <span class="text-[12px] text-slate-500 font-medium">Утасны дугаар</span>
-                   <span class="text-[14px] font-bold text-gray-900 tracking-wide">${o.receiver_phone || '-'}</span>
-                 </div>
-                 <div>
-                   <span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Монгол хаяг)</span>
-                   <span class="text-[14px] font-semibold text-gray-800 leading-relaxed block">${o.receiver_address || '-'}</span>
-                 </div>
-              </div>
             </div>
-
           </div>
         </section>
 

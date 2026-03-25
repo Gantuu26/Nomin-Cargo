@@ -74,27 +74,41 @@
 
 <body class="bg-[#F0F4FF] text-[#0F172A] min-h-screen pb-32">
   
-  <header class="fixed top-0 w-full z-40 header-blur border-b border-blue-100/50">
-    <div class="px-5 py-3.5 max-w-lg mx-auto">
-      <div class="flex items-center justify-between">
-        <h1 class="text-[20px] font-bold text-gray-900 tracking-tight">Контейнерүүд</h1>
-          <button onclick="openNewContainerModal()" class="flex items-center gap-1.5 pl-3 pr-4 py-2 mr-1 rounded-xl bg-primary text-white shadow-btn hover:bg-blue-600 transition-colors active:scale-95">
-            <span class="material-symbols-outlined text-[18px]">add</span>
-            <span class="font-bold text-[13px]">Шинэ</span>
-          </button>
-          <button class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-500 hover:text-primary transition-colors">
-            <span class="material-symbols-outlined text-[20px]">search</span>
-          </button>
-          <button onclick="toggleSidebar()" class="w-10 h-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-gray-800 hover:bg-slate-50 transition-colors active:scale-95">
-            <span class="material-symbols-outlined text-[24px]">menu</span>
-          </button>
-        </div>
+  <!-- Admin Header -->
+  <header class="fixed top-0 w-full lg:w-[calc(100%-260px)] lg:ml-[260px] z-50 bg-white/90 backdrop-blur-md border-b border-slate-100">
+    <div class="flex items-center justify-between px-5 py-3 lg:px-8 mx-auto h-16">
+      <div class="lg:hidden">
+        <h1 class="text-[18px] font-bold text-gray-900 tracking-tight leading-tight">Контейнерүүд</h1>
+      </div>
+      <div class="hidden lg:flex items-center relative w-full max-w-md">
+         <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[20px]">search</span>
+         <input type="text" placeholder="Утгаар хайх..." class="w-full bg-slate-50 text-slate-700 text-[13px] rounded-full pl-10 pr-4 py-2 outline-none focus:ring-1 focus:ring-slate-200">
+      </div>
+      <div class="flex items-center gap-3 lg:gap-5 ml-auto">
+        
+        <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-800 active:scale-95">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="pt-[80px] px-4 max-w-lg mx-auto space-y-4">
-    <div id="containers-list" class="space-y-4 pb-10">
+  <main class="pt-[84px] px-4 lg:px-8 lg:ml-[260px] max-w-7xl mx-auto space-y-4">
+    
+    <!-- Top Action Bar (Desktop & Mobile) -->
+    <div class="flex justify-between items-end mb-4 mt-2 lg:mt-0">
+       <div class="hidden lg:block">
+         <h1 class="text-[24px] font-bold text-gray-900">Контейнерүүд</h1>
+       </div>
+       <div class="flex items-center gap-3 lg:ml-auto w-full lg:w-auto justify-end">
+          <button onclick="openNewContainerModal()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white shadow-btn hover:bg-blue-600 transition-colors active:scale-95 font-bold text-[14px]">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+            Шинэ контейнер
+          </button>
+       </div>
+    </div>
+
+    <div id="containers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
       <!-- Containers dynamically injected here -->
     </div>
   </main>
@@ -142,7 +156,7 @@
 
 
   <!-- Admin Bottom Navigation -->
-  <nav class="fixed bottom-0 left-0 w-full nav-glass shadow-nav border-t border-blue-100/40 z-40">
+  <nav class="fixed bottom-0 left-0 w-full nav-glass shadow-nav border-t border-blue-100/40 z-40 lg:hidden">
     <div class="flex justify-around items-center px-4 pb-7 pt-2.5 max-w-lg mx-auto">
       <a href="admin" class="flex flex-col items-center justify-center gap-0.5 min-w-[56px] opacity-60 hover:opacity-100 transition-opacity">
         <div class="w-10 h-8 flex items-center justify-center">
@@ -172,70 +186,72 @@
   </nav>
 
   <!-- Sidebar Overlay -->
-  <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm" onclick="toggleSidebar()"></div>
-  
+  <div id="sidebar-overlay"
+    class="fixed inset-0 bg-slate-900/40 z-[60] opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-sm lg:hidden"
+    onclick="toggleSidebar()"></div>
+
   <!-- Sidebar Drawer -->
-  <aside id="sidebar-drawer" class="fixed top-0 right-0 w-[280px] h-full bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-[-10px_0_30px_rgba(0,0,0,0.1)] flex flex-col">
-    <div class="px-5 py-4 flex items-center justify-between border-b border-slate-100">
+  <aside id="sidebar-drawer"
+    class="fixed top-0 left-0 w-[260px] h-full bg-[#fdfdfd] z-[70] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 lg:shadow-none shadow-2xl flex flex-col border-r border-slate-100">
+    <!-- Sidebar Header (Logo) -->
+    <div class="h-16 flex items-center px-6 border-b border-transparent lg:border-slate-100/0">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-primary to-primary-dark flex items-center justify-center text-white font-bold text-[14px] shadow-sm">
-          АД
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">local_shipping</span>
         </div>
-        <div>
-          <h3 class="text-[14px] font-bold text-gray-900 leading-tight">Админ</h3>
-          <p class="text-[11px] text-slate-500 font-medium">nomincargo@admin.mn</p>
-        </div>
+        <span class="text-[18px] font-black tracking-tight text-gray-900">LogiFlow</span>
       </div>
-      <button onclick="toggleSidebar()" class="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-slate-100 transition-colors">
-        <span class="material-symbols-outlined text-[20px]">close</span>
+      <button onclick="toggleSidebar()" class="lg:hidden ml-auto w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+        <span class="material-symbols-outlined text-[18px]">close</span>
       </button>
     </div>
-    
-    <div class="flex-1 overflow-y-auto py-4">
-      <ul class="space-y-1.5 px-3">
+    <!-- Sidebar Links -->
+    <div class="flex-1 overflow-y-auto py-6 px-4">
+      <ul class="space-y-1">
         <li>
-          <a href="admin" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px] filled">dashboard</span>
-            Хяналтын самбар
+          <a href="admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span> Самбар
           </a>
         </li>
         <li>
-          <a href="admin-orders" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">list_alt</span>
-            Захиалгууд
+          <a href="admin-orders" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">inventory_2</span> Захиалгууд
           </a>
         </li>
         <li>
-          <a href="admin-containers" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 text-primary transition-colors font-semibold text-[14px] justify-between">
-            <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">inventory_2</span>Контейнер</div>
+          <a href="admin-delivery" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+             <span class="material-symbols-outlined text-[20px]">local_shipping</span> Монгол хүргэлт
           </a>
         </li>
         <li>
-          <a href="admin-banners" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">view_carousel</span>
-            Баннер
+          <a href="admin-containers" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white text-primary font-bold text-[13px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-slate-100 justify-between">
+            <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px] filled">view_in_ar</span> Контейнер</div>
           </a>
         </li>
         <li>
-          <a href="admin-notifications" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">campaign</span>
-            Мэдэгдэл
+          <a href="admin-banners" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">map</span> Баннер нэмэх
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-700 hover:text-primary transition-colors font-medium text-[14px]">
-            <span class="material-symbols-outlined text-[20px]">settings</span>
-            Тохиргоо
+          <a href="admin-notifications" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">campaign</span> Мэдэгдэл
+          </a>
+        </li>
+        <li class="pt-2">
+          <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100/50 text-slate-500 hover:text-slate-900 transition-colors font-medium text-[13px]">
+            <span class="material-symbols-outlined text-[20px]">settings</span> Тохиргоо
           </a>
         </li>
       </ul>
     </div>
-    
-    <div class="p-5 border-t border-slate-100">
-      <a href="#" onclick="logoutAdmin(event)" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors font-bold text-[14px] justify-center">
-        <span class="material-symbols-outlined text-[20px]">logout</span>
-        Гарах
-      </a>
+    <!-- Sidebar Footer Action -->
+    <div class="px-4 pb-6 mt-auto">
+       <div class="mt-4 flex items-center justify-end px-2">
+         <a href="#" onclick="logoutAdmin(event)" class="flex items-center gap-2 text-slate-400 hover:text-red-500 transition-colors text-[12px] font-semibold">
+            <span class="material-symbols-outlined text-[18px]">logout</span> Гарах
+         </a>
+       </div>
     </div>
   </aside>
 
@@ -243,11 +259,11 @@
     function toggleSidebar() {
       const overlay = document.getElementById('sidebar-overlay');
       const drawer = document.getElementById('sidebar-drawer');
-      if (drawer.classList.contains('translate-x-full')) {
-        drawer.classList.remove('translate-x-full');
+      if (drawer.classList.contains('-translate-x-full')) {
+        drawer.classList.remove('-translate-x-full');
         overlay.classList.remove('opacity-0', 'pointer-events-none');
       } else {
-        drawer.classList.add('translate-x-full');
+        drawer.classList.add('-translate-x-full');
         overlay.classList.add('opacity-0', 'pointer-events-none');
       }
     }
