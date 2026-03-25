@@ -224,17 +224,8 @@
     function renderOrders() {
       const ordersList = document.getElementById('orders-list');
       
-      // Determine if order is pending
-      const isPending = (o) => {
-         if (!o.container_id) return true;
-         const c = allContainers.find(x => x.id === o.container_id);
-         if (!c) return true;
-         if (['checking', 'picking_up'].includes(c.status)) return true;
-         return false; // It's in transit or arrived, so hide from this screen
-      };
-
-      // Only care about pending orders on this page
-      const pendingOrders = allOrders.filter(isPending);
+      // Show all orders (no filtering by container status)
+      const pendingOrders = allOrders;
 
       // Determine the branch tab mapping
       const getBranchCategory = (o) => {
@@ -252,7 +243,7 @@
       // Render filter tabs
       const tabsContainer = document.getElementById('filter-tabs-container');
       const tabsInfo = [
-         { id: 'all', label: 'Хүлээгдэж буй (Бүгд)' },
+         { id: 'all', label: 'Бүгд' },
          { id: 'branch1', label: 'Салбар 1' },
          { id: 'branch2', label: 'Салбар 2' },
          { id: 'branch3', label: 'Салбар 3' },
@@ -296,8 +287,8 @@
                  'checking': 'Шалгаж байна',
                  'picking_up': 'Хаягаар очиж байна',
                  'loaded': 'Контейнерт ачигдлаа',
-                 'departed': 'Инчоноос хөдөлсөн',
-                 'in_transit': 'Ачаа замдаа явж байна',
+                 'departed': 'Пусанаас хөдөлсөн',
+                 'in_transit': 'Зам-Үүдэд ирсэн',
                  'arrived': 'Монголд ачаа буусан'
               };
               const sName = STATUSES[c.status] || 'Шалгаж байна';
