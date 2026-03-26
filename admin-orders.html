@@ -383,22 +383,19 @@
           </div>
 
           <div class="flex gap-2 mt-2">
-            <a href="tel:${sPhone}" class="flex-[1] py-3 rounded-2xl border border-blue-100/80 bg-white text-gray-700 active:scale-[0.98] transition-all hover:bg-slate-50 flex flex-col items-center justify-center shadow-sm">
-              <div class="flex items-center gap-1.5 text-[14px] font-bold mb-0.5">
-                <span class="material-symbols-outlined text-[18px]">phone</span>
-                Залгах
-              </div>
-              <span class="text-[10px] text-slate-400 font-semibold tracking-wide">${sPhone}</span>
+            <a href="tel:${sPhone}" class="flex-1 py-3 rounded-2xl border border-slate-200 bg-white text-gray-900 active:scale-[0.98] transition-all hover:bg-slate-50 flex flex-col items-center justify-center shadow-sm gap-0.5">
+              <span class="material-symbols-outlined text-[20px]">call</span>
+              <span class="text-[12px] font-bold tracking-wide">Залгах</span>
             </a>
-            <button onclick="openSmsModal(event, '${orderId}', '${sPhone}', '${sName}')" class="w-16 py-3 rounded-2xl border border-slate-200 bg-white text-gray-900 active:scale-[0.98] transition-all hover:bg-slate-50 flex flex-col items-center justify-center shadow-sm">
-              <span class="material-symbols-outlined text-[20px] mb-0.5">sms</span>
-              <span class="text-[10px] font-bold">Мессеж</span>
+            <button onclick="openSmsModal(event, '${orderId}', '${sPhone}', '${sName}')" class="flex-1 py-3 rounded-2xl border border-slate-200 bg-white text-gray-900 active:scale-[0.98] transition-all hover:bg-slate-50 flex flex-col items-center justify-center shadow-sm gap-0.5">
+              <span class="material-symbols-outlined text-[20px]">sms</span>
+              <span class="text-[12px] font-bold tracking-wide">Мессеж</span>
             </button>
-            <a href="admin-order-detail?id=${orderId}" class="flex-[1.2] py-3 rounded-2xl bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-[14px] shadow-btn active:scale-[0.98] hover:shadow-lg transition-all flex items-center justify-center gap-2">
+            <a href="admin-order-detail?id=${orderId}" class="flex-[1.2] py-3 rounded-2xl bg-gradient-to-r from-primary to-primary-dark text-white active:scale-[0.98] hover:shadow-lg transition-all flex flex-col items-center justify-center shadow-btn gap-0.5">
               <span class="material-symbols-outlined text-[20px]">edit_note</span>
-              Дэлгэрэнгүй
+              <span class="text-[12px] font-bold tracking-wide">Дэлгэрэнгүй</span>
             </a>
-            <button onclick="deleteOrder('${orderId}')" class="w-12 py-3 rounded-2xl bg-white border border-slate-200 text-gray-900 active:scale-[0.98] transition-all hover:bg-slate-50 flex items-center justify-center">
+            <button onclick="deleteOrder('${orderId}')" class="w-[54px] py-3 rounded-2xl bg-white border border-slate-200 text-gray-900 active:scale-[0.98] transition-all hover:bg-slate-50 flex items-center justify-center shadow-sm">
               <span class="material-symbols-outlined text-[20px]">delete</span>
             </button>
           </div>
