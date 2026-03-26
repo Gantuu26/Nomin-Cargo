@@ -360,6 +360,7 @@
                        <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
                        <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${o.item_quantity || '-'} ш</span>
                      </div>
+                      ${o.weight ? `<div class="flex justify-between items-start"><span class="text-[12px] text-slate-500 font-medium">Барааны жин</span><span class="text-[14px] font-bold text-gray-900">${o.weight} кг</span></div>` : ''}
                      ${imagesHtml}
                   </div>
                 </div>
@@ -419,13 +420,13 @@
            <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card flex flex-col print-hide">
               <h3 class="text-[16px] font-bold text-gray-900 mb-4 flex items-center gap-2">
                  <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">calculate</span>
-                 요금 계산 (Төлбөр бодох)
+                 Төлбөр бодох
               </h3>
               
               <div class="space-y-4 flex-1">
                  <div class="flex gap-4">
                     <div class="flex-1">
-                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Жин (Weight - kg)</label>
+                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Жин (кг)</label>
                        <input type="number" id="input-weight" step="0.1" value="${o.weight || ''}" placeholder="0.0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-semibold text-[16px]">
                     </div>
                     <div class="flex-1">
@@ -438,7 +439,7 @@
                  
                  <div class="flex gap-3">
                     <div class="flex-1">
-                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Нийт төлбөр (Total - ₩)</label>
+                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Нийт төлбөр (₩)</label>
                        <input type="number" id="input-price" value="${o.total_price || ''}" placeholder="0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-bold text-primary text-[16px]">
                     </div>
                     <div class="flex items-end">
@@ -450,7 +451,7 @@
               </div>
 
               <button onclick="saveInvoiceData('${o.order_id}')" class="w-full h-12 mt-6 bg-primary text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(59,130,246,0.35)] hover:bg-primary-dark transition-all flex items-center justify-center gap-2 text-[15px]">
-                 <span class="material-symbols-outlined text-[20px]">save</span> Хадгалах (Save)
+                 <span class="material-symbols-outlined text-[20px]">save</span> Хадгалах
               </button>
            </div>
 
@@ -464,7 +465,7 @@
                    <p class="text-[13px] text-slate-300 font-medium relative z-10">Нэхэмжлэх - Nomin Cargo</p>
                    
                    <div class="absolute top-6 right-6 text-right relative z-10">
-                      <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Order No</p>
+                      <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Захиалгын дугаар</p>
                       <div class="bg-white/10 px-2 py-0.5 rounded-lg"><p class="text-[15px] font-bold tracking-widest text-white">${o.order_id}</p></div>
                    </div>
                 </div>
@@ -472,29 +473,29 @@
                 <div class="p-6 pb-2">
                    <div class="flex justify-between items-end border-b border-dashed border-slate-200 pb-5 mb-5">
                       <div>
-                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Огноо / Date</p>
+                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Огноо</p>
                          <p class="text-[14px] font-bold text-slate-800">${dateString}</p>
                       </div>
                       <div class="text-right">
-                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Төрөл / Type</p>
+                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Төрөл</p>
                          <div class="inline-block bg-primary/10 text-primary px-2.5 py-1 rounded-md font-bold text-[12px]">${typeLabel}</div>
                       </div>
                    </div>
 
                    <div class="flex justify-between items-center bg-[#F0F4FF] p-4 rounded-2xl mb-6">
                       <div class="text-center flex-1 border-r border-blue-100">
-                         <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Жин (Weight)</p>
+                         <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Жин</p>
                          <p class="text-[18px] font-black text-slate-800">${o.weight ? o.weight + ' kg' : '-'}</p>
                       </div>
                       <div class="text-center flex-1">
-                         <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Төлбөр (Total)</p>
+                         <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Төлбөр</p>
                          <p class="text-[20px] font-black text-primary">${o.total_price ? parseInt(o.total_price).toLocaleString() + ' ₩' : '-'}</p>
                       </div>
                    </div>
 
                    <div class="space-y-4 mb-3" ${o.total_price ? '' : 'style="opacity: 0.5;"'}>
                       <div>
-                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">account_balance</span> Төлбөр хийх данс (Bank)</p>
+                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">account_balance</span> Төлбөр хийх данс</p>
                          <div class="bg-blue-50/50 rounded-xl p-3.5 space-y-3 border border-blue-100/50">
                             <div class="flex items-start gap-2.5">
                                <div class="w-1 bg-green-500 h-[34px] rounded-full shrink-0"></div>
@@ -516,7 +517,7 @@
                 </div>
               </div>
               
-              <button onclick="downloadReceiptAsImage()" class="absolute bottom-6 right-6 w-11 h-11 bg-slate-900 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-slate-800 transition-all print-hide group z-10" title="Нэхэмжлэх татах (Download Invoice)">
+              <button onclick="downloadReceiptAsImage()" class="absolute bottom-6 right-6 w-11 h-11 bg-slate-900 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-slate-800 transition-all print-hide group z-10" title="Нэхэмжлэх татах">
                  <span class="material-symbols-outlined text-[20px] group-hover:-translate-y-0.5 transition-transform">download</span>
               </button>
            </div>
@@ -528,7 +529,7 @@
               <span class="material-symbols-outlined text-[20px]">arrow_back</span> Буцах
             </a>
             <button onclick="downloadOrderAsPDF()" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-primary font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
-              <span class="material-symbols-outlined text-[20px]">download</span> Татах (PDF)
+              <span class="material-symbols-outlined text-[20px]">download</span> Татах PDF
             </button>
             <a href="tel:${o.sender_phone || o.receiver_phone || ''}" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">call</span> Залгах
