@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorState = document.getElementById('errorState');
   const errorMessage = document.getElementById('errorMessage');
   const resultContainer = document.getElementById('resultContainer');
+  const paymentContainer = document.getElementById('paymentContainer');
   const timelineContainer = document.getElementById('timelineContainer');
   
   // Elements to populate
@@ -87,6 +88,47 @@ document.addEventListener('DOMContentLoaded', () => {
       resReceiver.textContent = order.receiver_name || (order.receiver ? order.receiver.name : 'Тодорхойгүй');
       resItem.textContent = `${order.item_category || (order.item ? order.item.category : '')} (${order.item_quantity || (order.item ? order.item.quantity : 1)}ш)`;
       resBranch.textContent = order.branch || 'Улаанбаатар';
+
+      if (order.total_price) {
+         paymentContainer.innerHTML = `
+          <h3 class="text-[17px] font-bold text-gray-900 mb-4 pl-2">Төлбөрийн мэдээлэл</h3>
+          <div class="bg-white rounded-3xl shadow-card border border-primary/20 mb-6 p-5">
+             <div class="flex justify-between items-center bg-[#F0F4FF] p-4 rounded-2xl mb-5">
+                <div class="text-center flex-1 border-r border-blue-100">
+                   <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Жин (Weight)</p>
+                   <p class="text-[18px] font-black text-slate-800">${order.weight ? order.weight + ' kg' : '-'}</p>
+                </div>
+                <div class="text-center flex-1">
+                   <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Төлбөр (Total)</p>
+                   <p class="text-[20px] font-black text-primary">${parseInt(order.total_price).toLocaleString()} ₩</p>
+                </div>
+             </div>
+             
+             <div>
+                <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">account_balance</span> Төлбөр хийх данс (Bank)</p>
+                <div class="bg-blue-50/50 rounded-xl p-3.5 space-y-3 border border-blue-100/50">
+                   <div class="flex items-start gap-2.5">
+                      <div class="w-1 bg-green-500 h-[34px] rounded-full shrink-0"></div>
+                      <div>
+                         <p class="text-[13px] font-bold text-slate-800 tracking-tight">Hana bank: 536-910562-15707</p>
+                         <p class="text-[11px] text-slate-500 font-medium">DUGERSUREN JAMBALDORJ</p>
+                      </div>
+                   </div>
+                   <div class="flex items-start gap-2.5 pt-2 border-t border-blue-100/50">
+                      <div class="w-1 bg-blue-500 h-[34px] rounded-full shrink-0"></div>
+                      <div>
+                         <p class="text-[13px] font-bold text-slate-800 tracking-tight">NongHyup bank: 352-185218-7323</p>
+                         <p class="text-[11px] text-slate-500 font-medium">ZUNDUIJAMTS ODGEREL</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+             <div class="bg-orange-50-50 mt-4 text-[11px] text-center text-slate-500 font-medium leading-[1.5]">Төлбөр төлөхдөө гүйлгээний утга дээр <strong class="text-slate-700">${order.order_id || order.orderId}</strong> болон <strong class="text-slate-700">утас</strong>-аа бичнэ үү.</div>
+          </div>
+         `;
+      } else {
+         paymentContainer.innerHTML = '';
+      }
 
       // Generate mock logs for ALL statuses
       let logs = [];

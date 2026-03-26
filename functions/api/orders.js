@@ -46,6 +46,12 @@ export async function onRequest(context) {
             try { 
                 await env.DB.prepare('ALTER TABLE orders ADD COLUMN images TEXT').run(); 
             } catch(e) { /* ignore */ }
+            try { 
+                await env.DB.prepare('ALTER TABLE orders ADD COLUMN weight TEXT').run(); 
+            } catch(e) { /* ignore */ }
+            try { 
+                await env.DB.prepare('ALTER TABLE orders ADD COLUMN total_price TEXT').run(); 
+            } catch(e) { /* ignore */ }
             
             const stmt = env.DB.prepare(`
                 INSERT INTO orders (
@@ -70,6 +76,10 @@ export async function onRequest(context) {
             const body = await request.json();
             if (!body.orderId) return new Response(JSON.stringify({ error: "Missing orderId" }), { status: 400 });
 
+            // Ensure columns exist on the fly during PUT
+            try { await env.DB.prepare('ALTER TABLE orders ADD COLUMN weight TEXT').run(); } catch(e){}
+            try { await env.DB.prepare('ALTER TABLE orders ADD COLUMN total_price TEXT').run(); } catch(e){}
+
             // If updating container assignment only:
             let stmt;
             if (body.hasOwnProperty('containerId')) {
@@ -78,6 +88,9 @@ export async function onRequest(context) {
             } else if (body.hasOwnProperty('status')) {
                  stmt = env.DB.prepare('UPDATE orders SET status = ? WHERE order_id = ?')
                              .bind(body.status, body.orderId);
+            } else if (body.hasOwnProperty('weight') && body.hasOwnProperty('total_price')) {
+                 stmt = env.DB.prepare('UPDATE orders SET weight = ?, total_price = ? WHERE order_id = ?')
+                             .bind(body.weight, body.total_price, body.orderId);
             } else {
                  return new Response(JSON.stringify({ error: "Invalid update payload" }), { status: 400 });
             }

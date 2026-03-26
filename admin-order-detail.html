@@ -8,6 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -74,8 +76,8 @@
         <h1 id="page-title" class="text-[18px] font-bold text-gray-900 tracking-tight leading-tight">Захиалга</h1>
       </div>
       <div class="flex items-center gap-3 ml-auto">
-        <button onclick="window.print()" class="w-9 h-9 flex items-center justify-center rounded-full bg-blue-50 text-primary hover:bg-blue-100 transition-colors shadow-sm" title="Хэвлэх">
-          <span class="material-symbols-outlined text-[20px]">print</span>
+        <button onclick="downloadOrderAsPDF()" class="w-9 h-9 flex items-center justify-center rounded-full bg-blue-50 text-primary hover:bg-blue-100 transition-colors shadow-sm" title="Хэвлэх / Татах">
+          <span class="material-symbols-outlined text-[20px]">download</span>
         </button>
         <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-800 active:scale-95">
           <span class="material-symbols-outlined text-[24px]">menu</span>
@@ -263,11 +265,14 @@
             <div class="pt-2">
               <span class="text-[12px] text-slate-500 font-medium block mb-2">Барааны зураг</span>
               <div class="flex gap-2.5">
-                ${imgs.map(img => `<div class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm" style="background-image: url('${img}');"></div>`).join('')}
+                ${imgs.map(img => `<div onclick="openLightbox('${img}')" class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm cursor-pointer hover:border-primary transition-colors" style="background-image: url('${img}');"></div>`).join('')}
               </div>
             </div>`;
         }
       }
+
+      const isExpress = o.type === 'express';
+      const cargoRate = isExpress ? 2500 : 1800;
 
       content.innerHTML = `
         <!-- Status Tracker -->
@@ -408,13 +413,122 @@
           </div>
         </section>
 
+        <!-- Pricing & Invoice UI -->
+        <section class="animate-fade-in-up delay-200 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6" id="invoice-wrapper">
+           <!-- Editor Form -->
+           <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card flex flex-col print-hide">
+              <h3 class="text-[16px] font-bold text-gray-900 mb-4 flex items-center gap-2">
+                 <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">calculate</span>
+                 요금 계산 (Төлбөр бодох)
+              </h3>
+              
+              <div class="space-y-4 flex-1">
+                 <div class="flex gap-4">
+                    <div class="flex-1">
+                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Жин (Weight - kg)</label>
+                       <input type="number" id="input-weight" step="0.1" value="${o.weight || ''}" placeholder="0.0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-semibold text-[16px]">
+                    </div>
+                    <div class="flex-1">
+                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Ачааны төрөл</label>
+                       <div class="h-12 px-3 rounded-xl border border-slate-200 bg-slate-100 flex items-center font-bold text-slate-700 text-[13px] sm:text-[14px]">
+                          ${typeLabel} (${cargoRate} ₩)
+                       </div>
+                    </div>
+                 </div>
+                 
+                 <div class="flex gap-3">
+                    <div class="flex-1">
+                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Нийт төлбөр (Total - ₩)</label>
+                       <input type="number" id="input-price" value="${o.total_price || ''}" placeholder="0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-bold text-primary text-[16px]">
+                    </div>
+                    <div class="flex items-end">
+                       <button onclick="calculatePrice(${cargoRate})" class="h-12 px-5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl transition-colors text-[14px] flex items-center justify-center min-w-[90px]">
+                          Бодох
+                       </button>
+                    </div>
+                 </div>
+              </div>
+
+              <button onclick="saveInvoiceData('${o.order_id}')" class="w-full h-12 mt-6 bg-primary text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(59,130,246,0.35)] hover:bg-primary-dark transition-all flex items-center justify-center gap-2 text-[15px]">
+                 <span class="material-symbols-outlined text-[20px]">save</span> Хадгалах (Save)
+              </button>
+           </div>
+
+           <!-- Generated Invoice / Receipt -->
+           <div class="relative bg-white rounded-3xl border border-slate-200/60 shadow-card overflow-hidden flex flex-col">
+              <div id="receipt-capture-area" class="bg-white w-full h-full pb-6">
+                <!-- Decorative header -->
+                <div class="bg-slate-900 text-white p-6 relative overflow-hidden">
+                   <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                   <h2 class="text-[24px] font-black tracking-tight mb-0.5 relative z-10">INVOICE</h2>
+                   <p class="text-[13px] text-slate-300 font-medium relative z-10">Нэхэмжлэх - Nomin Cargo</p>
+                   
+                   <div class="absolute top-6 right-6 text-right relative z-10">
+                      <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Order No</p>
+                      <div class="bg-white/10 px-2 py-0.5 rounded-lg"><p class="text-[15px] font-bold tracking-widest text-white">${o.order_id}</p></div>
+                   </div>
+                </div>
+
+                <div class="p-6 pb-2">
+                   <div class="flex justify-between items-end border-b border-dashed border-slate-200 pb-5 mb-5">
+                      <div>
+                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Огноо / Date</p>
+                         <p class="text-[14px] font-bold text-slate-800">${dateString}</p>
+                      </div>
+                      <div class="text-right">
+                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Төрөл / Type</p>
+                         <div class="inline-block bg-primary/10 text-primary px-2.5 py-1 rounded-md font-bold text-[12px]">${typeLabel}</div>
+                      </div>
+                   </div>
+
+                   <div class="flex justify-between items-center bg-[#F0F4FF] p-4 rounded-2xl mb-6">
+                      <div class="text-center flex-1 border-r border-blue-100">
+                         <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Жин (Weight)</p>
+                         <p class="text-[18px] font-black text-slate-800">${o.weight ? o.weight + ' kg' : '-'}</p>
+                      </div>
+                      <div class="text-center flex-1">
+                         <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Төлбөр (Total)</p>
+                         <p class="text-[20px] font-black text-primary">${o.total_price ? parseInt(o.total_price).toLocaleString() + ' ₩' : '-'}</p>
+                      </div>
+                   </div>
+
+                   <div class="space-y-4 mb-3" ${o.total_price ? '' : 'style="opacity: 0.5;"'}>
+                      <div>
+                         <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">account_balance</span> Төлбөр хийх данс (Bank)</p>
+                         <div class="bg-blue-50/50 rounded-xl p-3.5 space-y-3 border border-blue-100/50">
+                            <div class="flex items-start gap-2.5">
+                               <div class="w-1 bg-green-500 h-[34px] rounded-full shrink-0"></div>
+                               <div>
+                                  <p class="text-[13px] font-bold text-slate-800">Hana bank: 536-910562-15707</p>
+                                  <p class="text-[11px] text-slate-500 font-medium">DUGERSUREN JAMBALDORJ</p>
+                               </div>
+                            </div>
+                            <div class="flex items-start gap-2.5 pt-2 border-t border-blue-100/50">
+                               <div class="w-1 bg-blue-500 h-[34px] rounded-full shrink-0"></div>
+                               <div>
+                                  <p class="text-[13px] font-bold text-slate-800">NongHyup bank: 352-185218-7323</p>
+                                  <p class="text-[11px] text-slate-500 font-medium">ZUNDUIJAMTS ODGEREL</p>
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+              </div>
+              
+              <button onclick="downloadReceiptAsImage()" class="absolute bottom-6 right-6 w-11 h-11 bg-slate-900 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-slate-800 transition-all print-hide group z-10" title="Нэхэмжлэх татах (Download Invoice)">
+                 <span class="material-symbols-outlined text-[20px] group-hover:-translate-y-0.5 transition-transform">download</span>
+              </button>
+           </div>
+        </section>
+
         <!-- Actions -->
-         <div class="flex gap-3 pb-8 animate-fade-in-up delay-200 mt-6 flex-wrap">
+         <div class="flex gap-3 pb-8 animate-fade-in-up delay-200 mt-6 flex-wrap print-hide">
             <a href="admin-orders" class="w-[full] sm:w-auto flex-1 p-4 bg-slate-100 border border-slate-200 shadow-sm text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-200 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">arrow_back</span> Буцах
             </a>
-            <button onclick="window.print()" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-primary font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
-              <span class="material-symbols-outlined text-[20px]">print</span> Хэвлэх
+            <button onclick="downloadOrderAsPDF()" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-primary font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
+              <span class="material-symbols-outlined text-[20px]">download</span> Татах (PDF)
             </button>
             <a href="tel:${o.sender_phone || o.receiver_phone || ''}" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">call</span> Залгах
@@ -534,6 +648,109 @@
         });
       }
     }
+
+    function calculatePrice(rate) {
+       const weightInput = document.getElementById('input-weight').value;
+       const weight = parseFloat(weightInput);
+       if(isNaN(weight) || weight <= 0) {
+          alert('Жингээ зөв оруулна уу. (Please enter a valid weight)');
+          return;
+       }
+       const price = Math.round(weight * rate);
+       document.getElementById('input-price').value = price;
+    }
+
+    window.saveInvoiceData = async function(orderId) {
+       const weight = document.getElementById('input-weight').value;
+       const price = document.getElementById('input-price').value;
+       if(!weight || !price) {
+          alert('Жин болон Төлбөрөө оруулна уу.');
+          return;
+       }
+       
+       const btn = event.currentTarget;
+       const originalHtml = btn.innerHTML;
+       btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span> Түр хүлээнэ үү...';
+       
+       try {
+         const res = await fetch('/api/orders', {
+             method: 'PUT',
+             headers: {'Content-Type': 'application/json'},
+             body: JSON.stringify({ orderId: orderId, weight: weight, total_price: price })
+         });
+         if (res.ok) {
+            window.location.reload();
+         } else {
+            alert('Хадгалах үед алдаа гарлаа');
+            btn.innerHTML = originalHtml;
+         }
+       } catch(e) {
+            alert('Холболтын алдаа: ' + e.message);
+            btn.innerHTML = originalHtml;
+       }
+    };
+
+    window.downloadReceiptAsImage = async function() {
+       document.getElementById('pdf-loading').classList.remove('opacity-0', 'pointer-events-none');
+       
+       const content = document.getElementById('receipt-capture-area');
+       try {
+         const canvas = await html2canvas(content, {
+            scale: 3, 
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+         });
+
+         const imgData = canvas.toDataURL('image/jpeg', 1.0);
+         const link = document.createElement('a');
+         link.download = `Invoice_${currentOrder?.order_id || 'Detail'}.jpg`;
+         link.href = imgData;
+         link.click();
+
+       } catch (err) {
+         console.error('Зураг үүсгэхэд алдаа:', err);
+         alert('Үүсгэх үед алдаа гарлаа. Та дахин оролдоно уу.');
+       } finally {
+         document.getElementById('pdf-loading').classList.add('opacity-0', 'pointer-events-none');
+       }
+    };
+
+    window.downloadOrderAsPDF = async function() {
+       document.getElementById('pdf-loading').classList.remove('opacity-0', 'pointer-events-none');
+       
+       const content = document.getElementById('orderContent');
+       try {
+         const { jsPDF } = window.jspdf;
+         
+         const printHides = content.querySelectorAll('.print-hide');
+         printHides.forEach(el => el.style.display = 'none');
+
+         const canvas = await html2canvas(content, {
+            scale: 2, // өндөр чанартай
+            useCORS: true, // гадаад зураг (cross-origin) ашиглах
+            backgroundColor: '#F0F4FF', // суурь өнгө
+            logging: false
+         });
+
+         printHides.forEach(el => el.style.display = '');
+
+         const imgData = canvas.toDataURL('image/jpeg', 0.95);
+         
+         const pdfWidth = canvas.width / 2; // px to pt
+         const pdfHeight = canvas.height / 2;
+         const pdf = new jsPDF(canvas.width > canvas.height ? 'l' : 'p', 'pt', [pdfWidth, pdfHeight]);
+         
+         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+         pdf.save(`Order_${currentOrder?.order_id || 'Detail'}.pdf`);
+
+       } catch (err) {
+         console.error('PDF үүсгэхэд алдаа:', err);
+         alert('Үүсгэх үед алдаа гарлаа. Та дахин оролдоно уу.');
+       } finally {
+         document.getElementById('pdf-loading').classList.add('opacity-0', 'pointer-events-none');
+       }
+    };
   </script>
 
   <!-- SMS Message Modal -->
@@ -574,5 +791,33 @@
       </div>
     </div>
   </div>
+
+  <!-- PDF Loading Overlay -->
+  <div id="pdf-loading" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+     <div class="bg-white rounded-2xl p-6 flex flex-col items-center shadow-2xl">
+        <span class="material-symbols-outlined animate-spin text-[40px] text-primary mb-3">progress_activity</span>
+        <p class="font-bold text-gray-900">PDF файл үүсгэж байна...</p>
+        <p class="text-[12px] text-slate-500 mt-1">Түр хүлээнэ үү</p>
+     </div>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div id="image-lightbox" class="fixed inset-0 z-[110] bg-black/90 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 backdrop-blur-md" onclick="closeLightbox()">
+     <img id="lightbox-img" src="" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl transform scale-95 transition-transform duration-300">
+     <button class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm transition-colors">
+        <span class="material-symbols-outlined text-[24px]">close</span>
+     </button>
+  </div>
+  <script>
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('image-lightbox').classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => document.getElementById('lightbox-img').classList.remove('scale-95'), 50);
+    }
+    function closeLightbox() {
+      document.getElementById('image-lightbox').classList.add('opacity-0', 'pointer-events-none');
+      document.getElementById('lightbox-img').classList.add('scale-95');
+    }
+  </script>
 </body>
 </html>
