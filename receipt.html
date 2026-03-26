@@ -97,7 +97,17 @@
             <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-2.5">
                <div class="flex justify-between"><span class="text-[12px] text-slate-500">Төрөл</span><span id="i-cat" class="text-[13px] font-bold text-gray-900"></span></div>
                <div class="flex justify-between"><span class="text-[12px] text-slate-500">Тоо ширхэг</span><span id="i-qty" class="text-[13px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md"></span></div>
+        <div id="large-items-row" class="hidden flex justify-between items-start">
+          <span class="text-[13px] text-slate-500 font-medium">Том оврын ачаа</span>
+          <span id="large-items-list" class="text-[13px] font-bold text-orange-700 text-right max-w-[60%]"></span>
+        </div>
                <div class="flex justify-between" id="weight-row" style="display:none;"><span class="text-[12px] text-slate-500">Жин</span><span id="i-weight" class="text-[13px] font-bold text-gray-900"></span></div>
+        <div id="volume-items-receipt" class="hidden">
+          <div class="flex justify-between items-start mb-1">
+            <span class="text-[13px] text-slate-500 font-bold">Овор ихтэй ачаа</span>
+          </div>
+          <div id="volume-items-receipt-list" class="bg-orange-50/50 rounded-xl p-2 border border-orange-100/50 mb-2"></div>
+        </div>
                <div id="i-images" class="pt-2 hidden">
                   <span class="text-[12px] text-slate-500 font-medium block mb-2">Зураг</span>
                   <div class="flex gap-2 overflow-x-auto pb-1" id="i-images-container"></div>
@@ -210,6 +220,26 @@
           document.getElementById('r-address').textContent = o.receiver_address || '-';
           
           document.getElementById('i-cat').textContent = o.item_category || '-';
+          // Large items
+          try {
+            const largeItems = JSON.parse(o.large_items || '[]');
+            const liEl = document.getElementById('large-items-row');
+            if (largeItems.length > 0 && liEl) {
+              liEl.classList.remove('hidden');
+              document.getElementById('large-items-list').textContent = largeItems.join(', ');
+            }
+          } catch(e) {}
+          // Volume items
+          try {
+            const volItems = JSON.parse(o.volume_items || '[]');
+            const volEl = document.getElementById('volume-items-receipt');
+            if (volItems.length > 0 && volEl) {
+              volEl.classList.remove('hidden');
+              document.getElementById('volume-items-receipt-list').innerHTML = volItems.map(v => 
+                '<div class="flex justify-between items-center py-1.5 border-b border-dashed border-orange-100"><span class="text-[13px] text-slate-600 font-medium">' + v.name + '</span><span class="text-[13px] font-bold text-orange-600">' + parseInt(v.price).toLocaleString() + ' ₩</span></div>'
+              ).join('');
+            }
+          } catch(e) {}
           document.getElementById('i-qty').textContent = o.item_quantity ? `${o.item_quantity} ш` : '-';
           
           if(o.weight) {

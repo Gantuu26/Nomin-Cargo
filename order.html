@@ -334,13 +334,62 @@
       <div class="wizard-step bg-white p-5 rounded-3xl shadow-card border border-blue-100/50 hidden" id="step3">
         <h3 class="text-[17px] font-bold text-on-surface mb-4 pl-1">Барааны мэдээлэл</h3>
         
-        <div class="bg-blue-50/70 border border-blue-100 rounded-2xl p-4 mb-5 shadow-sm">
-          <div class="flex gap-3">
-             <span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">info</span>
-             <p class="text-[12px] text-blue-900 leading-relaxed font-medium">
-               <span class="font-bold text-primary-dark block mb-1">Том оврын ачаа:</span>
-               Ор, Сандал, ТВ, Матрас, Хөргөгч, Угаалгын машин, Дугуй, Аяга угаагч машин, Ширээ, Дасгалын дугуй, Массажны сандал зэрэг овор ихтэй ачаануудыг хоорондоо үнэ тохирч явуулж болно.
-             </p>
+        <div class="mb-5">
+          <button type="button" id="largeItemToggle" onclick="toggleLargeItems()" class="w-full bg-blue-50/70 border border-blue-100 rounded-2xl p-4 shadow-sm text-left transition-all hover:bg-blue-50 active:scale-[0.99]">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
+                <span class="text-[13px] font-bold text-primary-dark">Том оврын ачаа байгаа бол та сонгоно уу</span>
+              </div>
+              <span id="largeItemArrow" class="material-symbols-outlined text-primary text-[20px] transition-transform duration-300">expand_more</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mt-1.5 pl-[30px] leading-snug">Сонголттой - Овор ихтэй ачаануудыг доорх жагсаалтаас сонгоно уу</p>
+          </button>
+          <div id="largeItemsGrid" class="hidden mt-3 grid grid-cols-2 gap-2 animate-fade-in-up">
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Ор" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Ор</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Сандал" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Сандал</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="ТВ" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">ТВ</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Матрас" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Матрас</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Хөргөгч" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Хөргөгч</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Угаалгын машин" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Угаалгын машин</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Дугуй" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Дугуй</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Аяга угаагч машин" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Аяга угаагч машин</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Ширээ" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Ширээ</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98]">
+              <input type="checkbox" name="largeItem" value="Дасгалын дугуй" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Дасгалын дугуй</span>
+            </label>
+            <label class="flex items-center gap-2.5 bg-surface-container-low border border-blue-100/50 rounded-xl px-3 py-3 cursor-pointer hover:bg-blue-50/50 transition-colors active:scale-[0.98] col-span-2">
+              <input type="checkbox" name="largeItem" value="Массажны сандал" class="w-4.5 h-4.5 rounded accent-primary cursor-pointer">
+              <span class="text-[13px] font-medium text-gray-700">Массажны сандал</span>
+            </label>
           </div>
         </div>
         <div class="form-group mb-4">
@@ -531,6 +580,19 @@
     </div>
   </nav>
 
-  <script src="order.js?v=2"></script>
+  <script>
+    function toggleLargeItems() {
+      const grid = document.getElementById('largeItemsGrid');
+      const arrow = document.getElementById('largeItemArrow');
+      if (grid.classList.contains('hidden')) {
+        grid.classList.remove('hidden');
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        grid.classList.add('hidden');
+        arrow.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+  <script src="order.js?v=3"></script>
 </body>
 </html>

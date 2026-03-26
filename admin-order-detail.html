@@ -360,6 +360,7 @@
                        <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
                        <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${o.item_quantity || '-'} ш</span>
                      </div>
+                      ${(() => { try { const li = JSON.parse(o.large_items || '[]'); return li.length > 0 ? `<div class="flex justify-between items-start"><span class="text-[12px] text-slate-500 font-medium">Том оврын ачаа</span><div class="flex flex-wrap gap-1 justify-end max-w-[60%]">${li.map(x => `<span class="text-[11px] font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md">${x}</span>`).join('')}</div></div>` : ''; } catch(e) { return ''; } })()}
                       ${o.weight ? `<div class="flex justify-between items-start"><span class="text-[12px] text-slate-500 font-medium">Барааны жин</span><span class="text-[14px] font-bold text-gray-900">${o.weight} кг</span></div>` : ''}
                      ${imagesHtml}
                   </div>
@@ -418,44 +419,73 @@
         <section class="animate-fade-in-up delay-200 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6" id="invoice-wrapper">
            <!-- Editor Form -->
            <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card flex flex-col print-hide">
-              <h3 class="text-[16px] font-bold text-gray-900 mb-4 flex items-center gap-2">
-                 <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">calculate</span>
-                 Төлбөр бодох
-              </h3>
-              
-              <div class="space-y-4 flex-1">
-                 <div class="flex gap-4">
-                    <div class="flex-1">
-                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Жин (кг)</label>
-                       <input type="number" id="input-weight" step="0.1" value="${o.weight || ''}" placeholder="0.0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-semibold text-[16px]">
-                    </div>
-                    <div class="flex-1">
-                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Ачааны төрөл</label>
-                       <div class="h-12 px-3 rounded-xl border border-slate-200 bg-slate-100 flex items-center font-bold text-slate-700 text-[13px] sm:text-[14px]">
-                          ${typeLabel} (${cargoRate} ₩)
-                       </div>
-                    </div>
-                 </div>
-                 
-                 <div class="flex gap-3">
-                    <div class="flex-1">
-                       <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Нийт төлбөр (₩)</label>
-                       <input type="number" id="input-price" value="${o.total_price || ''}" placeholder="0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-bold text-primary text-[16px]">
-                    </div>
-                    <div class="flex items-end">
-                       <button onclick="calculatePrice(${cargoRate})" class="h-12 px-5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl transition-colors text-[14px] flex items-center justify-center min-w-[90px]">
-                          Бодох
-                       </button>
-                    </div>
-                 </div>
-              </div>
+               <h3 class="text-[16px] font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">calculate</span>
+                  Төлбөр бодох
+               </h3>
+               
+               <div class="space-y-4 flex-1">
+                  <!-- Weight-based pricing -->
+                  <div class="flex gap-4">
+                     <div class="flex-1">
+                        <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Жин (кг)</label>
+                        <input type="number" id="input-weight" step="0.1" value="${o.weight || ''}" placeholder="0.0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-semibold text-[16px]">
+                     </div>
+                     <div class="flex-1">
+                        <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Ачааны төрөл</label>
+                        <div class="h-12 px-3 rounded-xl border border-slate-200 bg-slate-100 flex items-center font-bold text-slate-700 text-[13px] sm:text-[14px]">
+                           ${typeLabel} (${cargoRate} ₩)
+                        </div>
+                     </div>
+                  </div>
+                  
+                  <div class="flex gap-3">
+                     <div class="flex-1">
+                        <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Жингийн төлбөр (₩)</label>
+                        <input type="number" id="input-price" value="${o.total_price || ''}" placeholder="0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-bold text-primary text-[16px]">
+                     </div>
+                     <div class="flex items-end">
+                        <button onclick="calculatePrice(${cargoRate})" class="h-12 px-5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl transition-colors text-[14px] flex items-center justify-center min-w-[90px]">
+                           Бодох
+                        </button>
+                     </div>
+                  </div>
 
-              <button onclick="saveInvoiceData('${o.order_id}')" class="w-full h-12 mt-6 bg-primary text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(59,130,246,0.35)] hover:bg-primary-dark transition-all flex items-center justify-center gap-2 text-[15px]">
-                 <span class="material-symbols-outlined text-[20px]">save</span> Хадгалах
-              </button>
-           </div>
+                  <!-- Volume-based pricing -->
+                  <div class="border-t border-slate-100 pt-4 mt-2">
+                     <div class="flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-orange-500 text-[18px]">inventory_2</span>
+                        <label class="text-[13px] font-bold text-gray-900">Овор ихтэй ачаа (Тусдаа үнэ)</label>
+                     </div>
+                     <div id="volume-items-list" class="space-y-2">
+                     </div>
+                     <button type="button" onclick="addCustomVolumeItem()" class="mt-3 w-full h-10 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 hover:border-primary hover:text-primary text-[12px] font-bold flex items-center justify-center gap-1.5 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">add</span> Өөрөө бичиж оруулах
+                     </button>
+                  </div>
 
-           <!-- Generated Invoice / Receipt -->
+                  <!-- Pricing summary -->
+                  <div class="border-t border-slate-100 pt-4 mt-2" id="pricing-summary">
+                     <div class="bg-slate-50 rounded-2xl p-4 space-y-2.5 border border-slate-100">
+                        <div class="flex justify-between items-center">
+                           <span class="text-[12px] text-slate-500 font-medium">Жингийн төлбөр</span>
+                           <span id="summary-weight-price" class="text-[14px] font-bold text-gray-800">0 ₩</span>
+                        </div>
+                        <div id="summary-volume-rows"></div>
+                        <div class="border-t border-slate-200 pt-2.5 mt-1 flex justify-between items-center">
+                           <span class="text-[13px] font-bold text-gray-900">Нийт дүн</span>
+                           <span id="summary-total" class="text-[18px] font-black text-primary">0 ₩</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <button onclick="saveInvoiceData('${o.order_id}')" class="w-full h-12 mt-6 bg-primary text-white font-bold rounded-xl shadow-[0_4px_14px_rgba(59,130,246,0.35)] hover:bg-primary-dark transition-all flex items-center justify-center gap-2 text-[15px]">
+                  <span class="material-symbols-outlined text-[20px]">save</span> Хадгалах
+               </button>
+            </div>
+
+            <!-- Generated Invoice / Receipt -->
            <div class="relative bg-white rounded-3xl border border-slate-200/60 shadow-card overflow-hidden flex flex-col">
               <div id="receipt-capture-area" class="bg-white w-full h-full pb-6">
                 <!-- Decorative header -->
@@ -492,6 +522,8 @@
                          <p class="text-[20px] font-black text-primary">${o.total_price ? parseInt(o.total_price).toLocaleString() + ' ₩' : '-'}</p>
                       </div>
                    </div>
+                    
+                    ${(() => { try { const vi = JSON.parse(o.volume_items || '[]'); if (vi.length === 0) return ''; let rows = vi.map(v => '<div class="flex justify-between items-center py-1.5 border-b border-dashed border-slate-100"><span class="text-[13px] text-slate-600 font-medium">' + (v.name || '-') + '</span><span class="text-[14px] font-bold text-orange-600">' + parseInt(v.price || 0).toLocaleString() + ' ₩</span></div>').join(''); return '<div class="mb-6"><p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">inventory_2</span> Овор ихтэй ачаа</p><div class="bg-orange-50/50 rounded-xl p-3.5 border border-orange-100/50">' + rows + '</div></div>'; } catch(e) { return ''; } })()}
 
                    <div class="space-y-4 mb-3" ${o.total_price ? '' : 'style="opacity: 0.5;"'}>
                       <div>
@@ -543,6 +575,9 @@
          </div>
       `;
     });
+
+    // Initialize volume items after rendering
+    setTimeout(() => { initVolumeItems(currentOrder?.volume_items || '[]'); }, 50);
 
     window.updateOrderStatus = async function(orderId, newStatus) {
        try {
@@ -649,18 +684,111 @@
        const weightInput = document.getElementById('input-weight').value;
        const weight = parseFloat(weightInput);
        if(isNaN(weight) || weight <= 0) {
-          alert('Жингээ зөв оруулна уу. (Please enter a valid weight)');
+          alert('Жингээ зөв оруулна уу.');
           return;
        }
        const price = Math.round(weight * rate);
        document.getElementById('input-price').value = price;
+       updatePricingSummary();
     }
+
+    const LARGE_ITEM_LIST = ['Ор', 'Сандал', 'ТВ', 'Матрас', 'Хөргөгч', 'Угаалгын машин', 'Дугуй', 'Аяга угаагч машин', 'Ширээ', 'Дасгалын дугуй', 'Массажны сандал'];
+    let volumeItemCounter = 0;
+
+    function initVolumeItems(savedItems) {
+       const list = document.getElementById('volume-items-list');
+       // Parse saved items
+       let existingItems = [];
+       try { existingItems = JSON.parse(savedItems || '[]'); } catch(e) {}
+       
+       // Add preset large items with checkboxes
+       LARGE_ITEM_LIST.forEach(name => {
+          const existing = existingItems.find(x => x.name === name);
+          addVolumeItemRow(name, existing ? existing.price : '', !!existing, false);
+       });
+       
+       // Add custom items that were saved
+       existingItems.filter(x => !LARGE_ITEM_LIST.includes(x.name)).forEach(item => {
+          addVolumeItemRow(item.name, item.price, true, true);
+       });
+       
+       updatePricingSummary();
+    }
+
+    function addVolumeItemRow(name, price, checked, isCustom) {
+       const list = document.getElementById('volume-items-list');
+       const id = 'vol-' + (volumeItemCounter++);
+       const row = document.createElement('div');
+       row.className = 'flex items-center gap-2 animate-fade-in';
+       row.id = id;
+       row.innerHTML = `
+          <label class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer">
+             <input type="checkbox" class="vol-check w-4 h-4 rounded accent-orange-500 cursor-pointer shrink-0" ${checked ? 'checked' : ''} onchange="updatePricingSummary()">
+             ${isCustom ? '<input type="text" class="vol-name flex-1 min-w-0 h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none text-[13px] font-medium" value="' + (name || '') + '" placeholder="Нэр оруулах..." onchange="updatePricingSummary()">' : '<span class="text-[13px] font-medium text-gray-700 truncate">' + name + '</span>'}
+          </label>
+          <input type="number" class="vol-price w-[110px] h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 outline-none text-[13px] font-bold text-orange-600 text-right" placeholder="₩ Үнэ" value="${price || ''}" oninput="updatePricingSummary()">
+          ${isCustom ? '<button onclick="removeVolumeItem(\'' + id + '\')" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors shrink-0"><span class="material-symbols-outlined text-[18px]">close</span></button>' : '<div class="w-8"></div>'}
+       `;
+       // Store name for non-custom
+       if (!isCustom) row.dataset.itemName = name;
+       list.appendChild(row);
+    }
+
+    function addCustomVolumeItem() {
+       addVolumeItemRow('', '', true, true);
+    }
+
+    function removeVolumeItem(id) {
+       const el = document.getElementById(id);
+       if (el) el.remove();
+       updatePricingSummary();
+    }
+
+    function getVolumeItems() {
+       const rows = document.querySelectorAll('#volume-items-list > div');
+       const items = [];
+       rows.forEach(row => {
+          const checked = row.querySelector('.vol-check')?.checked;
+          if (!checked) return;
+          const nameInput = row.querySelector('.vol-name');
+          const name = nameInput ? nameInput.value.trim() : (row.dataset.itemName || '');
+          const price = parseInt(row.querySelector('.vol-price')?.value) || 0;
+          if (name && price > 0) items.push({ name, price });
+       });
+       return items;
+    }
+
+    function updatePricingSummary() {
+       const weightPrice = parseInt(document.getElementById('input-price').value) || 0;
+       const volumeItems = getVolumeItems();
+       const volumeTotal = volumeItems.reduce((sum, v) => sum + v.price, 0);
+       
+       document.getElementById('summary-weight-price').textContent = weightPrice.toLocaleString() + ' ₩';
+       
+       const volRows = document.getElementById('summary-volume-rows');
+       if (volumeItems.length > 0) {
+          volRows.innerHTML = volumeItems.map(v => 
+             '<div class="flex justify-between items-center"><span class="text-[12px] text-orange-600 font-medium">• ' + v.name + '</span><span class="text-[13px] font-bold text-orange-600">' + v.price.toLocaleString() + ' ₩</span></div>'
+          ).join('');
+       } else {
+          volRows.innerHTML = '';
+       }
+       
+       document.getElementById('summary-total').textContent = (weightPrice + volumeTotal).toLocaleString() + ' ₩';
+    }
+
+    // Listen for weight price changes
+    document.getElementById('input-price')?.addEventListener('input', updatePricingSummary);
 
     window.saveInvoiceData = async function(orderId) {
        const weight = document.getElementById('input-weight').value;
-       const price = document.getElementById('input-price').value;
-       if(!weight || !price) {
-          alert('Жин болон Төлбөрөө оруулна уу.');
+       const weightPrice = document.getElementById('input-price').value;
+       const volumeItems = getVolumeItems();
+       const volumeTotal = volumeItems.reduce((sum, v) => sum + v.price, 0);
+       const grandTotal = (parseInt(weightPrice) || 0) + volumeTotal;
+       
+       if(!weight && volumeItems.length === 0) {
+          alert('Жин эсвэл овор ихтэй ачааны үнэ оруулна уу.');
           return;
        }
        
@@ -672,7 +800,12 @@
          const res = await fetch('/api/orders', {
              method: 'PUT',
              headers: {'Content-Type': 'application/json'},
-             body: JSON.stringify({ orderId: orderId, weight: weight, total_price: price })
+             body: JSON.stringify({ 
+                orderId: orderId, 
+                weight: weight || null, 
+                total_price: grandTotal.toString(),
+                volume_items: JSON.stringify(volumeItems)
+             })
          });
          if (res.ok) {
             window.location.reload();

@@ -239,7 +239,9 @@
                     <span class="text-[12px] text-slate-500 font-medium">Барааны тоо ширхэг</span>
                     <span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${order.item_quantity || ''} ш</span>
                   </div>
-                  ${order.weight ? `<div class="flex justify-between items-start"><span class="text-[12px] text-slate-500 font-medium">Барааны жин</span><span class="text-[14px] font-bold text-gray-900">${order.weight} кг</span></div>` : ''}
+                   ${(() => { try { const li = JSON.parse(order.large_items || '[]'); return li.length > 0 ? `<div class="flex justify-between items-start"><span class="text-[12px] text-slate-500 font-medium">Том оврын ачаа</span><div class="flex flex-wrap gap-1 justify-end max-w-[60%]">${li.map(x => `<span class="text-[11px] font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md">${x}</span>`).join('')}</div></div>` : ''; } catch(e) { return ''; } })()}
+                  ${order.weight ? `<div class="flex justify-between items-start"><span class="text-[12px] text-slate-500 font-medium">Барааны жин</span><span class="text-[14px] font-bold text-gray-900">${order.weight} кг</span></div>
+                   ${(() => { try { const vi = JSON.parse(order.volume_items || '[]'); if (vi.length === 0) return ''; return '<div class="mt-2 pt-2 border-t border-slate-100"><p class="text-[11px] text-slate-400 font-bold mb-1.5">Овор ихтэй ачаа:</p>' + vi.map(v => '<div class="flex justify-between items-center py-1"><span class="text-[12px] text-orange-700 font-medium">• ' + v.name + '</span><span class="text-[13px] font-bold text-orange-600">' + parseInt(v.price).toLocaleString() + ' ₩</span></div>').join('') + '</div>'; } catch(e) { return ''; } })()}` : ''}
                   ${imagesHtml}
                </div>
              </div>

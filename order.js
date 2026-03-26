@@ -421,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
           address: document.getElementById('senderAddress').value.trim(),
         },
         item: { category: document.getElementById('itemCategory').value.trim(), quantity: document.getElementById('itemQuantity').value.trim() },
+        large_items: Array.from(document.querySelectorAll('input[name="largeItem"]:checked')).map(cb => cb.value),
         receiver: {
           name: document.getElementById('receiverName').value.trim(),
           phone: document.getElementById('receiverPhone').value.trim(),
@@ -576,6 +577,11 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="text-gray-500 text-[13px]">Бараа</span>
         <span class="font-bold text-gray-900 text-[13px]">${data.item.category} (${data.item.quantity}ш)</span>
       </div>
+      ${data.large_items && data.large_items.length > 0 ? `
+      <div class="flex justify-between border-b border-gray-100 pb-2 pt-1">
+        <span class="text-gray-500 text-[13px]">Том оврын ачаа</span>
+        <span class="font-bold text-gray-900 text-[13px]">${data.large_items.join(', ')}</span>
+      </div>` : ''}
       <div class="flex justify-between pt-1">
         <span class="text-gray-500 text-[13px]">Хүргэлтийн хугацаа</span>
         <span class="font-bold text-gray-900 text-[13px]">${deliveryTime}</span>

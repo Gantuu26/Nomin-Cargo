@@ -62,20 +62,23 @@ export async function onRequest(context) {
             try { 
                 await env.DB.prepare('ALTER TABLE orders ADD COLUMN total_price TEXT').run(); 
             } catch(e) { /* ignore */ }
+            try { 
+                await env.DB.prepare('ALTER TABLE orders ADD COLUMN large_items TEXT').run(); 
+            } catch(e) { /* ignore */ }
             
             const stmt = env.DB.prepare(`
                 INSERT INTO orders (
                     order_id, type, branch, date, status, container_id,
                     sender_name, sender_phone, sender_address,
                     receiver_name, receiver_phone, receiver_address,
-                    item_category, item_quantity, user_email, images, weight, total_price
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    item_category, item_quantity, user_email, images, weight, total_price, large_items
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).bind(
                 finalOrderId, body.type, body.branch || '', body.date || new Date().toISOString(), body.status || 'pending', body.containerId || null,
                 body.sender?.name || '', body.sender?.phone || '', body.sender?.address || '',
                 body.receiver?.name || '', body.receiver?.phone || '', body.receiver?.address || '',
                 body.item?.category || body.items?.[0]?.category || '', body.item?.quantity || body.items?.[0]?.quantity || '', body.user_email || '', JSON.stringify(body.images || []),
-                body.weight || null, body.total_price || null
+                body.weight || null, body.total_price || null, JSON.stringify(body.large_items || [])
             );
             await stmt.run();
             
@@ -90,6 +93,7 @@ export async function onRequest(context) {
             // Ensure columns exist on the fly during PUT
             try { await env.DB.prepare('ALTER TABLE orders ADD COLUMN weight TEXT').run(); } catch(e){}
             try { await env.DB.prepare('ALTER TABLE orders ADD COLUMN total_price TEXT').run(); } catch(e){}
+            try { await env.DB.prepare('ALTER TABLE orders ADD COLUMN volume_items TEXT').run(); } catch(e){}
 
             // If updating container assignment only:
             let stmt;
@@ -100,8 +104,8 @@ export async function onRequest(context) {
                  stmt = env.DB.prepare('UPDATE orders SET status = ? WHERE order_id = ?')
                              .bind(body.status, body.orderId);
             } else if (body.hasOwnProperty('weight') && body.hasOwnProperty('total_price')) {
-                 stmt = env.DB.prepare('UPDATE orders SET weight = ?, total_price = ? WHERE order_id = ?')
-                             .bind(body.weight, body.total_price, body.orderId);
+                 stmt = env.DB.prepare('UPDATE orders SET weight = ?, total_price = ?, volume_items = ? WHERE order_id = ?')
+                             .bind(body.weight || null, body.total_price, body.volume_items || '[]', body.orderId);
             } else {
                  return new Response(JSON.stringify({ error: "Invalid update payload" }), { status: 400 });
             }
