@@ -576,8 +576,8 @@
     };
 
     const SMS_TEMPLATES = [
+      { id: 'payment_info', title: 'Төлбөрийн мэдээлэл', text: '[Номин Транс] Таны төлбөрийн мэдээлэл.\\nТаны захиалгын дэлгэрэнгүй мэдээлэл: {link}' },
       { id: 'payment_done', title: 'Төлбөр төлөгдсөн', text: '[Номин Транс] Таны төлбөр төлөгдлөө.' },
-      { id: 'payment_info', title: 'Төлбөрийн мэдээлэл', text: '[Номин Транс] Таны төлбөрийн мэдээлэл.\nТаны захиалгын дэлгэрэнгүй мэдээлэл: {link}' },
       { id: 'picking_up', title: 'Очиж байна', text: '[Номин Транс] Таны ачааг хаягаар очиж авахаар явлаа. Захиалга: {orderId}' }
     ];
 
@@ -614,7 +614,7 @@
                   <div class="flex items-center gap-1.5 text-[11px] font-bold text-primary">
                      <span class="material-symbols-outlined text-[14px]">phone_iphone</span> ${phone}
                   </div>
-                  <button onclick="sendTemplateSms('${fullMessage.replace(/'/g, "\\'")}')" class="flex items-center gap-1 text-[13px] font-bold text-primary hover:text-primary active:scale-95 transition-all">
+                  <button onclick="sendTemplateSms('${fullMessage.replace(/\\n/g, '\\\\\\\\n').replace(/'/g, "\\\\'")}')" class="flex items-center gap-1 text-[13px] font-bold text-primary hover:text-primary active:scale-95 transition-all">
                      <span class="material-symbols-outlined text-[18px]">send</span> Дарж илгээх
                   </button>
                </div>
