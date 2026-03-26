@@ -528,16 +528,16 @@
             <a href="admin-orders" class="w-[full] sm:w-auto flex-1 p-4 bg-slate-100 border border-slate-200 shadow-sm text-slate-700 font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-slate-200 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">arrow_back</span> Буцах
             </a>
-            <button onclick="downloadOrderAsPDF()" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-primary font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
+            <button onclick="downloadOrderAsPDF()" class="flex-1 p-4 bg-white border border-slate-200 shadow-sm text-gray-900 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">download</span> Татах PDF
             </button>
             <a href="tel:${o.sender_phone || o.receiver_phone || ''}" class="flex-1 p-4 bg-white border border-blue-100 shadow-sm text-slate-700 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">call</span> Залгах
             </a>
-            <button onclick="openSmsModal(event, '${o.order_id}', '${o.sender_phone || o.receiver_phone || ''}', '${o.sender_name || o.receiver_name || ''}')" class="flex-1 p-4 bg-white border border-green-100 shadow-sm text-green-600 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-green-50 active:scale-[0.98] transition-all">
+            <button onclick="openSmsModal(event, '${o.order_id}', '${o.sender_phone || o.receiver_phone || ''}', '${o.sender_name || o.receiver_name || ''}')" class="flex-1 p-4 bg-white border border-slate-200 shadow-sm text-gray-900 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">sms</span> Мессеж
             </button>
-            <button onclick="deleteThisOrder('${o.order_id}')" class="flex-1 p-4 bg-red-50 border border-red-100/50 shadow-sm text-red-500 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-red-100 active:scale-[0.98] transition-all">
+            <button onclick="deleteThisOrder('${o.order_id}')" class="flex-1 p-4 bg-white border border-slate-200 shadow-sm text-gray-900 font-bold rounded-2xl flex flex-col items-center justify-center gap-1 hover:bg-slate-50 active:scale-[0.98] transition-all">
               <span class="material-symbols-outlined text-[20px]">delete</span> Устгах
             </button>
          </div>
