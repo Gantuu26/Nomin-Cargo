@@ -733,7 +733,8 @@
             const titleClass = isActive ? 'text-green-700' : 'text-slate-500';
             const badge = isActive ? '<span class="px-2 py-0.5 bg-green-500 text-white text-[10px] rounded-md font-bold uppercase tracking-wider">Одоогийн төлөв</span>' : '';
             
-            const fullMessage = t.text.replace('{orderId}', orderId);
+            const link = window.location.origin + '/receipt?id=' + orderId;
+            const fullMessage = t.text.replace('{orderId}', orderId) + '\n\nТаны захиалгын дэлгэрэнгүй мэдээлэл:\n' + link;
             
             return `
             <div class="rounded-xl border ${bgClass} p-4 transition-all">

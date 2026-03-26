@@ -6,8 +6,14 @@ export async function onRequest(context) {
     try {
         if (request.method === 'GET') {
             const email = url.searchParams.get('user_email');
+            const targetId = url.searchParams.get('id');
             let results;
-            if (email && email !== 'none') {
+            
+            if (targetId) {
+                 const stmt = env.DB.prepare('SELECT * FROM orders WHERE order_id = ?').bind(targetId);
+                 const res = await stmt.first();
+                 results = res ? [res] : [];
+            } else if (email && email !== 'none') {
                  // Try adding the column just in case it's an old DB
                  try { await env.DB.prepare('ALTER TABLE orders ADD COLUMN user_email TEXT').run(); } catch(e){}
                  

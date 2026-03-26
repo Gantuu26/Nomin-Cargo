@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Нэхэмжлэх - Номин Транс</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: "#3B82F6", "surface": "#F0F4FF" },
+          fontFamily: { body: ["Inter", "sans-serif"] },
+          boxShadow: { card: "0 4px 24px rgba(15, 23, 42, 0.06)" }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="min-h-screen pb-10 flex items-center justify-center p-4">
+
+  <div id="loading" class="text-center text-slate-400 py-20 w-full animate-pulse">
+     Мэдээллийг татаж байна...
+  </div>
+  
+  <div id="error" class="hidden text-center text-red-500 py-10 w-full bg-red-50 rounded-2xl border border-red-100 max-w-sm mx-auto p-6 shadow-sm">
+     Захиалгын мэдээлэл олдсонгүй
+  </div>
+
+  <main id="receipt-container" class="hidden max-w-sm w-full mx-auto relative bg-white rounded-3xl border border-slate-200/60 shadow-card overflow-hidden flex flex-col animate-fade-in">
+      <div class="bg-slate-900 text-white p-6 relative overflow-hidden">
+         <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+         <h2 class="text-[24px] font-black tracking-tight mb-0.5 relative z-10">INVOICE</h2>
+         <p class="text-[13px] text-slate-300 font-medium relative z-10">Нэхэмжлэх - Nomin Cargo</p>
+         
+         <div class="absolute top-6 right-6 text-right relative z-10">
+            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Захиалгын дугаар</p>
+            <div class="bg-white/10 px-2 py-0.5 rounded-lg"><p id="r-id" class="text-[15px] font-bold tracking-widest text-white"></p></div>
+         </div>
+      </div>
+
+      <div class="p-6 pb-6">
+         <div class="flex justify-between items-end border-b border-dashed border-slate-200 pb-5 mb-5">
+            <div>
+               <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Огноо</p>
+               <p id="r-date" class="text-[14px] font-bold text-slate-800"></p>
+            </div>
+            <div class="text-right">
+               <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">Төрөл</p>
+               <div id="r-type" class="inline-block bg-primary/10 text-primary px-2.5 py-1 rounded-md font-bold text-[12px]"></div>
+            </div>
+         </div>
+
+         <div class="flex justify-between items-center bg-[#F0F4FF] p-4 rounded-2xl mb-6">
+            <div class="text-center flex-1 border-r border-blue-100">
+               <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Жин</p>
+               <p id="r-weight" class="text-[18px] font-black text-slate-800"></p>
+            </div>
+            <div class="text-center flex-1">
+               <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">Төлбөр</p>
+               <p id="r-price" class="text-[20px] font-black text-primary"></p>
+            </div>
+         </div>
+
+         <div id="r-bank" class="space-y-4 mb-3 transition-opacity">
+            <div>
+               <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">account_balance</span> Төлбөр хийх данс</p>
+               <div class="bg-blue-50/50 rounded-xl p-3.5 space-y-3 border border-blue-100/50">
+                  <div class="flex items-start gap-2.5">
+                     <div class="w-1 bg-green-500 h-[34px] rounded-full shrink-0"></div>
+                     <div>
+                        <p class="text-[13px] font-bold text-slate-800">Hana bank: 536-910562-15707</p>
+                        <p class="text-[11px] text-slate-500 font-medium">DUGERSUREN JAMBALDORJ</p>
+                     </div>
+                  </div>
+                  <div class="flex items-start gap-2.5 pt-2 border-t border-blue-100/50">
+                     <div class="w-1 bg-blue-500 h-[34px] rounded-full shrink-0"></div>
+                     <div>
+                        <p class="text-[13px] font-bold text-slate-800">NongHyup bank: 352-185218-7323</p>
+                        <p class="text-[11px] text-slate-500 font-medium">ZUNDUIJAMTS ODGEREL</p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+       const urlParams = new URLSearchParams(window.location.search);
+       const id = urlParams.get('id');
+       if (!id) {
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error').classList.remove('hidden');
+          return;
+       }
+
+       try {
+          const res = await fetch('/api/orders?id=' + id);
+          if (!res.ok) throw new Error();
+          const data = await res.json();
+          if (!data || data.length === 0) throw new Error();
+          
+          const o = data[0];
+          
+          const t = new Date(o.date);
+          const dateString = `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, '0')}.${String(t.getDate()).padStart(2, '0')} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+          
+          document.getElementById('r-id').textContent = o.order_id;
+          document.getElementById('r-date').textContent = dateString;
+          document.getElementById('r-type').textContent = o.type === 'standard' ? 'Энгийн ачаа' : 'Экспресс ачаа';
+          document.getElementById('r-weight').textContent = o.weight ? o.weight + ' kg' : '-';
+          document.getElementById('r-price').textContent = o.total_price ? parseInt(o.total_price).toLocaleString() + ' ₩' : '-';
+          
+          if (!o.total_price) {
+             document.getElementById('r-bank').style.opacity = '0.4';
+          }
+
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('receipt-container').classList.remove('hidden');
+       } catch(e) {
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error').classList.remove('hidden');
+       }
+    });
+  </script>
+</body>
+</html>
