@@ -58,13 +58,14 @@ export async function onRequest(context) {
                     order_id, type, branch, date, status, container_id,
                     sender_name, sender_phone, sender_address,
                     receiver_name, receiver_phone, receiver_address,
-                    item_category, item_quantity, user_email, images
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    item_category, item_quantity, user_email, images, weight, total_price
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).bind(
                 finalOrderId, body.type, body.branch || '', body.date || new Date().toISOString(), body.status || 'pending', body.containerId || null,
                 body.sender?.name || '', body.sender?.phone || '', body.sender?.address || '',
                 body.receiver?.name || '', body.receiver?.phone || '', body.receiver?.address || '',
-                body.item?.category || body.items?.[0]?.category || '', body.item?.quantity || body.items?.[0]?.quantity || '', body.user_email || '', JSON.stringify(body.images || [])
+                body.item?.category || body.items?.[0]?.category || '', body.item?.quantity || body.items?.[0]?.quantity || '', body.user_email || '', JSON.stringify(body.images || []),
+                body.weight || null, body.total_price || null
             );
             await stmt.run();
             

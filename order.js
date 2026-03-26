@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btnTypeExpress) {
         btnTypeExpress.classList.replace('text-gray-500', 'text-gray-900');
         btnTypeStandard.classList.replace('text-gray-900', 'text-gray-500');
-        typeToggleBg.style.transform = 'translateX(100%)';
+        if(typeToggleBg) typeToggleBg.style.transform = 'translateX(100%)';
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-amber-50 rounded-xl border border-amber-100 text-[13px] text-amber-900 leading-relaxed font-bold";
@@ -87,13 +87,38 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btnTypeStandard) {
         btnTypeStandard.classList.replace('text-gray-500', 'text-gray-900');
         btnTypeExpress.classList.replace('text-gray-900', 'text-gray-500');
-        typeToggleBg.style.transform = 'translateX(0)';
+        if(typeToggleBg) typeToggleBg.style.transform = 'translateX(0)';
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-blue-50/70 rounded-xl border border-blue-100 text-[13px] text-blue-900 leading-relaxed font-bold";
         descriptionContainer.innerHTML = "🚢 Энгийн ачаа: 30~45 хоногт хүргэгдэнэ (1,800 вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>";
       }
     }
+    updatePricePreview(); // recalculate price when type changes
+  }
+
+  // ========== WEIGHT PRICE CALCULATION ==========
+  const itemWeight = document.getElementById('itemWeight');
+  const pricePreviewArea = document.getElementById('pricePreviewArea');
+  const pricePreviewText = document.getElementById('pricePreviewText');
+
+  function updatePricePreview() {
+     if(!itemWeight || !pricePreviewArea || !pricePreviewText) return;
+     const weight = parseFloat(itemWeight.value);
+     if (isNaN(weight) || weight <= 0) {
+        pricePreviewArea.classList.remove('flex');
+        pricePreviewArea.classList.add('hidden');
+     } else {
+        const rate = isExpress ? 2500 : 1800;
+        const total = Math.round(weight * rate);
+        pricePreviewText.textContent = total.toLocaleString() + ' ₩';
+        pricePreviewArea.classList.remove('hidden');
+        pricePreviewArea.classList.add('flex');
+     }
+  }
+
+  if (itemWeight) {
+     itemWeight.addEventListener('input', updatePricePreview);
   }
 
   if (btnTypeStandard && btnTypeExpress) {
@@ -472,13 +497,27 @@ document.addEventListener('DOMContentLoaded', () => {
           if (uStr) userEmail = JSON.parse(uStr).email || '';
       } catch(e) {}
 
+      // Calculate weight and price if provided
+      let finalWeight = null;
+      let finalPrice = null;
+      const weightInputRaw = document.getElementById('itemWeight')?.value?.trim();
+      if (weightInputRaw) {
+          const w = parseFloat(weightInputRaw);
+          if (!isNaN(w) && w > 0) {
+              finalWeight = w.toString();
+              finalPrice = Math.round(w * (isExpress ? 2500 : 1800)).toString();
+          }
+      }
+
       const newOrder = {
         ...orderData,
         orderId: orderId,
         date: new Date().toISOString(),
         status: 'pending',
         images: imageUrls,
-        user_email: userEmail
+        user_email: userEmail,
+        weight: finalWeight,
+        total_price: finalPrice
       };
 
       // Real API Call

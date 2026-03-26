@@ -343,6 +343,16 @@
           <input type="number" id="itemQuantity" class="w-full px-4 py-3.5 bg-surface-container-low border border-blue-100/70 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 rounded-xl text-[15px] font-medium transition-all outline-none placeholder:text-slate-400" placeholder="Тоо ширхэгийг оруулна уу" min="1" required>
           <span class="error-msg text-error text-[12px] font-medium hidden mt-1 pl-1" id="itemQuantityError">Барааны тоо ширхэгийг оруулна уу</span>
         </div>
+        <div class="form-group mb-4">
+          <label class="block text-[13px] font-semibold text-on-surface-variant mb-1.5 pl-1" for="itemWeight">Барааны жин (kg) <span class="font-normal text-slate-400">- Сонголттой (선택사항)</span></label>
+          <input type="number" id="itemWeight" step="0.1" class="w-full px-4 py-3.5 bg-surface-container-low border border-blue-100/70 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 rounded-xl text-[15px] font-bold text-primary transition-all outline-none placeholder:text-slate-400" placeholder="Жишээ: 12.5" min="0.1">
+          
+          <div id="pricePreviewArea" class="hidden mt-3 bg-blue-50/50 border border-blue-100/50 rounded-xl p-3 justify-between items-center transition-all animate-fade-in-up">
+             <span class="text-[12px] font-bold text-slate-600 flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">calculate</span> Урьдчилсан төлбөр:</span>
+             <span id="pricePreviewText" class="text-[16px] font-black text-primary">0 ₩</span>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1.5 pl-1 leading-tight">Жингээ оруулж урьдчилсан байдлаар төлбөрөө тооцоолох боломжтой. 영수증에는 최종 실측 무게가 적용됩니다.</p>
+        </div>
         <div class="form-group mb-2">
           <label class="block text-[13px] font-semibold text-on-surface-variant mb-1 pl-1">Барааны зураг <span class="text-error">*</span> <span class="font-normal text-slate-400">(дээд тал нь 5)</span></label>
           <p class="text-[12px] text-slate-500 mb-2.5 pl-1 leading-snug">Монгол руу явуулах ачааныхаа зургийг оруулна уу</p>
