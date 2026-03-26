@@ -241,28 +241,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (currentStep === 1) {
       if (prevBtn) prevBtn.classList.add('hidden');
-      if (nextBtn) {
-        nextBtn.classList.remove('hidden');
-        nextBtn.className = 'w-full py-3.5 bg-primary text-white rounded-xl font-bold text-[15px] active:scale-[0.98] transition-all';
-      }
+      if (nextBtn) nextBtn.classList.remove('hidden');
       if (submitBtn) submitBtn.classList.add('hidden');
     } else if (currentStep === totalSteps) {
-      if (prevBtn) {
-        prevBtn.classList.add('hidden');
-      }
+      if (prevBtn) prevBtn.classList.add('hidden');
       if (nextBtn) nextBtn.classList.add('hidden');
-      if (submitBtn) {
-        submitBtn.classList.remove('hidden');
-        submitBtn.className = 'w-2/3 py-3.5 bg-primary text-white rounded-xl font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20';
-      }
+      if (submitBtn) submitBtn.classList.remove('hidden');
     } else {
-      if (prevBtn) {
-        prevBtn.classList.add('hidden');
-      }
-      if (nextBtn) {
-        nextBtn.classList.remove('hidden');
-        nextBtn.className = 'w-2/3 py-3.5 bg-primary text-white rounded-xl font-bold text-[15px] active:scale-[0.98] transition-all';
-      }
+      if (prevBtn) prevBtn.classList.add('hidden');
+      if (nextBtn) nextBtn.classList.remove('hidden');
       if (submitBtn) submitBtn.classList.add('hidden');
     }
   }
