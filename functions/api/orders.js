@@ -33,17 +33,21 @@ export async function onRequest(context) {
         if (request.method === 'POST') {
             const body = await request.json();
             
-            // Generate auto-incrementing ID
-            const countStmt = env.DB.prepare("SELECT order_id FROM orders WHERE order_id LIKE 'MN%'");
-            const allMNs = await countStmt.all();
+            // Generate auto-incrementing ID with branch prefix
+            let prefix = 'MN';
+            if (body.branch === 'Салбар 2') prefix = 'MK';
+            else if (body.branch === 'Салбар 3') prefix = 'TG';
+
+            const countStmt = env.DB.prepare(`SELECT order_id FROM orders WHERE order_id LIKE '${prefix}%'`);
+            const allMatch = await countStmt.all();
             let maxNum = 0;
-            if (allMNs.results && allMNs.results.length > 0) {
-                 allMNs.results.forEach(row => {
+            if (allMatch.results && allMatch.results.length > 0) {
+                 allMatch.results.forEach(row => {
                       const num = parseInt(row.order_id.substring(2), 10);
                       if (!isNaN(num) && num > maxNum) maxNum = num;
                  });
             }
-            let finalOrderId = 'MN' + String(maxNum + 1).padStart(2, '0');
+            let finalOrderId = prefix + String(maxNum + 1).padStart(2, '0');
 
             // Auto-migrate schema to include user_email if it doesn't exist
             try { 

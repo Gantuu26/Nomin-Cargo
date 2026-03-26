@@ -476,7 +476,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const imageUrls = await Promise.all(imagePromises);
 
       // Generate a temporary Order ID for UI
-      const orderId = 'MN' + Date.now().toString().slice(-6);
+      let tempPrefix = 'MN';
+      if (orderData.branch === 'Салбар 2') tempPrefix = 'MK';
+      else if (orderData.branch === 'Салбар 3') tempPrefix = 'TG';
+      const orderId = tempPrefix + Date.now().toString().slice(-6);
 
       let userEmail = '';
       try {
