@@ -694,13 +694,30 @@
        document.getElementById('pdf-loading').classList.remove('opacity-0', 'pointer-events-none');
        
        const content = document.getElementById('receipt-capture-area');
+         
+         // Remove animations to prevent opacity: 0 in clone
+         const animEls = content.querySelectorAll('.animate-fade-in-up, .delay-100, .delay-200');
+         animEls.forEach(el => {
+            el.style.animation = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+         });
+
+         // Scroll to top fix for iOS Safari html2canvas bug
+         const originalScroll = window.scrollY;
+         window.scrollTo(0, 0);
+         await new Promise(resolve => setTimeout(resolve, 100));
+
        try {
          const canvas = await html2canvas(content, {
-            scale: 3, 
+            scale: window.devicePixelRatio && window.devicePixelRatio > 2 ? window.devicePixelRatio : 2, 
             useCORS: true,
             backgroundColor: '#ffffff',
-            logging: false
+            logging: false,
+            scrollY: 0
          });
+         
+         window.scrollTo(0, originalScroll);
 
          const imgData = canvas.toDataURL('image/jpeg', 1.0);
          const link = document.createElement('a');
@@ -726,12 +743,35 @@
          const printHides = content.querySelectorAll('.print-hide');
          printHides.forEach(el => el.style.display = 'none');
 
+         // Remove animations to prevent opacity: 0 in clone
+         const animEls = content.querySelectorAll('.animate-fade-in-up, .delay-100, .delay-200');
+         animEls.forEach(el => {
+            el.style.animation = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+         });
+         
+         // Also apply to the content root if it has the class
+         if (content.classList.contains('animate-fade-in-up')) {
+            content.style.animation = 'none';
+            content.style.opacity = '1';
+            content.style.transform = 'none';
+         }
+
+         // Scroll to top fix for iOS Safari html2canvas bug
+         const originalScroll = window.scrollY;
+         window.scrollTo(0, 0);
+         await new Promise(resolve => setTimeout(resolve, 100));
+
          const canvas = await html2canvas(content, {
-            scale: 2, // өндөр чанартай
+            scale: window.devicePixelRatio && window.devicePixelRatio > 2 ? window.devicePixelRatio : 2, // өндөр чанартай
             useCORS: true, // гадаад зураг (cross-origin) ашиглах
             backgroundColor: '#F0F4FF', // суурь өнгө
-            logging: false
+            logging: false,
+            scrollY: 0
          });
+         
+         window.scrollTo(0, originalScroll);
 
          printHides.forEach(el => el.style.display = '');
 
