@@ -527,6 +527,30 @@
         await Notification.requestPermission();
       }
 
+      function playAlarmSound() {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          const ctx = new AudioContext();
+          const playBeep = (time, freq) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, time);
+              gain.gain.setValueAtTime(0, time);
+              gain.gain.linearRampToValueAtTime(0.5, time + 0.05);
+              gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(time);
+              osc.stop(time + 0.3);
+          };
+          const now = ctx.currentTime;
+          playBeep(now, 880);      // A5
+          playBeep(now + 0.15, 1108); // C#6
+        } catch(e) { console.error('Audio play failed', e); }
+      }
+
       setInterval(async () => {
         try {
           const res = await fetch('/api/orders');
@@ -541,17 +565,18 @@
             }
           });
 
-          if (newOrdersFound && Notification.permission === "granted") {
-            new Notification('Шинэ захиалга ирлээ!', {
-              body: 'Системд шинэ ачааны захиалга бүртгэгдлээ. Шалгана уу.',
-              // Using a simple shipping icon from an open source CDN as placeholder
-              icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135692.png'
-            });
-          }
-          
           if (newOrdersFound) {
-             // Refresh dashboard data silently if new orders come in
-             loadDashboardData();
+            playAlarmSound(); // Play the alarm sound immediately
+            
+            if (Notification.permission === "granted") {
+              new Notification('Шинэ захиалга ирлээ!', {
+                body: 'Системд шинэ ачааны захиалга бүртгэгдлээ. Шалгана уу.',
+                icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135692.png'
+              });
+            }
+            
+            // Refresh dashboard data silently if new orders come in
+            loadDashboardData();
           }
         } catch (e) {}
       }, 10000); // Poll every 10 seconds

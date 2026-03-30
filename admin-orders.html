@@ -205,12 +205,80 @@
     
     let allOrders = [];
     let allContainers = [];
+    
+    let lastOrderIdMap = new Set();
+    let isPolling = false;
+
+    async function startOrderPolling() {
+      if (isPolling) return;
+      isPolling = true;
+      
+      if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        await Notification.requestPermission();
+      }
+
+      function playAlarmSound() {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          const ctx = new AudioContext();
+          const playBeep = (time, freq) => {
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(freq, time);
+              gain.gain.setValueAtTime(0, time);
+              gain.gain.linearRampToValueAtTime(0.5, time + 0.05);
+              gain.gain.exponentialRampToValueAtTime(0.01, time + 0.3);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start(time);
+              osc.stop(time + 0.3);
+          };
+          const now = ctx.currentTime;
+          playBeep(now, 880);
+          playBeep(now + 0.15, 1108);
+        } catch(e) { console.error('Audio play failed', e); }
+      }
+
+      setInterval(async () => {
+        try {
+          const res = await fetch('/api/orders');
+          const orders = await res.json();
+          if (!orders || orders.length === 0) return;
+          
+          let newOrdersFound = false;
+          orders.forEach(o => {
+            if (!lastOrderIdMap.has(o.order_id)) {
+              lastOrderIdMap.add(o.order_id);
+              newOrdersFound = true;
+            }
+          });
+
+          if (newOrdersFound) {
+            playAlarmSound();
+            if (Notification.permission === "granted") {
+              new Notification('Шинэ захиалга ирлээ!', {
+                body: 'Системд шинэ ачааны захиалга бүртгэгдлээ. Шалгана уу.',
+                icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135692.png'
+              });
+            }
+            loadDataAndRender();
+          }
+        } catch (e) {}
+      }, 10000);
+    }
 
     async function loadDataAndRender() {
         try {
             const [oRes, cRes] = await Promise.all([ fetch('/api/orders'), fetch('/api/containers') ]);
             allOrders = await oRes.json();
             allContainers = await cRes.json();
+
+            if (lastOrderIdMap.size === 0) {
+               allOrders.forEach(o => lastOrderIdMap.add(o.order_id));
+               startOrderPolling(); 
+            }
         } catch(e) { console.error('Error fetching data:', e); return; }
         renderOrders();
     }
