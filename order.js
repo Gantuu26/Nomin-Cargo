@@ -73,11 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const typeToggleBg = document.getElementById('typeToggleBg');
 
   function renderOrderType() {
-    const branch = document.querySelector('input[name="branchSelect"]:checked')?.value || 'Салбар 1';
-    const rateStandard = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 2000 : 1800;
-    const rateExpress = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 3000 : 2500;
-    const rateStandardFormatted = rateStandard.toLocaleString();
-    const rateExpressFormatted = rateExpress.toLocaleString();
+    const selectedBranch = document.querySelector('input[name="branchSelect"]:checked');
+    const branch = selectedBranch ? selectedBranch.value : null;
+    const isBranch23 = branch && (branch.includes('2') || branch.includes('3'));
+
+    // Determine price display text based on branch selection
+    let expressPrice, standardPrice;
+    if (!branch) {
+      // No branch selected yet - show price range
+      expressPrice = '2,500~3,000';
+      standardPrice = '1,800~2,000';
+    } else {
+      expressPrice = isBranch23 ? '3,000' : '2,500';
+      standardPrice = isBranch23 ? '2,000' : '1,800';
+    }
 
     if (isExpress) {
       if (btnTypeExpress) {
@@ -87,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-amber-50 rounded-xl border border-amber-100 text-[13px] text-amber-900 leading-relaxed font-bold";
-        descriptionContainer.innerHTML = `✈️ Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (${rateExpressFormatted} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
+        descriptionContainer.innerHTML = `✈️ Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (${expressPrice} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
       }
     } else {
       if (btnTypeStandard) {
@@ -97,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-blue-50/70 rounded-xl border border-blue-100 text-[13px] text-blue-900 leading-relaxed font-bold";
-        descriptionContainer.innerHTML = `🚢 Энгийн ачаа: 30~45 хоногт хүргэгдэнэ (${rateStandardFormatted} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
+        descriptionContainer.innerHTML = `🚢 Энгийн ачаа: 30~45 хоногт хүргэгдэнэ (${standardPrice} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
       }
     }
     updatePricePreview(); // recalculate price when type changes
@@ -116,8 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
         pricePreviewArea.classList.add('hidden');
      } else {
         const branch = document.querySelector('input[name="branchSelect"]:checked')?.value || 'Салбар 1';
-        const rateStandard = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 2000 : 1800;
-        const rateExpress = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 3000 : 2500;
+        const isBranch23 = branch.includes('2') || branch.includes('3');
+        const rateStandard = isBranch23 ? 2000 : 1800;
+        const rateExpress = isBranch23 ? 3000 : 2500;
         const rate = isExpress ? rateExpress : rateStandard;
         const total = Math.round(weight * rate);
         pricePreviewText.textContent = total.toLocaleString() + ' ₩';
@@ -506,8 +516,9 @@ document.addEventListener('DOMContentLoaded', () => {
           const w = parseFloat(weightInputRaw);
           if (!isNaN(w) && w > 0) {
               finalWeight = w.toString();
-              const rateStandard = (orderData.branch === 'Салбар 2' || orderData.branch === 'Салбар 3') ? 2000 : 1800;
-              const rateExpress = (orderData.branch === 'Салбар 2' || orderData.branch === 'Салбар 3') ? 3000 : 2500;
+              const isBranch23 = orderData.branch && (orderData.branch.includes('2') || orderData.branch.includes('3'));
+              const rateStandard = isBranch23 ? 2000 : 1800;
+              const rateExpress = isBranch23 ? 3000 : 2500;
               const finalRate = isExpress ? rateExpress : rateStandard;
               finalPrice = Math.round(w * finalRate).toString();
           }
