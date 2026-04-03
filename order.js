@@ -73,6 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const typeToggleBg = document.getElementById('typeToggleBg');
 
   function renderOrderType() {
+    const branch = document.querySelector('input[name="branchSelect"]:checked')?.value || 'Салбар 1';
+    const rateStandard = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 2000 : 1800;
+    const rateExpress = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 3000 : 2500;
+    const rateStandardFormatted = rateStandard.toLocaleString();
+    const rateExpressFormatted = rateExpress.toLocaleString();
+
     if (isExpress) {
       if (btnTypeExpress) {
         btnTypeExpress.classList.replace('text-gray-500', 'text-gray-900');
@@ -81,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-amber-50 rounded-xl border border-amber-100 text-[13px] text-amber-900 leading-relaxed font-bold";
-        descriptionContainer.innerHTML = "✈️ Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (2,500 вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>";
+        descriptionContainer.innerHTML = `✈️ Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (${rateExpressFormatted} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
       }
     } else {
       if (btnTypeStandard) {
@@ -91,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-blue-50/70 rounded-xl border border-blue-100 text-[13px] text-blue-900 leading-relaxed font-bold";
-        descriptionContainer.innerHTML = "🚢 Энгийн ачаа: 30~45 хоногт хүргэгдэнэ (1,800 вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>";
+        descriptionContainer.innerHTML = `🚢 Энгийн ачаа: 30~45 хоногт хүргэгдэнэ (${rateStandardFormatted} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
       }
     }
     updatePricePreview(); // recalculate price when type changes
@@ -109,7 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
         pricePreviewArea.classList.remove('flex');
         pricePreviewArea.classList.add('hidden');
      } else {
-        const rate = isExpress ? 2500 : 1800;
+        const branch = document.querySelector('input[name="branchSelect"]:checked')?.value || 'Салбар 1';
+        const rateStandard = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 2000 : 1800;
+        const rateExpress = (branch === 'Салбар 2' || branch === 'Салбар 3') ? 3000 : 2500;
+        const rate = isExpress ? rateExpress : rateStandard;
         const total = Math.round(weight * rate);
         pricePreviewText.textContent = total.toLocaleString() + ' ₩';
         pricePreviewArea.classList.remove('hidden');
@@ -388,6 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
     radio.addEventListener('change', () => {
       const branchError = document.getElementById('branchSelectError');
       if (branchError) branchError.style.display = 'none';
+      renderOrderType();
     });
   });
 
@@ -496,7 +506,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const w = parseFloat(weightInputRaw);
           if (!isNaN(w) && w > 0) {
               finalWeight = w.toString();
-              finalPrice = Math.round(w * (isExpress ? 2500 : 1800)).toString();
+              const rateStandard = (orderData.branch === 'Салбар 2' || orderData.branch === 'Салбар 3') ? 2000 : 1800;
+              const rateExpress = (orderData.branch === 'Салбар 2' || orderData.branch === 'Салбар 3') ? 3000 : 2500;
+              const finalRate = isExpress ? rateExpress : rateStandard;
+              finalPrice = Math.round(w * finalRate).toString();
           }
       }
 
