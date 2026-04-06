@@ -272,7 +272,8 @@
       }
 
       const isExpress = o.type === 'express';
-      const cargoRate = isExpress ? 2500 : 1800;
+      const isBranch23 = o.branch && (o.branch.includes('2') || o.branch.includes('3'));
+      const cargoRate = isExpress ? (isBranch23 ? 3000 : 2500) : (isBranch23 ? 2000 : 1800);
 
       content.innerHTML = `
         <!-- Status Tracker -->
