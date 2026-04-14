@@ -133,16 +133,24 @@
             statusLabel = 'Хаягаар очиж байна';
             statusColor = 'text-info';
             statusBg = 'bg-info/10';
-         } else if (order.status === 'loaded' || order.status === 'in_transit' || order.status === 'departed') {
-            statusLabel = 'Тээвэрлэгдэж байна';
+         } else if (order.status === 'loaded') {
+            statusLabel = 'Контейнерт ачигдлаа';
+            statusColor = 'text-info';
+            statusBg = 'bg-info/10';
+         } else if (order.status === 'departed') {
+            statusLabel = 'Пусанаас хөдөлсөн';
+            statusColor = 'text-info';
+            statusBg = 'bg-info/10';
+         } else if (order.status === 'in_transit') {
+            statusLabel = 'Зам-Үүдэд ирсэн';
             statusColor = 'text-info';
             statusBg = 'bg-info/10';
          } else if (order.status === 'arrived') {
-            statusLabel = 'Салбарт ирсэн';
+            statusLabel = 'Монголд ачаа буусан';
             statusColor = 'text-primary';
             statusBg = 'bg-primary/10';
          } else if (order.status === 'delivered') {
-            statusLabel = 'Олгогдсон';
+            statusLabel = 'Хүргэгдсэн';
             statusColor = 'text-success';
             statusBg = 'bg-success/10';
          }
