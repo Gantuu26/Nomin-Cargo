@@ -313,11 +313,13 @@
         { id: 'all', label: 'Бүгд', count: totalCount },
       ];
 
-      // Add all containers as tabs (sorted newest first)
+      // Add containers with orders as tabs (sorted newest first)
       const sortedContainers = [...allContainers].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
       sortedContainers.forEach(c => {
         const orderCount = containerOrderCounts[c.id] || 0;
+        if (orderCount === 0) return; // Hide empty containers to keep tabs manageable
+        
         const dateStr = c.created_at;
         let dateLabel = '';
         if (dateStr) {
@@ -356,7 +358,7 @@
       if (currentDeliveryFilter === 'delivered') {
         filteredOrders = filteredOrders.filter(o => o.status === 'delivered');
       } else if (currentDeliveryFilter.startsWith('container_')) {
-        const cId = parseInt(currentDeliveryFilter.replace('container_', ''));
+        const cId = currentDeliveryFilter.replace('container_', '');
         filteredOrders = filteredOrders.filter(o => o.container_id === cId);
       } else {
         // 'all' - show orders that have container or are delivered
