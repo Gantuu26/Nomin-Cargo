@@ -52,3 +52,13 @@ CREATE TABLE pre_alert_configs (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+
+CREATE TABLE tracking_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    description TEXT,
+    images TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(order_id) REFERENCES orders(order_id)
+);

@@ -82,6 +82,12 @@ export async function onRequest(context) {
             );
             await stmt.run();
             
+            try {
+                // Ensure tracking_logs exists (failsafe)
+                await env.DB.prepare('CREATE TABLE IF NOT EXISTS tracking_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id TEXT NOT NULL, status TEXT NOT NULL, description TEXT, images TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)').run();
+                await env.DB.prepare("INSERT INTO tracking_logs (order_id, status, description) VALUES (?, 'pending', 'Захиалга бүртгэгдлээ')").bind(finalOrderId).run();
+            } catch(e) {}
+            
             return new Response(JSON.stringify({ success: true, orderId: finalOrderId }), { status: 201, headers: { 'Content-Type': 'application/json' } });
         }
 
@@ -97,20 +103,38 @@ export async function onRequest(context) {
 
             // If updating container assignment only:
             let stmt;
+            let logStatus = null;
+            let logDesc = '';
+
             if (body.hasOwnProperty('containerId')) {
                  stmt = env.DB.prepare('UPDATE orders SET container_id = ? WHERE order_id = ?')
                              .bind(body.containerId, body.orderId);
+                 logDesc = 'Контейнерт нэмэгдлээ';
             } else if (body.hasOwnProperty('status')) {
                  stmt = env.DB.prepare('UPDATE orders SET status = ? WHERE order_id = ?')
                              .bind(body.status, body.orderId);
+                 logStatus = body.status;
             } else if (body.hasOwnProperty('weight') && body.hasOwnProperty('total_price')) {
                  stmt = env.DB.prepare('UPDATE orders SET weight = ?, total_price = ?, volume_items = ? WHERE order_id = ?')
                              .bind(body.weight || null, body.total_price, body.volume_items || '[]', body.orderId);
+                 logDesc = 'Үнэ тооцогдлоо';
             } else {
                  return new Response(JSON.stringify({ error: "Invalid update payload" }), { status: 400 });
             }
             
             await stmt.run();
+
+            try {
+                 if (logStatus) { 
+                     await env.DB.prepare("INSERT INTO tracking_logs (order_id, status, description) VALUES (?, ?, 'Төлөв өөрчлөгдлөө')").bind(body.orderId, logStatus).run();
+                 } else if (logDesc) {
+                     const curr = await env.DB.prepare("SELECT status FROM orders WHERE order_id = ?").bind(body.orderId).first();
+                     if (curr) {
+                         await env.DB.prepare("INSERT INTO tracking_logs (order_id, status, description) VALUES (?, ?, ?)").bind(body.orderId, curr.status, logDesc).run();
+                     }
+                 }
+            } catch(e) {}
+
             return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
         }
 
