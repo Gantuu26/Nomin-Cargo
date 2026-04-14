@@ -566,56 +566,7 @@
            </div>
          </section>
 
-        <!-- Tracking History -->
-        <section class="animate-fade-in-up delay-200 mt-6 print-hide">
-           <div class="bg-white rounded-3xl p-6 border border-blue-100/50 shadow-card flex flex-col">
-               <h3 class="text-[16px] font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
-                  <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">history</span>
-                  Итгэмжилсэн түүх (Tracking Logs)
-               </h3>
-               
-               <div class="space-y-4 mb-6 relative">
-                  <!-- Vertical Line -->
-                  ${trackingLogs.length > 0 ? '<div class="absolute left-[7px] top-4 bottom-0 w-0.5 bg-slate-100"></div>' : ''}
-                  ${trackingLogs.length === 0 ? '<p class="text-[13px] text-slate-500 text-center py-4">Одоогоор бүртгэгдсэн түүх алга байна.</p>' : 
-                    trackingLogs.map((log, i) => `
-                     <div class="relative pl-6 py-1 animate-fade-in" style="animation-delay: ${i * 0.05}s; opacity: 0; animation-fill-mode: forwards;">
-                        <div class="absolute left-0 top-1.5 w-4 h-4 rounded-full border-2 border-white bg-primary shadow-sm z-10"></div>
-                        <div class="flex justify-between items-start mb-1">
-                           <span class="font-bold text-[14px] text-gray-800">${STATUSES[log.status] || log.status}</span>
-                           <span class="text-[11px] text-slate-400 font-medium">${new Date(log.created_at).toLocaleString('mn-MN')}</span>
-                        </div>
-                        <p class="text-[13px] text-slate-600">${log.description || ''}</p>
-                        ${(() => {
-                           let lImgs = [];
-                           try { lImgs = JSON.parse(log.images || '[]'); } catch(e){}
-                           if(lImgs.length > 0) {
-                              return '<div class="flex gap-2 mt-2">' + lImgs.map(img => `<img src="${img}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 cursor-pointer" onclick="openLightbox('${img}')">`).join('') + '</div>';
-                           } return '';
-                        })()}
-                     </div>
-                    `).join('')
-                  }
-               </div>
 
-               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <h4 class="text-[13px] font-bold text-gray-900 mb-3">Хяналтын түүх & Фото нэмэх</h4>
-                  <div class="space-y-3">
-                     <select id="new-log-status" class="w-full h-10 px-3 rounded-xl border border-slate-200 bg-white focus:border-primary text-[13px]">
-                        ${STATUS_KEYS.map(k => `<option value="${k}" ${k === displayStatus ? 'selected' : ''}>${STATUSES[k]}</option>`).join('')}
-                     </select>
-                     <input type="text" id="new-log-desc" placeholder="Тэмдэглэл (Сонголт)" class="w-full h-10 px-3 rounded-xl border border-slate-200 bg-white focus:border-primary text-[13px]">
-                     
-                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                        <input type="file" id="new-log-image" accept="image/*" class="text-[12px] text-slate-500 w-full mb-2 sm:mb-0 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[12px] file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
-                        <button id="add-log-btn" onclick="addTrackingLog('${orderId}')" class="shrink-0 px-4 h-10 bg-primary text-white text-[13px] font-bold rounded-xl active:scale-95 transition-all w-full sm:w-24 flex items-center justify-center gap-1">
-                            Нэмэх
-                        </button>
-                     </div>
-                  </div>
-               </div>
-           </div>
-        </section>
 
         <!-- Actions -->
          <div class="flex gap-3 pb-8 animate-fade-in-up delay-200 mt-6 flex-wrap print-hide">
@@ -669,72 +620,6 @@
          }
        } catch(e) {
          alert('Холболтын алдаа: ' + e.message);
-       }
-    };
-
-    window.addTrackingLog = async function(orderId) {
-       const status = document.getElementById('new-log-status').value;
-       const desc = document.getElementById('new-log-desc').value;
-       const imageFile = document.getElementById('new-log-image').files[0];
-       
-       const btn = document.getElementById('add-log-btn');
-       const originalText = btn.innerHTML;
-       btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[16px]">sync</span>';
-       btn.disabled = true;
-
-       let imageUrls = [];
-       
-       if (imageFile) {
-          try {
-             const img = new Image();
-             img.src = URL.createObjectURL(imageFile);
-             await new Promise(r => img.onload = r);
-             
-             const canvas = document.createElement('canvas');
-             let width = img.width, height = img.height;
-             const MAX = 800;
-             if (width > height && width > MAX) { height = Math.round(height * MAX / width); width = MAX; }
-             else if (height > width && height > MAX) { width = Math.round(width * MAX / height); height = MAX; }
-             
-             canvas.width = width; canvas.height = height;
-             canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-             
-             const blob = await new Promise(r => canvas.toBlob(r, 'image/webp', 0.7));
-             const fn = `log_${Date.now()}_${Math.random().toString(36).substr(2,5)}.webp`;
-             
-             const resUpload = await fetch('/api/upload?filename=' + fn, { method: 'POST', body: blob });
-             if (resUpload.ok) {
-                 const { url } = await resUpload.json();
-                 imageUrls.push(url);
-             }
-          } catch(e) {
-             console.error("Image upload failed", e);
-          }
-       }
-
-       try {
-           const logRes = await fetch('/api/tracking', {
-               method: 'POST',
-               headers: {'Content-Type': 'application/json'},
-               body: JSON.stringify({
-                   order_id: orderId,
-                   status: status,
-                   description: desc,
-                   images: JSON.stringify(imageUrls)
-               })
-           });
-           
-           if(logRes.ok) {
-               window.location.reload();
-           } else {
-               alert('Түүх нэмэхэд алдаа гарлаа');
-               btn.innerHTML = originalText;
-               btn.disabled = false;
-           }
-       } catch(e) {
-           alert('Холболтын алдаа: ' + e.message);
-           btn.innerHTML = originalText;
-           btn.disabled = false;
        }
     };
 
