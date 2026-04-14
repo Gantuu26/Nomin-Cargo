@@ -61,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
          'checking': 'Шалгаж байна',
          'picking_up': 'Хаягаар очиж байна',
          'loaded': 'Контейнерт ачигдлаа',
-         'departed': 'Инчоноос хөдөлсөн',
-         'in_transit': 'Ачаа замдаа явж байна',
+         'departed': 'Пусанаас хөдөлсөн',
+         'in_transit': 'Зам-Үүдэд ирсэн',
          'arrived': 'Монголд ачаа буусан',
          'delivered': 'Хүргэгдсэн'
       };
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
          logs.push({
             status: STATUSES[st],
             logged_at: dStr,
-            location: (st === 'departed' || st === 'loaded') ? 'Инчон, БНСУ' : ((st === 'arrived') ? 'Улаанбаатар, МНГ' : ''),
+            location: (st === 'departed' || st === 'loaded') ? 'Пусан, БНСУ' : ((st === 'in_transit') ? 'Зам-Үүд' : ((st === 'arrived') ? 'Улаанбаатар, МНГ' : '')),
             description: '',
             isCompleted: isCompleted,
             isCurrent: isCurrent
@@ -167,11 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
              const date = new Date(log.logged_at);
              const mo = String(date.getMonth() + 1).padStart(2, '0');
              const da = String(date.getDate()).padStart(2, '0');
-             let hr = date.getHours();
-             const ampm = hr >= 12 ? '오후' : '오전';  
-             hr = hr % 12; hr = hr ? hr : 12;
+             const hr = String(date.getHours()).padStart(2, '0');
              const min = String(date.getMinutes()).padStart(2, '0');
-             dateHtml = `<div>${mo}. ${da}.</div><div>${ampm} ${String(hr).padStart(2,'0')}:${min}</div>`;
+             dateHtml = `<div>${mo}. ${da}.</div><div>${hr}:${min}</div>`;
           }
 
           const activeClasses = log.isCurrent ? 'bg-primary text-white border-primary shadow-md' : 'bg-primary/10 text-primary border-transparent';
