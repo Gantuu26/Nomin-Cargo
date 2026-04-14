@@ -163,22 +163,17 @@
       </div>
     </div>
 
-    <!-- Filters Bar -->
-    <div
-      class="bg-white rounded-2xl border border-slate-200 p-2 lg:p-3 mb-4 flex flex-wrap gap-3 items-center shadow-sm">
-      <div class="flex-1 min-w-[200px] relative">
-        <span
-          class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+    <!-- Filter Tabs -->
+    <div id="filter-tabs-container" class="flex overflow-x-auto gap-2 pb-1 no-scrollbar px-1 mb-3">
+      <!-- Tabs injected dynamically via JS -->
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-2 lg:p-3 mb-4 flex gap-3 items-center shadow-sm">
+      <div class="flex-1 relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
         <input type="text" id="searchInput" placeholder="Хайх (Утас, Нэр, ID)..." onkeyup="renderDeliveryOrders()"
           class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl pl-9 pr-3 py-2.5 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-      </div>
-      <div class="w-[160px]">
-        <select id="statusFilter" onchange="renderDeliveryOrders()"
-          class="w-full bg-slate-50 border border-slate-200 text-sm rounded-xl px-3 py-2.5 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-slate-700 font-medium cursor-pointer">
-          <option value="all" selected>Бүгд</option>
-          <option value="arrived">Монголд буусан</option>
-          <option value="delivered">Олгогдсон</option>
-        </select>
       </div>
       <button onclick="loadDeliveryData()"
         class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-primary transition-colors active:scale-95">
@@ -253,6 +248,7 @@
   <script>
     let allOrders = [];
     let allContainers = [];
+    let currentDeliveryFilter = 'all';
 
     const STATUSES = {
       'checking': 'Шалгаж байна',
@@ -262,6 +258,11 @@
       'in_transit': 'Зам-Үүдэд ирсэн',
       'arrived': 'Монголд ачаа буусан'
     };
+
+    function setDeliveryFilter(filter) {
+      currentDeliveryFilter = filter;
+      renderDeliveryOrders();
+    }
 
     async function loadDeliveryData() {
       const list = document.getElementById('delivery-list');
@@ -279,33 +280,107 @@
       renderDeliveryOrders();
     }
 
+    function getEffectiveStatus(order) {
+      if (order.status === 'delivered') return 'delivered';
+      if (order.container_id) {
+        const c = allContainers.find(x => x.id === order.container_id);
+        if (c) return c.status || 'checking';
+      }
+      return order.status || 'checking';
+    }
+
     function renderDeliveryOrders() {
       const list = document.getElementById('delivery-list');
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
-      const statFilter = document.getElementById('statusFilter').value;
 
-      const filteredOrders = allOrders.filter(o => {
-        let effectiveStatus = o.status || 'checking';
-        if (o.status === 'delivered') {
-          effectiveStatus = 'delivered';
-        } else if (o.container_id) {
-          const c = allContainers.find(x => x.id === o.container_id);
-          if (c) effectiveStatus = c.status || effectiveStatus;
+      // Build container info map
+      const containerMap = {};
+      allContainers.forEach(c => { containerMap[c.id] = c; });
+
+      // Get arrived containers (with orders)
+      const arrivedContainerIds = new Set();
+      let arrivedCount = 0;
+      let deliveredCount = 0;
+
+      allOrders.forEach(o => {
+        const eff = getEffectiveStatus(o);
+        if (eff === 'delivered') {
+          deliveredCount++;
+        } else if (eff === 'arrived' && o.container_id) {
+          arrivedCount++;
+          arrivedContainerIds.add(o.container_id);
         }
+      });
 
-        if (statFilter === 'arrived' && effectiveStatus !== 'arrived') return false;
-        if (statFilter === 'delivered' && effectiveStatus !== 'delivered') return false;
+      // Build tab list
+      const tabs = [
+        { id: 'all', label: 'Бүгд', count: arrivedCount + deliveredCount },
+        { id: 'arrived', label: 'Монголд буусан', count: arrivedCount },
+      ];
 
-        if (q) {
-          if (!((o.order_id && o.order_id.toLowerCase().includes(q)) ||
-            (o.receiver_name && o.receiver_name.toLowerCase().includes(q)) ||
-            (o.receiver_phone && o.receiver_phone.includes(q)) ||
-            (o.sender_name && o.sender_name.toLowerCase().includes(q)))) {
-            return false;
-          }
+      // Add container-specific tabs (only arrived containers)
+      const arrivedContainers = Array.from(arrivedContainerIds).map(id => containerMap[id]).filter(Boolean);
+      // Sort by updated_at descending (newest first)
+      arrivedContainers.sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+
+      arrivedContainers.forEach(c => {
+        const orderCount = allOrders.filter(o => o.container_id === c.id && getEffectiveStatus(o) === 'arrived').length;
+        const dateStr = c.updated_at || c.created_at;
+        let dateLabel = '';
+        if (dateStr) {
+          const d = new Date(dateStr);
+          dateLabel = ` · ${d.getMonth() + 1}/${d.getDate()}`;
         }
+        tabs.push({
+          id: 'container_' + c.id,
+          label: `${c.name}${dateLabel}`,
+          count: orderCount,
+          containerId: c.id
+        });
+      });
+
+      tabs.push({ id: 'delivered', label: 'Олгогдсон ✅', count: deliveredCount });
+
+      // Render tabs
+      const tabsContainer = document.getElementById('filter-tabs-container');
+      tabsContainer.innerHTML = tabs.filter(t => t.id === 'all' || t.count > 0).map(t => {
+        const isActive = t.id === currentDeliveryFilter;
+        const badgeClass = isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500';
+        return `
+          <button onclick="setDeliveryFilter('${t.id}')" class="group whitespace-nowrap px-4 py-2.5 rounded-2xl ${isActive ? 'bg-slate-800 text-white shadow-md' : 'bg-white border border-blue-100/50 text-slate-500 hover:bg-slate-50 shadow-sm'} font-bold text-[13px] transition-all flex items-center gap-2">
+            ${t.label}
+            <span class="text-[10px] px-1.5 py-0.5 rounded-md font-bold ${badgeClass} transition-colors">${t.count}</span>
+          </button>
+        `;
+      }).join('');
+
+      // Filter orders
+      let filteredOrders = allOrders.filter(o => {
+        const eff = getEffectiveStatus(o);
+        // Only show arrived or delivered orders on this page
+        if (eff !== 'arrived' && eff !== 'delivered') return false;
         return true;
       });
+
+      // Apply tab filter
+      if (currentDeliveryFilter === 'arrived') {
+        filteredOrders = filteredOrders.filter(o => getEffectiveStatus(o) === 'arrived');
+      } else if (currentDeliveryFilter === 'delivered') {
+        filteredOrders = filteredOrders.filter(o => getEffectiveStatus(o) === 'delivered');
+      } else if (currentDeliveryFilter.startsWith('container_')) {
+        const cId = parseInt(currentDeliveryFilter.replace('container_', ''));
+        filteredOrders = filteredOrders.filter(o => o.container_id === cId && getEffectiveStatus(o) === 'arrived');
+      }
+
+      // Apply search
+      if (q) {
+        filteredOrders = filteredOrders.filter(o =>
+          (o.order_id && o.order_id.toLowerCase().includes(q)) ||
+          (o.receiver_name && o.receiver_name.toLowerCase().includes(q)) ||
+          (o.receiver_phone && o.receiver_phone.includes(q)) ||
+          (o.sender_name && o.sender_name.toLowerCase().includes(q))
+        );
+      }
 
       if (filteredOrders.length === 0) {
         list.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-[14px] font-medium border-2 border-dashed border-slate-200 rounded-3xl animate-fade-in-up">Тохирох захиалга алга байна</div>`;
@@ -342,7 +417,7 @@
         const iQty = order.item_quantity || 1;
 
         html += `
-          <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card relative animate-fade-in-up">
+          <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card relative animate-fade-in-up ${isDelivered ? 'opacity-60' : ''}">
             <div class="mb-3 border-b border-slate-100 pb-3">
               <div class="flex items-center flex-wrap gap-2 mb-2 text-[11px] font-bold uppercase tracking-wide">
                 <span class="text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">${order.branch || '-'}</span>
@@ -350,6 +425,7 @@
                 <span class="text-primary bg-primary/10 px-2 py-0.5 rounded-md normal-case tracking-normal">${typeLabel}</span>
                 ${containerLabel}
                 ${containerStatusLabel}
+                ${isDelivered ? '<span class="w-1 h-1 rounded-full bg-slate-300"></span><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-md normal-case tracking-normal text-[10px] font-bold">✅ Олгогдсон</span>' : ''}
               </div>
               <h3 class="text-[18px] font-bold text-gray-900 leading-tight mb-0.5">${orderId}</h3>
               <p class="text-[12px] text-slate-400 font-medium tracking-wide">${formattedDate}</p>
