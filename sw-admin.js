@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nomin-admin-v3';
+const CACHE_NAME = 'nomin-admin-v4';
 const ASSETS_TO_CACHE = [
   '/admin',
   '/admin-orders',
