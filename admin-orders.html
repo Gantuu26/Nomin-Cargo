@@ -305,17 +305,19 @@
       };
 
       // Calculate counts
-      let counts = { all: pendingOrders.length, unassigned: 0, branch1: 0, branch2: 0, branch3: 0, other: 0 };
+      let counts = { all: pendingOrders.length, new: 0, unassigned: 0, branch1: 0, branch2: 0, branch3: 0, other: 0 };
       pendingOrders.forEach(o => {
          counts[getBranchCategory(o)]++;
          if (!o.container_id) counts['unassigned']++;
+         if (o.status === 'pending' || !o.status) counts['new']++;
       });
 
       // Render filter tabs
       const tabsContainer = document.getElementById('filter-tabs-container');
       const tabsInfo = [
          { id: 'all', label: 'Бүгд' },
-         { id: 'unassigned', label: 'Ачагдаагүй ⚠️' },
+         { id: 'new', label: 'Шинэ захиалга' },
+         { id: 'unassigned', label: 'Ачигдаагүй' },
          { id: 'branch1', label: 'Салбар 1' },
          { id: 'branch2', label: 'Салбар 2' },
          { id: 'branch3', label: 'Салбар 3' },
@@ -338,7 +340,9 @@
 
       // Filter list
       let filteredOrders = pendingOrders;
-      if (currentFilter === 'unassigned') {
+      if (currentFilter === 'new') {
+          filteredOrders = pendingOrders.filter(o => o.status === 'pending' || !o.status);
+      } else if (currentFilter === 'unassigned') {
           filteredOrders = pendingOrders.filter(o => !o.container_id);
       } else if (currentFilter !== 'all') {
           filteredOrders = pendingOrders.filter(o => getBranchCategory(o) === currentFilter);
