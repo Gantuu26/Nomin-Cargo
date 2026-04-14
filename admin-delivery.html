@@ -293,39 +293,32 @@
       const list = document.getElementById('delivery-list');
       const q = document.getElementById('searchInput').value.toLowerCase().trim();
 
-      // Build container info map
-      const containerMap = {};
-      allContainers.forEach(c => { containerMap[c.id] = c; });
-
-      // Get arrived containers (with orders)
-      const arrivedContainerIds = new Set();
-      let arrivedCount = 0;
+      // Count orders per container and delivered
       let deliveredCount = 0;
+      const containerOrderCounts = {};
 
       allOrders.forEach(o => {
-        const eff = getEffectiveStatus(o);
-        if (eff === 'delivered') {
+        if (o.status === 'delivered') {
           deliveredCount++;
-        } else if (eff === 'arrived' && o.container_id) {
-          arrivedCount++;
-          arrivedContainerIds.add(o.container_id);
+        }
+        if (o.container_id) {
+          containerOrderCounts[o.container_id] = (containerOrderCounts[o.container_id] || 0) + 1;
         }
       });
 
+      const totalCount = allOrders.filter(o => o.container_id || o.status === 'delivered').length;
+
       // Build tab list
       const tabs = [
-        { id: 'all', label: 'Бүгд', count: arrivedCount + deliveredCount },
-        { id: 'arrived', label: 'Монголд буусан', count: arrivedCount },
+        { id: 'all', label: 'Бүгд', count: totalCount },
       ];
 
-      // Add container-specific tabs (only arrived containers)
-      const arrivedContainers = Array.from(arrivedContainerIds).map(id => containerMap[id]).filter(Boolean);
-      // Sort by updated_at descending (newest first)
-      arrivedContainers.sort((a, b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+      // Add all containers as tabs (sorted newest first)
+      const sortedContainers = [...allContainers].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
-      arrivedContainers.forEach(c => {
-        const orderCount = allOrders.filter(o => o.container_id === c.id && getEffectiveStatus(o) === 'arrived').length;
-        const dateStr = c.updated_at || c.created_at;
+      sortedContainers.forEach(c => {
+        const orderCount = containerOrderCounts[c.id] || 0;
+        const dateStr = c.created_at;
         let dateLabel = '';
         if (dateStr) {
           const d = new Date(dateStr);
@@ -339,11 +332,13 @@
         });
       });
 
-      tabs.push({ id: 'delivered', label: 'Олгогдсон ✅', count: deliveredCount });
+      if (deliveredCount > 0) {
+        tabs.push({ id: 'delivered', label: 'Олгогдсон ✅', count: deliveredCount });
+      }
 
       // Render tabs
       const tabsContainer = document.getElementById('filter-tabs-container');
-      tabsContainer.innerHTML = tabs.filter(t => t.id === 'all' || t.count > 0).map(t => {
+      tabsContainer.innerHTML = tabs.map(t => {
         const isActive = t.id === currentDeliveryFilter;
         const badgeClass = isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500';
         return `
@@ -355,21 +350,17 @@
       }).join('');
 
       // Filter orders
-      let filteredOrders = allOrders.filter(o => {
-        const eff = getEffectiveStatus(o);
-        // Only show arrived or delivered orders on this page
-        if (eff !== 'arrived' && eff !== 'delivered') return false;
-        return true;
-      });
+      let filteredOrders = [...allOrders];
 
       // Apply tab filter
-      if (currentDeliveryFilter === 'arrived') {
-        filteredOrders = filteredOrders.filter(o => getEffectiveStatus(o) === 'arrived');
-      } else if (currentDeliveryFilter === 'delivered') {
-        filteredOrders = filteredOrders.filter(o => getEffectiveStatus(o) === 'delivered');
+      if (currentDeliveryFilter === 'delivered') {
+        filteredOrders = filteredOrders.filter(o => o.status === 'delivered');
       } else if (currentDeliveryFilter.startsWith('container_')) {
         const cId = parseInt(currentDeliveryFilter.replace('container_', ''));
-        filteredOrders = filteredOrders.filter(o => o.container_id === cId && getEffectiveStatus(o) === 'arrived');
+        filteredOrders = filteredOrders.filter(o => o.container_id === cId);
+      } else {
+        // 'all' - show orders that have container or are delivered
+        filteredOrders = filteredOrders.filter(o => o.container_id || o.status === 'delivered');
       }
 
       // Apply search
