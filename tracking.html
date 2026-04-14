@@ -213,6 +213,11 @@
     </div>
   </nav>
 
-  <script src="tracking.js?v=2"></script>
+  <script>
+    // Force cache bypass by appending timestamp, or use v=4
+    var script = document.createElement('script');
+    script.src = "tracking.js?v=" + new Date().getTime();
+    document.body.appendChild(script);
+  </script>
 </body>
 </html>
