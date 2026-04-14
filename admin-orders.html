@@ -309,7 +309,7 @@
       pendingOrders.forEach(o => {
          counts[getBranchCategory(o)]++;
          if (!o.container_id) counts['unassigned']++;
-         if (o.status === 'pending' || !o.status) counts['new']++;
+         if ((o.status === 'pending' || !o.status) && !o.container_id) counts['new']++;
       });
 
       // Render filter tabs
@@ -341,7 +341,7 @@
       // Filter list
       let filteredOrders = pendingOrders;
       if (currentFilter === 'new') {
-          filteredOrders = pendingOrders.filter(o => o.status === 'pending' || !o.status);
+          filteredOrders = pendingOrders.filter(o => (o.status === 'pending' || !o.status) && !o.container_id);
       } else if (currentFilter === 'unassigned') {
           filteredOrders = pendingOrders.filter(o => !o.container_id);
       } else if (currentFilter !== 'all') {
