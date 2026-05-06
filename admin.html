@@ -166,7 +166,7 @@
         <span class="text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">2026.03.22</span>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 lg:gap-4">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4" id="dashboard-stats-grid">
         <!-- New Orders Card -->
         <div
           class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card relative overflow-hidden group hover:border-warning/50 transition-colors cursor-pointer">
@@ -205,6 +205,43 @@
           </div>
         </div>
 
+        <!-- Unassigned Card -->
+        <div
+          class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card relative overflow-hidden group hover:border-red-500/50 transition-colors cursor-pointer">
+          <div
+            class="absolute -right-4 -top-4 w-20 h-20 bg-red-50 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+          </div>
+          <div class="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center mb-3">
+                <span class="material-symbols-outlined text-[16px]">pending_actions</span>
+              </div>
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Ачигдаагүй</p>
+            </div>
+            <div class="flex items-end gap-2 mt-2">
+              <h4 class="text-[28px] font-bold text-gray-900 leading-none tracking-tight"><span class="material-symbols-outlined animate-spin text-[24px]">sync</span></h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expected Revenue Card -->
+        <div
+          class="bg-white p-4 rounded-3xl border border-blue-100/50 shadow-card relative overflow-hidden group hover:border-success/50 transition-colors cursor-pointer">
+          <div
+            class="absolute -right-4 -top-4 w-20 h-20 bg-success/5 rounded-full z-0 group-hover:scale-150 transition-transform duration-500">
+          </div>
+          <div class="relative z-10 flex flex-col justify-between h-full">
+            <div>
+              <div class="w-8 h-8 rounded-full bg-success/10 text-success flex items-center justify-center mb-3">
+                <span class="material-symbols-outlined text-[16px]">payments</span>
+              </div>
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Нийт орлого (₩)</p>
+            </div>
+            <div class="flex items-end gap-2 mt-2">
+              <h4 class="text-[24px] font-bold text-gray-900 leading-none tracking-tight"><span class="material-symbols-outlined animate-spin text-[24px]">sync</span></h4>
+            </div>
+          </div>
+        </div>
 
       </div>
     </section>
@@ -613,15 +650,22 @@
       // ---- Update stat cards ----
       const pendingCount = orders.filter(o => getEffectiveStatus(o) === 'pending' || getEffectiveStatus(o) === 'checking' || getEffectiveStatus(o) === 'picking_up').length;
       const inTransitCount = orders.filter(o => ['loaded', 'departed', 'in_transit'].includes(getEffectiveStatus(o))).length;
-      const arrivedCount = orders.filter(o => getEffectiveStatus(o) === 'arrived').length;
-      const deliveredCount = orders.filter(o => getEffectiveStatus(o) === 'delivered').length;
+      const unassignedCount = orders.filter(o => !o.container_id).length;
+      
+      let totalRevenue = 0;
+      orders.forEach(o => {
+         if (o.total_price) {
+            const price = parseInt(o.total_price.toString().replace(/[^0-9]/g, ''), 10);
+            if (!isNaN(price)) totalRevenue += price;
+         }
+      });
 
       // Update the 4 stat card numbers
-      const statCards = document.querySelectorAll('.grid.grid-cols-2 h4');
+      const statCards = document.querySelectorAll('#dashboard-stats-grid h4');
       if (statCards[0]) statCards[0].textContent = pendingCount;
       if (statCards[1]) statCards[1].textContent = inTransitCount;
-      if (statCards[2]) statCards[2].textContent = arrivedCount;
-      if (statCards[3]) statCards[3].textContent = deliveredCount;
+      if (statCards[2]) statCards[2].textContent = unassignedCount;
+      if (statCards[3]) statCards[3].textContent = totalRevenue > 0 ? (totalRevenue / 1000).toFixed(0) + 'k' : '0';
 
       // Update today's date
       const todayEl = document.querySelector('section .text-primary.bg-primary\\/10');

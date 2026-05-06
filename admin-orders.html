@@ -118,11 +118,21 @@
   <main class="pt-[84px] px-4 lg:px-8 lg:ml-[260px] max-w-7xl mx-auto space-y-4">
     
     <!-- Top Action Bar (Desktop only) -->
-    <div class="hidden lg:flex justify-between items-end mb-4">
-       <div>
+    <div class="hidden lg:flex justify-between items-end mb-4 gap-4">
+       <div class="flex items-center gap-4">
          <h1 class="text-[24px] font-bold text-gray-900">Захиалгууд</h1>
+         <div class="flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-slate-400 text-[18px]">calendar_today</span>
+            <input type="date" id="filter-start-date" class="bg-transparent text-[13px] outline-none text-slate-700 font-medium cursor-pointer" onchange="renderOrders()">
+            <span class="text-slate-400 text-[13px]">-</span>
+            <input type="date" id="filter-end-date" class="bg-transparent text-[13px] outline-none text-slate-700 font-medium cursor-pointer" onchange="renderOrders()">
+         </div>
        </div>
        <div class="flex items-center gap-3">
+          <button onclick="downloadExcel()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm hover:bg-slate-50 transition-colors active:scale-95 font-bold text-[14px]">
+            <span class="material-symbols-outlined text-[20px] text-green-600">table_view</span>
+            Экспорт (Excel)
+          </button>
           <button onclick="openManualOrderModal()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white shadow-btn hover:bg-blue-600 transition-colors active:scale-95 font-bold text-[14px]">
             <span class="material-symbols-outlined text-[20px]">add</span>
             Шинэ захиалга
@@ -143,8 +153,43 @@
       <!-- Tabs injected dynamically via JS -->
     </div>
 
-    <div id="orders-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Mobile/Tablet Card View -->
+    <div id="orders-list-cards" class="grid grid-cols-1 md:grid-cols-2 lg:hidden gap-4">
       <!-- Orders dynamically injected here -->
+    </div>
+
+    <!-- Desktop Table View -->
+    <div class="hidden lg:block w-full bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden overflow-x-auto relative mb-20">
+      <!-- Floating Bulk Action Bar (Hidden by default) -->
+      <div id="bulk-action-bar" class="absolute top-0 left-0 w-full h-14 bg-blue-50/95 backdrop-blur-md border-b border-blue-200 z-20 flex items-center justify-between px-6 opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-full">
+        <div class="flex items-center gap-3">
+          <span class="w-6 h-6 rounded-full bg-primary text-white text-[12px] font-bold flex items-center justify-center shadow-sm" id="bulk-selected-count">0</span>
+          <span class="text-[14px] font-bold text-slate-800">захиалга сонгогдлоо</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="handleBulkStatusUpdate('picking_up')" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[12px] font-bold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">Очиж авсан</button>
+          <button onclick="handleBulkStatusUpdate('loaded')" class="px-3 py-1.5 bg-primary border border-primary text-white rounded-lg text-[12px] font-bold hover:bg-primary-dark transition-colors shadow-sm">Ачигдсан</button>
+          <button onclick="handleBulkDelete()" class="px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg text-[12px] font-bold hover:bg-red-50 transition-colors shadow-sm">Устгах</button>
+        </div>
+      </div>
+
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-slate-100 bg-slate-50/50">
+            <th class="py-4 px-5 w-12"><input type="checkbox" id="selectAllCheckbox" class="w-4 h-4 rounded border-slate-300 accent-primary cursor-pointer" onchange="toggleSelectAll()"></th>
+            <th class="py-4 px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Захиалгын ID</th>
+            <th class="py-4 px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Харилцагч (Илгээгч)</th>
+            <th class="py-4 px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Утас</th>
+            <th class="py-4 px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Жин / Дүн</th>
+            <th class="py-4 px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Төлөв</th>
+            <th class="py-4 px-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Огноо</th>
+            <th class="py-4 px-5 text-[11px] font-bold text-slate-400 uppercase tracking-wider text-right">Үйлдэл</th>
+          </tr>
+        </thead>
+        <tbody id="orders-list-table" class="divide-y divide-slate-100">
+          <!-- Table rows dynamically injected here -->
+        </tbody>
+      </table>
     </div>
 
   </main>
@@ -340,20 +385,51 @@
 
       // Filter list
       let filteredOrders = pendingOrders;
-      if (currentFilter === 'new') {
-          filteredOrders = pendingOrders.filter(o => (o.status === 'pending' || !o.status) && !o.container_id);
-      } else if (currentFilter === 'unassigned') {
-          filteredOrders = pendingOrders.filter(o => !o.container_id);
-      } else if (currentFilter !== 'all') {
-          filteredOrders = pendingOrders.filter(o => getBranchCategory(o) === currentFilter);
+      
+      // Date Filtering
+      const startDate = document.getElementById('filter-start-date')?.value;
+      const endDate = document.getElementById('filter-end-date')?.value;
+      
+      if (startDate || endDate) {
+          filteredOrders = filteredOrders.filter(o => {
+              if (!o.date) return false;
+              const d = new Date(o.date);
+              if (startDate) {
+                  const sd = new Date(startDate);
+                  sd.setHours(0,0,0,0);
+                  if (d < sd) return false;
+              }
+              if (endDate) {
+                  const ed = new Date(endDate);
+                  ed.setHours(23,59,59,999);
+                  if (d > ed) return false;
+              }
+              return true;
+          });
       }
 
+      if (currentFilter === 'new') {
+          filteredOrders = filteredOrders.filter(o => (o.status === 'pending' || !o.status) && !o.container_id);
+      } else if (currentFilter === 'unassigned') {
+          filteredOrders = filteredOrders.filter(o => !o.container_id);
+      } else if (currentFilter !== 'all') {
+          filteredOrders = filteredOrders.filter(o => getBranchCategory(o) === currentFilter);
+      }
+
+      const ordersListCards = document.getElementById('orders-list-cards');
+      const ordersListTable = document.getElementById('orders-list-table');
+
       if (!filteredOrders || filteredOrders.length === 0) {
-        ordersList.innerHTML = `<div class="text-center py-10 text-slate-400 text-[14px] font-medium border-2 border-dashed border-slate-200 rounded-3xl animate-fade-in-up">Тохирох захиалга алга байна</div>`;
+        ordersListCards.innerHTML = `<div class="text-center py-10 text-slate-400 text-[14px] font-medium border-2 border-dashed border-slate-200 rounded-3xl animate-fade-in-up col-span-full">Тохирох захиалга алга байна</div>`;
+        ordersListTable.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-slate-400 text-[14px] font-medium">Тохирох захиалга алга байна</td></tr>`;
+        updateBadges(pendingOrders.length);
+        document.getElementById('selectAllCheckbox').checked = false;
+        updateBulkSelection(); // Reset bulk selection
         return;
       }
 
-      let html = '';
+      let cardsHtml = '';
+      let tableHtml = '';
       filteredOrders.forEach(order => {
         const t = new Date(order.date);
         const formattedDate = `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, '0')}.${String(t.getDate()).padStart(2, '0')} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
@@ -379,7 +455,6 @@
            containerLabel = ``;
         }
 
-        // Handle mapped DB columns
         const orderId = order.order_id || 'Тодорхойгүй';
         const sName = order.sender_name || 'Тодорхойгүй';
         const sPhone = order.sender_phone || '';
@@ -389,8 +464,77 @@
         const rAddress = order.receiver_address || '';
         const iCat = order.item_category || 'Бусад';
         const iQty = order.item_quantity || 1;
+        const totalPriceStr = order.total_price ? parseInt(order.total_price).toLocaleString() + ' ₩' : '-';
 
-        html += `
+        // Table Row Construction
+        const statusBadgeClasses = {
+           'pending': 'bg-slate-100 text-slate-600',
+           'checking': 'bg-blue-50 text-blue-600',
+           'picking_up': 'bg-indigo-50 text-indigo-600',
+           'loaded': 'bg-purple-50 text-purple-600',
+           'departed': 'bg-orange-50 text-orange-600',
+           'in_transit': 'bg-amber-50 text-amber-600',
+           'arrived': 'bg-teal-50 text-teal-600',
+           'delivered': 'bg-green-50 text-green-600'
+        };
+        const currentStatusKey = order.status || 'pending';
+        const stBadgeClass = statusBadgeClasses[currentStatusKey] || statusBadgeClasses['pending'];
+        const STATUSES_MAP = {
+           'pending': 'Хүлээгдэж байна',
+           'checking': 'Шалгаж байна',
+           'picking_up': 'Очиж авсан',
+           'loaded': 'Ачигдсан',
+           'departed': 'Хөдөлсөн',
+           'in_transit': 'Замд яваа',
+           'arrived': 'Ирсэн',
+           'delivered': 'Хүргэгдсэн'
+        };
+        const displayStatusName = STATUSES_MAP[currentStatusKey] || 'Хүлээгдэж байна';
+
+        tableHtml += `
+          <tr class="hover:bg-slate-50/80 transition-colors group">
+            <td class="py-3.5 px-5"><input type="checkbox" class="order-checkbox w-4 h-4 rounded border-slate-300 accent-primary cursor-pointer" value="${orderId}" onchange="updateBulkSelection()"></td>
+            <td class="py-3.5 px-2">
+               <a href="admin-order-detail?id=${orderId}" class="text-[13px] font-bold text-gray-900 hover:text-primary transition-colors">${orderId}</a>
+               <div class="text-[10px] font-bold text-slate-400 mt-0.5">${order.branch || '-'}</div>
+            </td>
+            <td class="py-3.5 px-2">
+               <p class="text-[13px] font-semibold text-gray-800">${sName}</p>
+            </td>
+            <td class="py-3.5 px-2">
+               <p class="text-[13px] font-semibold text-gray-800">${sPhone}</p>
+            </td>
+            <td class="py-3.5 px-2">
+               <p class="text-[13px] font-bold text-primary">${totalPriceStr}</p>
+               <p class="text-[11px] text-slate-500 font-medium mt-0.5">${order.weight ? order.weight + ' kg' : '-'}</p>
+            </td>
+            <td class="py-3.5 px-2">
+               <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${stBadgeClass} border border-white/20 shadow-sm text-[11px] font-bold">
+                 ${displayStatusName}
+               </div>
+               ${containerLabel ? '<div class="mt-1 text-[10px]">' + containerLabel + '</div>' : ''}
+            </td>
+            <td class="py-3.5 px-2">
+               <p class="text-[12px] text-slate-600 font-medium">${formattedDate}</p>
+            </td>
+            <td class="py-3.5 px-5 text-right">
+               <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <button onclick="openSmsModal(event, '${orderId}', '${sPhone}', '${sName}')" class="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center transition-colors" title="Мессеж">
+                   <span class="material-symbols-outlined text-[16px] filled">sms</span>
+                 </button>
+                 <a href="admin-order-detail?id=${orderId}" class="w-8 h-8 rounded-lg bg-blue-50 text-primary hover:bg-blue-100 flex items-center justify-center transition-colors" title="Дэлгэрэнгүй">
+                   <span class="material-symbols-outlined text-[18px]">edit</span>
+                 </a>
+                 <button onclick="deleteOrder('${orderId}')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-colors" title="Устгах">
+                   <span class="material-symbols-outlined text-[18px]">delete</span>
+                 </button>
+               </div>
+            </td>
+          </tr>
+        `;
+
+        // Card HTML Construction
+        cardsHtml += `
         <div class="bg-white rounded-3xl p-5 border border-blue-100/50 shadow-card relative animate-fade-in-up">
           <div class="mb-3 border-b border-slate-100 pb-3">
             <div class="flex items-center flex-wrap gap-2 mb-2 text-[11px] font-bold uppercase tracking-wide">
@@ -484,10 +628,15 @@
         </div>
         `;
       });
-      ordersList.innerHTML = html;
+      ordersListCards.innerHTML = cardsHtml;
+      ordersListTable.innerHTML = tableHtml;
       
       // Update notification counts in navigation
       updateBadges(pendingOrders.length);
+      
+      // Reset bulk selection
+      document.getElementById('selectAllCheckbox').checked = false;
+      updateBulkSelection();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -851,6 +1000,163 @@
           alert('Хуулахад алдаа гарлаа');
         });
       }
+    }
+
+    // Bulk Actions & Export
+    function toggleSelectAll() {
+       const isChecked = document.getElementById('selectAllCheckbox').checked;
+       const checkboxes = document.querySelectorAll('.order-checkbox');
+       checkboxes.forEach(cb => cb.checked = isChecked);
+       updateBulkSelection();
+    }
+
+    function updateBulkSelection() {
+       const selectedCount = document.querySelectorAll('.order-checkbox:checked').length;
+       const bulkBar = document.getElementById('bulk-action-bar');
+       if(!bulkBar) return;
+       document.getElementById('bulk-selected-count').textContent = selectedCount;
+       
+       if (selectedCount > 0) {
+          bulkBar.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-full');
+       } else {
+          bulkBar.classList.add('opacity-0', 'pointer-events-none', '-translate-y-full');
+       }
+    }
+
+    function getSelectedOrderIds() {
+       return Array.from(document.querySelectorAll('.order-checkbox:checked')).map(cb => cb.value);
+    }
+
+    async function handleBulkStatusUpdate(newStatus) {
+       const selectedIds = getSelectedOrderIds();
+       if(selectedIds.length === 0) return;
+       if(!confirm(`Сонгосон ${selectedIds.length} захиалгын төлөвийг өөрчлөхдөө итгэлтэй байна уу?`)) return;
+       
+       const btn = event.currentTarget;
+       const originalText = btn.innerHTML;
+       btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[14px]">sync</span>';
+       btn.disabled = true;
+
+       try {
+           await Promise.all(selectedIds.map(id => 
+               fetch('/api/orders', {
+                   method: 'PUT',
+                   headers: {'Content-Type': 'application/json'},
+                   body: JSON.stringify({ orderId: id, status: newStatus })
+               })
+           ));
+           
+           document.getElementById('selectAllCheckbox').checked = false;
+           updateBulkSelection();
+           loadDataAndRender();
+       } catch(e) {
+           alert("Алдаа гарлаа: " + e.message);
+       } finally {
+           btn.innerHTML = originalText;
+           btn.disabled = false;
+       }
+    }
+
+    async function handleBulkDelete() {
+       const selectedIds = getSelectedOrderIds();
+       if(selectedIds.length === 0) return;
+       if(!confirm(`Сонгосон ${selectedIds.length} захиалгыг устгахдаа итгэлтэй байна уу?`)) return;
+       
+       const btn = event.currentTarget;
+       const originalText = btn.innerHTML;
+       btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[14px]">sync</span>';
+       btn.disabled = true;
+
+       try {
+           await Promise.all(selectedIds.map(id => 
+               fetch('/api/orders?id=' + id, { method: 'DELETE' })
+           ));
+           
+           document.getElementById('selectAllCheckbox').checked = false;
+           updateBulkSelection();
+           loadDataAndRender();
+       } catch(e) {
+           alert("Алдаа гарлаа: " + e.message);
+       } finally {
+           btn.innerHTML = originalText;
+           btn.disabled = false;
+       }
+    }
+
+    function downloadExcel() {
+       if (typeof allOrders === 'undefined' || allOrders.length === 0) return alert('Татах өгөгдөл алга байна');
+       
+       let csvContent = "Захиалгын ID,Илгээгч,Утас (И),Хүлээн авагч,Утас (Х),Төрөл,Жин (kg),Үнэ (₩),Төлөв,Огноо\n";
+       
+       let filtered = allOrders;
+       const startDate = document.getElementById('filter-start-date')?.value;
+       const endDate = document.getElementById('filter-end-date')?.value;
+       if (startDate || endDate) {
+          filtered = filtered.filter(o => {
+              if (!o.date) return false;
+              const d = new Date(o.date);
+              if (startDate) {
+                  const sd = new Date(startDate);
+                  sd.setHours(0,0,0,0);
+                  if (d < sd) return false;
+              }
+              if (endDate) {
+                  const ed = new Date(endDate);
+                  ed.setHours(23,59,59,999);
+                  if (d > ed) return false;
+              }
+              return true;
+          });
+      }
+      if (currentFilter === 'new') {
+          filtered = filtered.filter(o => (o.status === 'pending' || !o.status) && !o.container_id);
+      } else if (currentFilter === 'unassigned') {
+          filtered = filtered.filter(o => !o.container_id);
+      } else if (currentFilter !== 'all') {
+          const getBranchCategory = (o) => {
+             const b = o.branch || '';
+             if (b.includes('Салбар 1')) return 'branch1';
+             if (b.includes('Салбар 2')) return 'branch2';
+             if (b.includes('Салбар 3')) return 'branch3';
+             return 'other';
+          };
+          filtered = filtered.filter(o => getBranchCategory(o) === currentFilter);
+      }
+       
+       filtered.forEach(o => {
+           const id = o.order_id || '';
+           const sName = (o.sender_name || '').replace(/,/g, ' ');
+           const sPhone = o.sender_phone || '';
+           const rName = (o.receiver_name || '').replace(/,/g, ' ');
+           const rPhone = o.receiver_phone || '';
+           const type = o.type === 'standard' ? 'Энгийн' : 'Экспресс';
+           const weight = o.weight || '';
+           const price = o.total_price || '';
+           
+           const STATUSES_MAP = {
+               'pending': 'Хүлээгдэж байна',
+               'checking': 'Шалгаж байна',
+               'picking_up': 'Очиж авсан',
+               'loaded': 'Ачигдсан',
+               'departed': 'Хөдөлсөн',
+               'in_transit': 'Замд яваа',
+               'arrived': 'Ирсэн',
+               'delivered': 'Хүргэгдсэн'
+            };
+           const status = STATUSES_MAP[o.status || 'pending'] || o.status;
+           const date = new Date(o.date).toLocaleDateString();
+           
+           csvContent += `${id},${sName},${sPhone},${rName},${rPhone},${type},${weight},${price},${status},${date}\n`;
+       });
+       
+       const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+       const link = document.createElement("a");
+       const url = URL.createObjectURL(blob);
+       link.setAttribute("href", url);
+       link.setAttribute("download", `Nomin_Cargo_Orders_${new Date().toISOString().split('T')[0]}.csv`);
+       document.body.appendChild(link);
+       link.click();
+       document.body.removeChild(link);
     }
   </script>
 
