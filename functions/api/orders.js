@@ -37,7 +37,7 @@ export async function onRequest(context) {
             let prefix = 'MN';
             if (body.branch === 'Салбар 2') prefix = 'MK';
             else if (body.branch === 'Салбар 3') prefix = 'TG';
-            else if (body.branch === 'Салбар 4') prefix = 'US';
+            else if (body.branch === 'Салбар 4') prefix = 'UL';
 
             const countStmt = env.DB.prepare(`SELECT order_id FROM orders WHERE order_id LIKE '${prefix}%'`);
             const allMatch = await countStmt.all();

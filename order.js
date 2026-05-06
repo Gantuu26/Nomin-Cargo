@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let tempPrefix = 'MN';
       if (orderData.branch === 'Салбар 2') tempPrefix = 'MK';
       else if (orderData.branch === 'Салбар 3') tempPrefix = 'TG';
-      else if (orderData.branch === 'Салбар 4') tempPrefix = 'US';
+      else if (orderData.branch === 'Салбар 4') tempPrefix = 'UL';
       const orderId = tempPrefix + Date.now().toString().slice(-6);
 
       let userEmail = '';
