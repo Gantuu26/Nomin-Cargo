@@ -379,12 +379,12 @@
               </div>
 
               <!-- Sender -->
-              <div class="bg-white rounded-3xl p-5 sm:p-0 border border-blue-100/50 sm:border-none shadow-card sm:shadow-none pt-2 sm:pt-0">
-                <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div class="flex flex-col h-full bg-white rounded-3xl p-5 sm:p-0 border border-blue-100/50 sm:border-none shadow-card sm:shadow-none pt-2 sm:pt-0">
+                <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2 shrink-0">
                   <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">person</span>
                   Илгээгчийн мэдээлэл
                 </p>
-                <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3 h-full">
+                <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3 flex-1">
                    <div class="flex justify-between items-start">
                      <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
                      <span class="text-[14px] font-bold text-gray-900">${o.sender_name || '-'}</span>
@@ -401,12 +401,12 @@
               </div>
 
               <!-- Receiver -->
-              <div class="bg-white rounded-3xl p-5 sm:p-0 border border-blue-100/50 sm:border-none shadow-card sm:shadow-none pt-2 sm:pt-0">
-                <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <div class="flex flex-col h-full bg-white rounded-3xl p-5 sm:p-0 border border-blue-100/50 sm:border-none shadow-card sm:shadow-none pt-2 sm:pt-0">
+                <p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2 shrink-0">
                   <span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">location_on</span>
                   Хүлээн авагчийн мэдээлэл
                 </p>
-                <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3 h-full">
+                <div class="bg-surface p-4 rounded-2xl border border-blue-100/50 space-y-3 flex-1">
                    <div class="flex justify-between items-start">
                      <span class="text-[12px] text-slate-500 font-medium">Нэр</span>
                      <span class="text-[14px] font-bold text-gray-900">${o.receiver_name || '-'}</span>
