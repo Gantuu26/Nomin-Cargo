@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -342,6 +343,9 @@
                     <div class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-blue-50 text-primary border border-blue-100">
                        ${orders.length} ачаа
                     </div>
+                    <button onclick="downloadContainerExcel('${c.id}')" class="w-8 h-8 rounded-xl bg-green-50 border border-green-100 text-green-500 hover:bg-green-100 hover:text-green-600 flex items-center justify-center active:scale-95 transition-all" title="Excel татах">
+                      <span class="material-symbols-outlined text-[16px]">download</span>
+                    </button>
                     <button onclick="deleteContainer('${c.id}')" class="w-8 h-8 rounded-xl bg-red-50 border border-red-100 text-red-400 hover:bg-red-100 hover:text-red-500 flex items-center justify-center active:scale-95 transition-all">
                       <span class="material-symbols-outlined text-[16px]">delete</span>
                     </button>
@@ -521,6 +525,65 @@
 
        btn.innerHTML = originalText;
        btn.disabled = false;
+    }
+
+    function downloadContainerExcel(cId) {
+      const container = containers.find(c => c.id === cId);
+      const orders = allOrders.filter(o => o.container_id === cId);
+      
+      if (orders.length === 0) {
+        alert('Энэ контейнерт ачаа байхгүй байна');
+        return;
+      }
+
+      const rows = orders.map((o, i) => {
+        let largeItems = '';
+        try { largeItems = JSON.parse(o.large_items || '[]').join(', '); } catch(e) {}
+        let volumeItems = '';
+        try { 
+          const vi = JSON.parse(o.volume_items || '[]');
+          volumeItems = vi.map(v => v.name + ': ' + (v.price || 0) + '₩').join(', ');
+        } catch(e) {}
+
+        return {
+          '№': i + 1,
+          'Захиалгын дугаар': o.order_id || '',
+          'Төрөл': o.type === 'express' ? 'Экспресс' : 'Энгийн',
+          'Салбар': o.branch || '',
+          'Огноо': o.date ? new Date(o.date).toLocaleString('ko-KR') : '',
+          'Төлөв': STATUSES[o.status] || o.status || '',
+          'Илгээгчийн нэр': o.sender_name || '',
+          'Илгээгчийн утас': o.sender_phone || '',
+          'Илгээгчийн хаяг': o.sender_address || '',
+          'Хүлээн авагчийн нэр': o.receiver_name || '',
+          'Хүлээн авагчийн утас': o.receiver_phone || '',
+          'Хүлээн авагчийн хаяг': o.receiver_address || '',
+          'Барааны төрөл': o.item_category || '',
+          'Барааны тоо': o.item_quantity || '',
+          'Жин (кг)': o.weight || '',
+          'Том оврын ачаа': largeItems,
+          'Овор ихтэй ачаа': volumeItems,
+          'Нийт төлбөр (₩)': o.total_price || '',
+        };
+      });
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      
+      // Auto-size columns
+      const colWidths = Object.keys(rows[0]).map(key => {
+        const maxLen = Math.max(
+          key.length,
+          ...rows.map(r => String(r[key] || '').length)
+        );
+        return { wch: Math.min(maxLen + 2, 40) };
+      });
+      ws['!cols'] = colWidths;
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Захиалгууд');
+      
+      const fileName = (container ? container.name : cId) + '_orders.xlsx';
+      XLSX.writeFile(wb, fileName);
     }
 
     async function deleteContainer(cId) {

@@ -23,7 +23,7 @@ export async function onRequest(context) {
 
         if (request.method === 'PUT') {
             const body = await request.json();
-            const { id: containerId, status } = body; // Typically we just update status
+            const { id: containerId, status } = body;  // Typically we just update status
             
             if (!containerId || !status) {
                 return new Response(JSON.stringify({ error: "Missing id or status" }), { status: 400 });
