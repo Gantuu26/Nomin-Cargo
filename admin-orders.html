@@ -349,11 +349,12 @@
          if (b.includes('Салбар 1')) return 'branch1';
          if (b.includes('Салбар 2')) return 'branch2';
          if (b.includes('Салбар 3')) return 'branch3';
+         if (b.includes('Салбар 4')) return 'branch4';
          return 'other';
       };
 
       // Calculate counts
-      let counts = { all: pendingOrders.length, new: 0, unassigned: 0, branch1: 0, branch2: 0, branch3: 0, other: 0 };
+      let counts = { all: pendingOrders.length, new: 0, unassigned: 0, branch1: 0, branch2: 0, branch3: 0, branch4: 0, other: 0 };
       pendingOrders.forEach(o => {
          counts[getBranchCategory(o)]++;
          if (!o.container_id) counts['unassigned']++;
@@ -369,6 +370,7 @@
          { id: 'branch1', label: 'Салбар 1' },
          { id: 'branch2', label: 'Салбар 2' },
          { id: 'branch3', label: 'Салбар 3' },
+         { id: 'branch4', label: 'Салбар 4' },
          { id: 'other', label: 'Бусад' }
       ];
       
@@ -389,6 +391,9 @@
          } else if (t.id === 'branch3') {
             btnClass = isActive ? 'bg-orange-600 text-white shadow-md border-orange-600' : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 shadow-sm';
             badgeClass = isActive ? 'bg-orange-800 text-white' : 'bg-orange-200 text-orange-800';
+         } else if (t.id === 'branch4') {
+            btnClass = isActive ? 'bg-cyan-600 text-white shadow-md border-cyan-600' : 'bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100 shadow-sm';
+            badgeClass = isActive ? 'bg-cyan-800 text-white' : 'bg-cyan-200 text-cyan-800';
          } else {
             btnClass = isActive ? 'bg-slate-800 text-white shadow-md border-slate-800' : 'bg-white border-blue-100/50 text-slate-500 hover:bg-slate-50 shadow-sm';
             badgeClass = isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200';
