@@ -8,6 +8,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <!-- Flatpickr for beautiful date pickers -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
     tailwind.config = {
       darkMode: "class",
@@ -121,11 +124,11 @@
     <div class="hidden lg:flex justify-between items-end mb-4 gap-4">
        <div class="flex items-center gap-4">
          <h1 class="text-[24px] font-bold text-gray-900">Захиалгууд</h1>
-         <div class="flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-1.5 shadow-sm">
-            <span class="material-symbols-outlined text-slate-400 text-[18px]">calendar_today</span>
-            <input type="date" id="filter-start-date" class="bg-transparent text-[13px] outline-none text-slate-700 font-medium cursor-pointer" onchange="renderOrders()">
-            <span class="text-slate-400 text-[13px]">-</span>
-            <input type="date" id="filter-end-date" class="bg-transparent text-[13px] outline-none text-slate-700 font-medium cursor-pointer" onchange="renderOrders()">
+         <div class="flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-1.5 shadow-sm hover:border-primary/50 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+            <span class="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
+            <input type="text" id="filter-start-date" placeholder="Эхлэх огноо" class="bg-transparent text-[13px] outline-none text-slate-700 font-bold cursor-pointer w-[90px] placeholder-slate-400">
+            <span class="text-slate-300 text-[13px] font-bold">~</span>
+            <input type="text" id="filter-end-date" placeholder="Дуусах огноо" class="bg-transparent text-[13px] outline-none text-slate-700 font-bold cursor-pointer w-[95px] placeholder-slate-400">
          </div>
        </div>
        <div class="flex items-center gap-3">
@@ -1158,6 +1161,18 @@
        link.click();
        document.body.removeChild(link);
     }
+
+    // Initialize Flatpickr for date filters
+    document.addEventListener("DOMContentLoaded", () => {
+       const fpOptions = {
+          dateFormat: "Y-m-d",
+          onChange: function() {
+             renderOrders();
+          }
+       };
+       flatpickr("#filter-start-date", fpOptions);
+       flatpickr("#filter-end-date", fpOptions);
+    });
   </script>
 
   <!-- SMS Message Modal -->
