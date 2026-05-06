@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderOrderType() {
     const selectedBranch = document.querySelector('input[name="branchSelect"]:checked');
     const branch = selectedBranch ? selectedBranch.value : null;
-    const isBranch23 = branch && (branch.includes('2') || branch.includes('3'));
+    const isBranch2 = branch && branch.includes('2');
 
     // Determine price display text based on branch selection
     let expressPrice, standardPrice;
@@ -84,8 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
       expressPrice = '2,500~3,000';
       standardPrice = '1,800~2,000';
     } else {
-      expressPrice = isBranch23 ? '3,000' : '2,500';
-      standardPrice = isBranch23 ? '2,000' : '1,800';
+      expressPrice = isBranch2 ? '3,000' : '2,500';
+      standardPrice = isBranch2 ? '2,000' : '1,800';
     }
 
     if (isExpress) {
@@ -125,9 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
         pricePreviewArea.classList.add('hidden');
      } else {
         const branch = document.querySelector('input[name="branchSelect"]:checked')?.value || 'Салбар 1';
-        const isBranch23 = branch.includes('2') || branch.includes('3');
-        const rateStandard = isBranch23 ? 2000 : 1800;
-        const rateExpress = isBranch23 ? 3000 : 2500;
+        const isBranch2 = branch.includes('2');
+        const rateStandard = isBranch2 ? 2000 : 1800;
+        const rateExpress = isBranch2 ? 3000 : 2500;
         const rate = isExpress ? rateExpress : rateStandard;
         const total = Math.round(weight * rate);
         pricePreviewText.textContent = total.toLocaleString() + ' ₩';
@@ -517,9 +517,9 @@ document.addEventListener('DOMContentLoaded', () => {
           const w = parseFloat(weightInputRaw);
           if (!isNaN(w) && w > 0) {
               finalWeight = w.toString();
-              const isBranch23 = orderData.branch && (orderData.branch.includes('2') || orderData.branch.includes('3'));
-              const rateStandard = isBranch23 ? 2000 : 1800;
-              const rateExpress = isBranch23 ? 3000 : 2500;
+              const isBranch2 = orderData.branch && orderData.branch.includes('2');
+              const rateStandard = isBranch2 ? 2000 : 1800;
+              const rateExpress = isBranch2 ? 3000 : 2500;
               const finalRate = isExpress ? rateExpress : rateStandard;
               finalPrice = Math.round(w * finalRate).toString();
           }
