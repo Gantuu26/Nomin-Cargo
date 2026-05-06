@@ -104,12 +104,14 @@
       <div class="lg:hidden">
         <h1 class="text-[18px] font-bold text-gray-900 tracking-tight leading-tight">Захиалгууд</h1>
       </div>
-      <div class="hidden lg:flex items-center relative w-full max-w-md">
+      <div class="hidden lg:flex items-center relative w-full max-w-md cursor-pointer" onclick="openLookupModal()">
          <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[20px]">search</span>
-         <input type="text" placeholder="Захиалга хайх..." class="w-full bg-slate-50 text-slate-700 text-[13px] rounded-full pl-10 pr-4 py-2 outline-none focus:ring-1 focus:ring-slate-200">
+         <div class="w-full bg-slate-50 text-slate-400 text-[13px] rounded-full pl-10 pr-4 py-2 border border-transparent hover:border-slate-200 transition-colors font-medium">Захиалгын дугаараар хайх...</div>
       </div>
       <div class="flex items-center gap-3 lg:gap-5 ml-auto">
-        
+        <button onclick="openLookupModal()" class="w-10 h-10 flex items-center justify-center text-gray-800 active:scale-95 lg:hidden">
+          <span class="material-symbols-outlined text-[24px]">search</span>
+        </button>
         <button onclick="toggleSidebar()" class="lg:hidden w-10 h-10 flex items-center justify-center text-gray-800 active:scale-95">
           <span class="material-symbols-outlined text-[24px]">menu</span>
         </button>
@@ -1194,7 +1196,147 @@
        flatpickr("#filter-start-date", fpOptions);
        flatpickr("#filter-end-date", fpOptions);
     });
+
+    // ---- Order Lookup ----
+    function openLookupModal() {
+       document.getElementById('lookup-modal').classList.remove('opacity-0', 'pointer-events-none');
+       document.getElementById('lookup-modal-card').classList.remove('scale-95');
+       document.getElementById('lookup-modal-card').classList.add('scale-100');
+       setTimeout(() => document.getElementById('lookup-input').focus(), 200);
+    }
+    function closeLookupModal() {
+       document.getElementById('lookup-modal-card').classList.add('scale-95');
+       document.getElementById('lookup-modal-card').classList.remove('scale-100');
+       setTimeout(() => document.getElementById('lookup-modal').classList.add('opacity-0', 'pointer-events-none'), 200);
+    }
+
+    function searchOrder() {
+       const q = document.getElementById('lookup-input').value.trim().toUpperCase();
+       const resultsEl = document.getElementById('lookup-results');
+       if (!q) return;
+
+       const matches = allOrders.filter(o => (o.order_id || '').toUpperCase().includes(q));
+       if (matches.length === 0) {
+          resultsEl.innerHTML = `<div class="text-center py-8"><span class="material-symbols-outlined text-[48px] text-red-300 mb-2 block">search_off</span><p class="text-[14px] font-bold text-slate-500">"${q}" дугаартай захиалга олдсонгүй</p></div>`;
+          return;
+       }
+
+       const STATUSES = { 'pending':'Хүлээгдэж буй','checking':'Шалгаж байна','picking_up':'Очиж авсан','loaded':'Ачигдсан','departed':'Хөдөлсөн','in_transit':'Замд яваа','arrived':'Монголд ирсэн','delivered':'Хүргэгдсэн' };
+       const STATUS_COLORS = { 'pending':'warning','checking':'warning','picking_up':'info','loaded':'info','departed':'info','in_transit':'info','arrived':'primary','delivered':'success' };
+
+       let html = '';
+       matches.forEach(order => {
+          const fmtDate = (d) => { if(!d) return '-'; const t=new Date(d); return `${t.getFullYear()}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getDate()).padStart(2,'0')} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`; };
+          const orderDate = fmtDate(order.date);
+          const effStatus = order.status || 'pending';
+          const statusLabel = STATUSES[effStatus] || effStatus;
+          const sColor = STATUS_COLORS[effStatus] || 'slate';
+
+          let containerInfo = '';
+          let containerDate = '-';
+          if (order.container_id) {
+             const c = allContainers.find(x => x.id === order.container_id);
+             if (c) {
+                containerInfo = c.name;
+                containerDate = c.created_at ? fmtDate(c.created_at) : (c.date ? fmtDate(c.date) : '-');
+             }
+          }
+
+          const timelineSteps = [
+             { key:'pending', icon:'receipt_long', label:'Захиалга бүртгэгдсэн', date: orderDate },
+             { key:'checking', icon:'fact_check', label:'Шалгаж байна', date: null },
+             { key:'loaded', icon:'inventory_2', label:'Контейнерт ачигдсан', date: containerInfo ? containerDate : null, extra: containerInfo },
+             { key:'departed', icon:'directions_boat', label:'Пусанаас хөдөлсөн', date: null },
+             { key:'in_transit', icon:'local_shipping', label:'Зам-Үүдэд ирсэн', date: null },
+             { key:'arrived', icon:'storefront', label:'Монголд ирсэн', date: null },
+             { key:'delivered', icon:'check_circle', label:'Хүргэгдсэн', date: null }
+          ];
+          const statusOrder = ['pending','checking','loaded','departed','in_transit','arrived','delivered'];
+          const currentIdx = statusOrder.indexOf(effStatus);
+
+          let timelineHtml = timelineSteps.map((step, i) => {
+             const stepIdx = statusOrder.indexOf(step.key);
+             const isDone = stepIdx <= currentIdx;
+             const isCurrent = stepIdx === currentIdx;
+             const dotClass = isCurrent ? 'bg-primary ring-4 ring-primary/20' : (isDone ? 'bg-primary' : 'bg-slate-200');
+             const lineClass = isDone ? 'bg-primary' : 'bg-slate-200';
+             const textClass = isDone ? 'text-gray-900' : 'text-slate-400';
+             const isLast = i === timelineSteps.length - 1;
+             return `
+             <div class="flex gap-3 relative">
+                <div class="flex flex-col items-center">
+                   <div class="w-3 h-3 rounded-full ${dotClass} shrink-0 mt-1 z-10"></div>
+                   ${!isLast ? `<div class="w-0.5 flex-1 ${lineClass} mt-0.5"></div>` : ''}
+                </div>
+                <div class="pb-5 flex-1">
+                   <p class="text-[13px] font-bold ${textClass} leading-tight">${step.label}</p>
+                   ${step.date ? `<p class="text-[11px] text-slate-400 mt-0.5">${step.date}</p>` : ''}
+                   ${step.extra ? `<span class="text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md mt-1 inline-block">${step.extra}</span>` : ''}
+                   ${isCurrent ? `<span class="text-[10px] font-bold text-white bg-primary px-2 py-0.5 rounded-md mt-1 inline-block animate-pulse">Одоогийн төлөв</span>` : ''}
+                </div>
+             </div>`;
+          }).join('');
+
+          html += `
+          <div class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden mb-4">
+             <div class="bg-white px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+                <div>
+                   <h4 class="text-[18px] font-extrabold text-gray-900 tracking-tight">${order.order_id}</h4>
+                   <p class="text-[12px] text-slate-400 font-medium mt-0.5">${order.sender_name || ''} · ${order.sender_phone || ''}</p>
+                </div>
+                <span class="text-[11px] font-bold text-${sColor} bg-${sColor}/10 px-2.5 py-1 rounded-lg">${statusLabel}</span>
+             </div>
+             <div class="px-5 py-4 space-y-3">
+                <div class="grid grid-cols-2 gap-3 text-[12px]">
+                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Төрөл</p><p class="font-bold text-gray-900">${order.type==='express'?'Экспресс':'Энгийн'}</p></div>
+                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Салбар</p><p class="font-bold text-gray-900">${order.branch||'-'}</p></div>
+                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Хүлээн авагч</p><p class="font-bold text-gray-900">${order.receiver_name||'-'}</p></div>
+                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Утас (Х)</p><p class="font-bold text-gray-900">${order.receiver_phone||'-'}</p></div>
+                </div>
+                <div class="bg-white rounded-xl p-4 border border-slate-100 mt-3">
+                   <p class="text-[12px] font-bold text-slate-500 mb-3 flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">timeline</span> Захиалгын явц</p>
+                   ${timelineHtml}
+                </div>
+             </div>
+          </div>`;
+       });
+       resultsEl.innerHTML = html;
+    }
   </script>
+
+  <!-- Order Lookup Modal -->
+  <div id="lookup-modal" class="fixed inset-0 z-[90] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeLookupModal()"></div>
+    <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative z-10 transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="lookup-modal-card">
+      <!-- Header -->
+      <div class="p-5 border-b border-slate-100 bg-white flex justify-between items-center sticky top-0 z-10">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-[20px]">search</span>
+          </div>
+          <h3 class="text-[17px] font-bold text-gray-900">Захиалга хайх</h3>
+        </div>
+        <button onclick="closeLookupModal()" class="w-8 h-8 flex items-center justify-center border border-slate-200 rounded-full bg-white text-slate-500 hover:bg-slate-50 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+      <!-- Search Input -->
+      <div class="px-5 pt-4 pb-2">
+        <div class="flex items-center gap-2 bg-slate-50 rounded-xl border border-slate-200 px-4 py-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+          <span class="material-symbols-outlined text-slate-400 text-[20px]">tag</span>
+          <input type="text" id="lookup-input" placeholder="Захиалгын дугаар оруулна уу (жишээ: UL0101)" class="flex-1 bg-transparent text-[14px] outline-none text-gray-900 font-bold placeholder-slate-400" onkeydown="if(event.key==='Enter') searchOrder()">
+          <button onclick="searchOrder()" class="px-3 py-1.5 bg-primary text-white rounded-lg text-[12px] font-bold hover:bg-blue-600 active:scale-95 transition-all">Хайх</button>
+        </div>
+      </div>
+      <!-- Results Area -->
+      <div class="p-5 overflow-y-auto flex-1 no-scrollbar" id="lookup-results">
+        <div class="text-center py-8 text-slate-400">
+          <span class="material-symbols-outlined text-[48px] mb-2 block">manage_search</span>
+          <p class="text-[13px] font-medium">Захиалгын дугаараар хайж, дэлгэрэнгүй мэдээлэл харна уу</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- SMS Message Modal -->
   <div id="sms-modal" class="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-4 opacity-0 pointer-events-none transition-opacity duration-300">
