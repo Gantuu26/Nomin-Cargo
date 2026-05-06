@@ -117,24 +117,30 @@
   <main class="pt-[84px] px-4 lg:px-8 lg:ml-[260px] max-w-7xl mx-auto space-y-4">
     
     <!-- Top Action Bar (Desktop only) -->
-    <div class="hidden lg:flex justify-between items-end mb-4 gap-4">
-       <div class="flex items-center gap-4">
-         <h1 class="text-[24px] font-bold text-gray-900">Захиалгууд</h1>
-         <div class="flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-1.5 shadow-sm hover:border-primary/50 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+    <div class="hidden lg:flex justify-between items-center mb-4 gap-4 flex-wrap">
+       <div class="flex items-center gap-4 flex-wrap">
+         <h1 class="text-[24px] font-bold text-gray-900 mr-2">Захиалгууд</h1>
+         
+         <!-- Date Filters -->
+         <div class="flex items-center gap-1.5 bg-white rounded-xl border border-slate-200 pl-3 pr-1.5 py-1.5 shadow-sm hover:border-primary/50 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 relative group">
             <span class="material-symbols-outlined text-primary text-[18px]">calendar_month</span>
-            <input type="text" id="filter-start-date" placeholder="Эхлэх огноо" class="bg-transparent text-[13px] outline-none text-slate-700 font-bold cursor-pointer w-[90px] placeholder-slate-400">
+            <input type="text" id="filter-start-date" placeholder="Эхлэх огноо" class="bg-transparent text-[13px] outline-none text-slate-700 font-bold cursor-pointer w-[85px] placeholder-slate-400">
             <span class="text-slate-300 text-[13px] font-bold">~</span>
-            <input type="text" id="filter-end-date" placeholder="Дуусах огноо" class="bg-transparent text-[13px] outline-none text-slate-700 font-bold cursor-pointer w-[95px] placeholder-slate-400">
+            <input type="text" id="filter-end-date" placeholder="Дуусах огноо" class="bg-transparent text-[13px] outline-none text-slate-700 font-bold cursor-pointer w-[85px] placeholder-slate-400">
+            <button id="clear-dates-btn" onclick="clearDateFilters()" class="hidden w-6 h-6 flex items-center justify-center rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors" title="Хугацаа цэвэрлэх">
+               <span class="material-symbols-outlined text-[16px]">close</span>
+            </button>
          </div>
-         <!-- Inline Search -->
-         <div class="flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-1.5 shadow-sm hover:border-primary/50 transition-colors focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20">
+
+         <!-- Inline Search Button -->
+         <button onclick="openLookupModal()" class="flex items-center gap-2 bg-white rounded-xl border border-slate-200 px-3 py-1.5 shadow-sm hover:border-primary/50 hover:bg-slate-50 transition-all focus:border-primary/50 focus:ring-1 focus:ring-primary/20 active:scale-95 text-left w-[240px]">
             <span class="material-symbols-outlined text-slate-400 text-[18px]">search</span>
-            <input type="text" id="desktop-search-input" placeholder="Захиалгын дугаараар хайх" class="bg-transparent text-[13px] outline-none text-slate-700 font-bold cursor-pointer w-[160px] placeholder-slate-400" onkeydown="if(event.key==='Enter'){document.getElementById('lookup-input').value=this.value; openLookupModal(); searchOrder();}">
-         </div>
+            <span class="text-[13px] text-slate-400 font-medium truncate">Захиалгын дугаараар хайх...</span>
+         </button>
        </div>
        <div class="flex items-center gap-3">
-          <button onclick="downloadExcel()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm hover:bg-slate-50 transition-colors active:scale-95 font-bold text-[14px]">
-            <span class="material-symbols-outlined text-[20px] text-green-600">table_view</span>
+          <button onclick="downloadExcel()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors active:scale-95 font-bold text-[14px]">
+            <span class="material-symbols-outlined text-[20px] text-[#107C41]">table_view</span>
             Экспорт (Excel)
           </button>
           <button onclick="openManualOrderModal()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white shadow-btn hover:bg-blue-600 transition-colors active:scale-95 font-bold text-[14px]">
@@ -1191,15 +1197,37 @@
     }
 
     // Initialize Flatpickr for date filters
+    let startDatePicker, endDatePicker;
+    
+    function toggleClearDatesBtn() {
+       const start = document.getElementById('filter-start-date').value;
+       const end = document.getElementById('filter-end-date').value;
+       const btn = document.getElementById('clear-dates-btn');
+       if (btn) {
+           if (start || end) btn.classList.remove('hidden');
+           else btn.classList.add('hidden');
+       }
+    }
+
+    function clearDateFilters() {
+       if (startDatePicker) startDatePicker.clear();
+       if (endDatePicker) endDatePicker.clear();
+       document.getElementById('filter-start-date').value = '';
+       document.getElementById('filter-end-date').value = '';
+       toggleClearDatesBtn();
+       renderOrders();
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
        const fpOptions = {
           dateFormat: "Y-m-d",
           onChange: function() {
+             toggleClearDatesBtn();
              renderOrders();
           }
        };
-       flatpickr("#filter-start-date", fpOptions);
-       flatpickr("#filter-end-date", fpOptions);
+       startDatePicker = flatpickr("#filter-start-date", fpOptions);
+       endDatePicker = flatpickr("#filter-end-date", fpOptions);
     });
 
     // ---- Order Lookup ----
