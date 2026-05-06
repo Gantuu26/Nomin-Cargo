@@ -1226,40 +1226,52 @@
           return;
        }
 
-       const STATUSES = { 'pending':'Хүлээгдэж буй','checking':'Шалгаж байна','picking_up':'Очиж авсан','loaded':'Ачигдсан','departed':'Хөдөлсөн','in_transit':'Замд яваа','arrived':'Монголд ирсэн','delivered':'Хүргэгдсэн' };
-       const STATUS_COLORS = { 'pending':'warning','checking':'warning','picking_up':'info','loaded':'info','departed':'info','in_transit':'info','arrived':'primary','delivered':'success' };
+       const fmtDate = (d) => { if(!d) return '-'; const t=new Date(d); return `${t.getFullYear()}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getDate()).padStart(2,'0')} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`; };
+       const STATUSES = { 'pending':'Хүлээгдэж буй','checking':'Шалгаж байна','picking_up':'Хаягаар очиж байна','loaded':'Контейнерт ачигдлаа','departed':'Пусанаас хөдөлсөн','in_transit':'Зам-Үүдэд ирсэн','arrived':'Монголд ачаа буусан','delivered':'Хүргэгдсэн' };
+       const STATUS_BG = { 'pending':'bg-warning/10 text-warning','checking':'bg-warning/10 text-warning','picking_up':'bg-info/10 text-info','loaded':'bg-info/10 text-info','departed':'bg-info/10 text-info','in_transit':'bg-info/10 text-info','arrived':'bg-primary/10 text-primary','delivered':'bg-success/10 text-success' };
 
        let html = '';
        matches.forEach(order => {
-          const fmtDate = (d) => { if(!d) return '-'; const t=new Date(d); return `${t.getFullYear()}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getDate()).padStart(2,'0')} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`; };
           const orderDate = fmtDate(order.date);
           const effStatus = order.status || 'pending';
           const statusLabel = STATUSES[effStatus] || effStatus;
-          const sColor = STATUS_COLORS[effStatus] || 'slate';
+          const statusBadge = STATUS_BG[effStatus] || 'bg-slate-100 text-slate-500';
+          const typeLabel = order.type === 'standard' ? 'Энгийн ачаа' : 'Экспресс ачаа';
 
-          let containerInfo = '';
-          let containerDate = '-';
+          let containerHtml = '';
           if (order.container_id) {
              const c = allContainers.find(x => x.id === order.container_id);
              if (c) {
-                containerInfo = c.name;
-                containerDate = c.created_at ? fmtDate(c.created_at) : (c.date ? fmtDate(c.date) : '-');
+                const cDate = c.created_at ? fmtDate(c.created_at) : (c.date ? fmtDate(c.date) : '-');
+                containerHtml = `<div class="flex justify-between items-center border-b border-slate-100 pb-4"><p class="text-[13px] text-slate-400 font-medium">Контейнер</p><p class="text-[13px] font-bold text-primary">${c.name} · ${cDate}</p></div>`;
              }
           }
 
+          let imagesHtml = '';
+          if (order.images && order.images.length > 0) {
+             let parsed = order.images;
+             if (typeof order.images === 'string') { try { parsed = JSON.parse(order.images); } catch(e) { parsed = []; } }
+             if (parsed.length > 0) { imagesHtml = `<div class="pt-2"><span class="text-[12px] text-slate-500 font-medium block mb-2">Барааны зураг</span><div class="flex gap-2.5 overflow-x-auto pb-1">${parsed.map(img => `<div class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm shrink-0" style="background-image: url('${img}');"></div>`).join('')}</div></div>`; }
+          }
+
+          let largeItemsHtml = '';
+          try { const li = JSON.parse(order.large_items || '[]'); if (li.length > 0) { largeItemsHtml = `<div class="flex justify-between items-start"><span class="text-[12px] text-slate-500 font-medium">Том оврын ачаа</span><div class="flex flex-wrap gap-1 justify-end max-w-[60%]">${li.map(x => `<span class="text-[11px] font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2 py-0.5 rounded-md">${x}</span>`).join('')}</div></div>`; } } catch(e) {}
+
+          let volumeHtml = '';
+          try { const vi = JSON.parse(order.volume_items || '[]'); if (vi.length > 0) { volumeHtml = `<div class="mt-2 pt-2 border-t border-slate-100"><p class="text-[11px] text-slate-400 font-bold mb-1.5">Овор ихтэй ачаа:</p>${vi.map(v => `<div class="flex justify-between items-center py-1"><span class="text-[12px] text-orange-700 font-medium">• ${v.name}</span><span class="text-[13px] font-bold text-orange-600">${parseInt(v.price).toLocaleString()} ₩</span></div>`).join('')}</div>`; } } catch(e) {}
+
           const timelineSteps = [
-             { key:'pending', icon:'receipt_long', label:'Захиалга бүртгэгдсэн', date: orderDate },
-             { key:'checking', icon:'fact_check', label:'Шалгаж байна', date: null },
-             { key:'loaded', icon:'inventory_2', label:'Контейнерт ачигдсан', date: containerInfo ? containerDate : null, extra: containerInfo },
-             { key:'departed', icon:'directions_boat', label:'Пусанаас хөдөлсөн', date: null },
-             { key:'in_transit', icon:'local_shipping', label:'Зам-Үүдэд ирсэн', date: null },
-             { key:'arrived', icon:'storefront', label:'Монголд ирсэн', date: null },
-             { key:'delivered', icon:'check_circle', label:'Хүргэгдсэн', date: null }
+             { key:'pending', label:'Захиалга бүртгэгдсэн', date: orderDate },
+             { key:'checking', label:'Шалгаж байна' },
+             { key:'loaded', label:'Контейнерт ачигдсан' },
+             { key:'departed', label:'Пусанаас хөдөлсөн' },
+             { key:'in_transit', label:'Зам-Үүдэд ирсэн' },
+             { key:'arrived', label:'Монголд ирсэн' },
+             { key:'delivered', label:'Хүргэгдсэн' }
           ];
           const statusOrder = ['pending','checking','loaded','departed','in_transit','arrived','delivered'];
           const currentIdx = statusOrder.indexOf(effStatus);
-
-          let timelineHtml = timelineSteps.map((step, i) => {
+          const timelineHtml = timelineSteps.map((step, i) => {
              const stepIdx = statusOrder.indexOf(step.key);
              const isDone = stepIdx <= currentIdx;
              const isCurrent = stepIdx === currentIdx;
@@ -1267,42 +1279,28 @@
              const lineClass = isDone ? 'bg-primary' : 'bg-slate-200';
              const textClass = isDone ? 'text-gray-900' : 'text-slate-400';
              const isLast = i === timelineSteps.length - 1;
-             return `
-             <div class="flex gap-3 relative">
-                <div class="flex flex-col items-center">
-                   <div class="w-3 h-3 rounded-full ${dotClass} shrink-0 mt-1 z-10"></div>
-                   ${!isLast ? `<div class="w-0.5 flex-1 ${lineClass} mt-0.5"></div>` : ''}
-                </div>
-                <div class="pb-5 flex-1">
-                   <p class="text-[13px] font-bold ${textClass} leading-tight">${step.label}</p>
-                   ${step.date ? `<p class="text-[11px] text-slate-400 mt-0.5">${step.date}</p>` : ''}
-                   ${step.extra ? `<span class="text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md mt-1 inline-block">${step.extra}</span>` : ''}
-                   ${isCurrent ? `<span class="text-[10px] font-bold text-white bg-primary px-2 py-0.5 rounded-md mt-1 inline-block animate-pulse">Одоогийн төлөв</span>` : ''}
-                </div>
-             </div>`;
+             return `<div class="flex gap-3"><div class="flex flex-col items-center"><div class="w-3 h-3 rounded-full ${dotClass} shrink-0 mt-1 z-10"></div>${!isLast ? `<div class="w-0.5 flex-1 ${lineClass} mt-0.5"></div>` : ''}</div><div class="pb-4 flex-1"><p class="text-[13px] font-bold ${textClass}">${step.label}</p>${step.date ? `<p class="text-[11px] text-slate-400 mt-0.5">${step.date}</p>` : ''}${isCurrent ? `<span class="text-[10px] font-bold text-white bg-primary px-2 py-0.5 rounded-md mt-1 inline-block animate-pulse">Одоогийн төлөв</span>` : ''}</div></div>`;
           }).join('');
 
           html += `
-          <div class="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden mb-4">
-             <div class="bg-white px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-                <div>
-                   <h4 class="text-[18px] font-extrabold text-gray-900 tracking-tight">${order.order_id}</h4>
-                   <p class="text-[12px] text-slate-400 font-medium mt-0.5">${order.sender_name || ''} · ${order.sender_phone || ''}</p>
-                </div>
-                <span class="text-[11px] font-bold text-${sColor} bg-${sColor}/10 px-2.5 py-1 rounded-lg">${statusLabel}</span>
-             </div>
-             <div class="px-5 py-4 space-y-3">
-                <div class="grid grid-cols-2 gap-3 text-[12px]">
-                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Төрөл</p><p class="font-bold text-gray-900">${order.type==='express'?'Экспресс':'Энгийн'}</p></div>
-                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Салбар</p><p class="font-bold text-gray-900">${order.branch||'-'}</p></div>
-                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Хүлээн авагч</p><p class="font-bold text-gray-900">${order.receiver_name||'-'}</p></div>
-                   <div class="bg-white rounded-xl p-3 border border-slate-100"><p class="text-slate-400 mb-0.5">Утас (Х)</p><p class="font-bold text-gray-900">${order.receiver_phone||'-'}</p></div>
-                </div>
-                <div class="bg-white rounded-xl p-4 border border-slate-100 mt-3">
-                   <p class="text-[12px] font-bold text-slate-500 mb-3 flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-primary">timeline</span> Захиалгын явц</p>
-                   ${timelineHtml}
-                </div>
-             </div>
+          <div class="mb-5">
+            <div class="bg-white rounded-t-3xl px-5 pt-5 pb-4 border border-blue-100/50 border-b-0 shadow-card">
+              <div class="flex justify-between items-start mb-1">
+                <h3 class="text-[20px] font-extrabold text-gray-900 tracking-tight">${order.order_id}</h3>
+                <span class="text-[11px] font-bold ${statusBadge} px-2.5 py-1 rounded-lg whitespace-nowrap">${statusLabel}</span>
+              </div>
+              <p class="text-[12px] text-slate-400 font-medium tracking-wide">${orderDate}</p>
+            </div>
+            <div class="bg-white rounded-b-3xl px-5 pb-5 border border-blue-100/50 border-t-0 shadow-card space-y-5">
+              <div class="flex justify-between items-center border-b border-slate-100 pb-4 pt-2"><p class="text-[13px] text-slate-400 font-medium">Төрөл</p><div class="bg-primary/10 px-2.5 py-1 rounded-lg"><p class="text-[13px] font-bold text-primary">${typeLabel}</p></div></div>
+              <div class="flex justify-between items-center border-b border-slate-100 pb-4"><p class="text-[13px] text-slate-400 font-medium">Бүртгэсэн огноо</p><p class="text-[14px] font-bold text-gray-900">${orderDate}</p></div>
+              <div class="flex justify-between items-center border-b border-slate-100 pb-4"><p class="text-[13px] text-slate-400 font-medium">Салбар</p><p class="text-[14px] font-bold text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">storefront</span>${order.branch || 'Тодорхойгүй'}</p></div>
+              ${containerHtml}
+              <div class="border-b border-slate-100 pb-4"><p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">person</span>Илгээгчийн мэдээлэл</p><div class="bg-[#F0F4FF] p-4 rounded-2xl border border-blue-100/50 space-y-3"><div class="flex justify-between"><span class="text-[12px] text-slate-500 font-medium">Нэр</span><span class="text-[14px] font-bold text-gray-900">${order.sender_name || ''}</span></div><div class="flex justify-between"><span class="text-[12px] text-slate-500 font-medium">Утас</span><span class="text-[14px] font-bold text-gray-900">${order.sender_phone || ''}</span></div><div><span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг</span><span class="text-[14px] font-semibold text-gray-800 block">${order.sender_address || ''}</span></div></div></div>
+              <div class="border-b border-slate-100 pb-4"><p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">package</span>Барааны мэдээлэл</p><div class="bg-[#F0F4FF] p-4 rounded-2xl border border-blue-100/50 space-y-3"><div class="flex justify-between"><span class="text-[12px] text-slate-500 font-medium">Барааны төрөл</span><span class="text-[14px] font-bold text-gray-900">${order.item_category || ''}</span></div><div class="flex justify-between"><span class="text-[12px] text-slate-500 font-medium">Барааны тоо</span><span class="text-[14px] font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-md">${order.item_quantity || ''} ш</span></div>${largeItemsHtml}${order.weight ? `<div class="flex justify-between"><span class="text-[12px] text-slate-500 font-medium">Жин</span><span class="text-[14px] font-bold text-gray-900">${order.weight} кг</span></div>${volumeHtml}` : ''}${imagesHtml}</div></div>
+              <div class="border-b border-slate-100 pb-4"><p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">location_on</span>Хүлээн авагчийн мэдээлэл</p><div class="bg-[#F0F4FF] p-4 rounded-2xl border border-blue-100/50 space-y-3"><div class="flex justify-between"><span class="text-[12px] text-slate-500 font-medium">Нэр</span><span class="text-[14px] font-bold text-gray-900">${order.receiver_name || ''}</span></div><div class="flex justify-between"><span class="text-[12px] text-slate-500 font-medium">Утас</span><span class="text-[14px] font-bold text-gray-900">${order.receiver_phone || ''}</span></div><div><span class="text-[12px] text-slate-500 font-medium block mb-1">Хаяг (Монгол)</span><span class="text-[14px] font-semibold text-gray-800 block">${order.receiver_address || ''}</span></div></div></div>
+              <div><p class="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px] bg-primary/10 rounded-full p-1">timeline</span>Захиалгын явц</p><div class="bg-[#F0F4FF] p-4 rounded-2xl border border-blue-100/50">${timelineHtml}</div></div>
+            </div>
           </div>`;
        });
        resultsEl.innerHTML = html;
