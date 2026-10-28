@@ -1,3 +1,4 @@
+import { sessionCookie } from '../../_auth.js';
 export async function onRequestPost({ request, env }) {
   try {
     const { email, password } = await request.json();
@@ -29,7 +30,7 @@ export async function onRequestPost({ request, env }) {
     const incomingPasswordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     // 3. Verify password
-    if (incomingPasswordHash !== user.password_hash) {
+    if (password.startsWith('google_oauth_') || incomingPasswordHash !== user.password_hash) {
       return new Response(JSON.stringify({ success: false, error: 'Нууц үг буруу байна.' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
@@ -52,7 +53,7 @@ export async function onRequestPost({ request, env }) {
       user: safeUser
     }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Set-Cookie': await sessionCookie(user.email, env) },
     });
 
   } catch (error) {
