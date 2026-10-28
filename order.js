@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-amber-50 rounded-xl border border-amber-100 text-[13px] text-amber-900 leading-relaxed font-bold";
-        descriptionContainer.innerHTML = `✈️ Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (${expressPrice} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
+        descriptionContainer.innerHTML = `<img class="logistics-icon logistics-art text-[24px] mr-1" src="/images/logistics/plane.webp" width="32" height="32" alt="" aria-hidden="true"> Экспрэсс ачаа: 10~14 хоногт хүргэгдэнэ (${expressPrice} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
       }
     } else {
       if (btnTypeStandard) {
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (descriptionContainer) {
         descriptionContainer.className = "mb-8 p-4 bg-blue-50/70 rounded-xl border border-blue-100 text-[13px] text-blue-900 leading-relaxed font-bold";
-        descriptionContainer.innerHTML = `🚢 Энгийн ачаа: 30~45 хоногт хүргэгдэнэ (${standardPrice} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
+        descriptionContainer.innerHTML = `<img class="logistics-icon logistics-art text-[24px] mr-1" src="/images/logistics/ship.webp" width="32" height="32" alt="" aria-hidden="true"> Энгийн ачаа: 30~45 хоногт хүргэгдэнэ (${standardPrice} вон/кг)<br><span class=\"font-medium text-[12px] opacity-80 font-normal\">Та доорх мэдээллийг бөглөж явуулсаны дараа бид таны оруулсан хаягаар ачааг очиж авах болно.</span>`;
       }
     }
     updatePricePreview(); // recalculate price when type changes
