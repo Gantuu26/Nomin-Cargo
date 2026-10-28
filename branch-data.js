@@ -12,12 +12,12 @@
     return `
       <div class="space-y-2 mb-4 pl-1">
         <div class="flex items-start text-[13px]">
-          <span class="material-symbols-outlined text-[16px] text-slate-400 shrink-0 w-7">person</span>
+          <img class="logistics-icon logistics-art text-[22px] text-slate-400 shrink-0 w-7" src="/images/logistics/operator.webp" width="32" height="32" alt="" aria-hidden="true">
           <span class="font-semibold text-gray-700 w-24 shrink-0">Хариуцагч:</span>
           <span class="text-gray-700 font-medium">${escapeHtml(branch.manager_name)}</span>
         </div>
         <div class="flex items-start text-[13px]">
-          <span class="material-symbols-outlined text-[16px] text-slate-400 shrink-0 w-7">call</span>
+          <img class="logistics-icon logistics-art text-[22px] text-slate-400 shrink-0 w-7" src="/images/logistics/support.webp" width="32" height="32" alt="" aria-hidden="true">
           <span class="font-semibold text-gray-700 w-24 shrink-0">Утас:</span>
           <a href="tel:${phoneHref(branch.phone)}" class="text-primary font-medium hover:underline">${escapeHtml(branch.phone)}</a>
         </div>
@@ -44,7 +44,7 @@
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary">
-              <span class="material-symbols-outlined text-[20px]">storefront</span>
+              <img class="logistics-icon logistics-art text-[28px]" src="/images/logistics/warehouse.webp" width="32" height="32" alt="" aria-hidden="true">
             </div>
             <h4 class="font-bold text-gray-900 text-[15px]">${escapeHtml(branch.name)}</h4>
           </div>
@@ -56,7 +56,7 @@
         ${priceGrid(branch)}
         ${branch.service_area ? `<div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
           <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[14px]">location_on</span> АЧАА АВАХ ХОТ
+            <img class="logistics-icon logistics-art text-[14px]" src="/images/logistics/location.webp" width="32" height="32" alt="" aria-hidden="true"> АЧАА АВАХ ХОТ
           </div>
           <p class="text-[12px] text-slate-600 leading-relaxed">${escapeHtml(branch.service_area)}</p>
         </div>` : ''}
