@@ -283,8 +283,24 @@
       }
 
       const isExpress = o.type === 'express';
-      const isBranch2 = o.branch && o.branch.includes('2');
-      const cargoRate = isExpress ? (isBranch2 ? 3000 : 2500) : (isBranch2 ? 2000 : 1800);
+      let cargoRate = null;
+      try {
+        const branchResponse = await fetch('/api/branches?admin=1', {
+          headers: { Authorization: `Bearer ${localStorage.getItem('admin_session') || ''}` },
+          cache: 'no-store'
+        });
+        if (!branchResponse.ok) throw new Error('Branch API unavailable');
+        const branches = await branchResponse.json();
+        const branch = branches.find(item => item.name === o.branch);
+        const savedRate = branch?.[isExpress ? 'express_price' : 'standard_price'];
+        if (savedRate === null || savedRate === undefined || savedRate === '' ||
+            !Number.isFinite(Number(savedRate)) || Number(savedRate) < 0) {
+          throw new Error('Branch rate unavailable');
+        }
+        cargoRate = Number(savedRate);
+      } catch (error) {
+        console.error('Unable to load the saved branch rate:', error);
+      }
 
       content.innerHTML = `
         <!-- Status Tracker -->
@@ -446,7 +462,7 @@
                      <div class="flex-1">
                         <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Ачааны төрөл</label>
                         <div class="h-12 px-3 rounded-xl border border-slate-200 bg-slate-100 flex items-center font-bold text-slate-700 text-[13px] sm:text-[14px]">
-                           ${typeLabel} (${cargoRate} ₩)
+                           ${typeLabel} (${cargoRate === null ? 'Үнэ олдсонгүй' : cargoRate.toLocaleString() + ' ₩'})
                         </div>
                      </div>
                   </div>
@@ -457,7 +473,7 @@
                         <input type="number" id="input-price" value="${o.total_price || ''}" placeholder="0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-bold text-primary text-[16px]">
                      </div>
                      <div class="flex items-end">
-                        <button onclick="calculatePrice(${cargoRate})" class="h-12 px-5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl transition-colors text-[14px] flex items-center justify-center min-w-[90px]">
+                        <button onclick="calculatePrice(${cargoRate})" ${cargoRate === null ? 'disabled title="Салбарын үнэ татаж чадсангүй. Хуудсыг дахин ачаална уу."' : ''} class="h-12 px-5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl transition-colors text-[14px] flex items-center justify-center min-w-[90px] disabled:opacity-50 disabled:cursor-not-allowed">
                            Бодох
                         </button>
                      </div>
@@ -698,6 +714,10 @@
     }
 
     function calculatePrice(rate) {
+       if (!Number.isFinite(rate) || rate < 0) {
+          alert('Салбарын үнэ татаж чадсангүй. Хуудсыг дахин ачаална уу.');
+          return;
+       }
        const weightInput = document.getElementById('input-weight').value;
        const weight = parseFloat(weightInput);
        if(isNaN(weight) || weight <= 0) {
