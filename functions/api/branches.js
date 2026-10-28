@@ -1,3 +1,4 @@
+import { isAdmin as isAdminRequest } from '../_auth.js';
 const DEFAULT_BRANCHES = [
   {
     name: 'Салбар 1',
@@ -82,25 +83,6 @@ function normalize(body) {
   };
 }
 
-async function isAdminRequest(request, env) {
-  const authorization = request.headers.get('Authorization') || '';
-  const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-  const [issuedAt, signatureText] = token.split('.');
-  if (!issuedAt || !signatureText || Date.now() - Number(issuedAt) > 12 * 60 * 60 * 1000) return false;
-
-  const secret = env.ADMIN_PASSWORD;
-  if (!secret) return false;
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['verify']
-  );
-  const padded = signatureText.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - signatureText.length % 4) % 4);
-  const signature = Uint8Array.from(atob(padded), char => char.charCodeAt(0));
-  return crypto.subtle.verify('HMAC', key, signature, new TextEncoder().encode(issuedAt));
-}
 
 export async function onRequest({ request, env }) {
   try {
