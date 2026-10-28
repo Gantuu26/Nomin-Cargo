@@ -2,11 +2,17 @@ export async function onRequest(context) {
     const { request, env } = context;
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
+    const admin = context.data?.isAdmin === true;
+    const emailSession = context.data?.userEmail;
+    const deny = () => new Response(JSON.stringify({ error: 'Нэвтрэх шаардлагатай.' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    if (['PUT', 'DELETE'].includes(request.method) && !admin) return deny();
+    if (request.method === 'POST' && !admin && !emailSession) return deny();
 
     try {
         if (request.method === 'GET') {
             const email = url.searchParams.get('user_email');
             const targetId = url.searchParams.get('id');
+            if (!admin && !targetId && (!emailSession || email !== emailSession)) return deny();
             let results;
             
             if (targetId) {
@@ -27,12 +33,31 @@ export async function onRequest(context) {
                  const stmt = env.DB.prepare('SELECT * FROM orders ORDER BY date DESC');
                  results = (await stmt.all()).results;
             }
+            if (!admin && targetId) {
+                results = results.map(order => {
+                    if (emailSession && order.user_email === emailSession) return order;
+                    const mask = value => value ? String(value).slice(0, 1) + '***' : '';
+                    return { order_id: order.order_id, type: order.type, branch: order.branch, date: order.date,
+                        status: order.status, container_id: order.container_id, weight: order.weight,
+                        total_price: order.total_price, sender_name: mask(order.sender_name), receiver_name: mask(order.receiver_name) };
+                });
+            }
             return new Response(JSON.stringify(results), { headers: { 'Content-Type': 'application/json' } });
         }
         
         if (request.method === 'POST') {
             const body = await request.json();
             
+            if (!admin) { body.user_email = emailSession; body.status = 'pending'; body.containerId = null; }
+            if (!['standard', 'express'].includes(body.type)) return new Response('Invalid cargo type', { status: 400 });
+            const branch = await env.DB.prepare('SELECT * FROM branches WHERE name = ? AND active = 1').bind(body.branch).first();
+            if (!branch) return new Response('Branch unavailable', { status: 400 });
+            if (body.weight !== null && body.weight !== undefined && body.weight !== '') {
+                const weight = Number(body.weight);
+                const rate = Number(branch[body.type === 'express' ? 'express_price' : 'standard_price']);
+                if (!Number.isFinite(weight) || weight <= 0 || !Number.isFinite(rate) || rate < 0) return new Response('Invalid pricing', { status: 400 });
+                body.total_price = String(Math.round(weight * rate));
+            } else { body.weight = null; body.total_price = null; }
             // Generate auto-incrementing ID with branch prefix
             let prefix = 'MN';
             if (body.branch === 'Салбар 2') prefix = 'MK';
@@ -116,6 +141,12 @@ export async function onRequest(context) {
                              .bind(body.status, body.orderId);
                  logStatus = body.status;
             } else if (body.hasOwnProperty('weight') && body.hasOwnProperty('total_price')) {
+                 const total = Number(body.total_price);
+                 const weight = body.weight === null || body.weight === '' ? null : Number(body.weight);
+                 let items;
+                 try { items = typeof body.volume_items === 'string' ? JSON.parse(body.volume_items) : (body.volume_items || []); } catch { return new Response('Invalid items', { status: 400 }); }
+                 if (!Number.isFinite(total) || total < 0 || weight !== null && (!Number.isFinite(weight) || weight <= 0) || !Array.isArray(items) || items.some(x => !x || typeof x.name !== 'string' || !Number.isFinite(x.price) || x.price < 0) || items.reduce((sum, x) => sum + x.price, 0) > total) return new Response('Invalid invoice', { status: 400 });
+                 body.volume_items = JSON.stringify(items);
                  stmt = env.DB.prepare('UPDATE orders SET weight = ?, total_price = ?, volume_items = ? WHERE order_id = ?')
                              .bind(body.weight || null, body.total_price, body.volume_items || '[]', body.orderId);
                  logDesc = 'Үнэ тооцогдлоо';

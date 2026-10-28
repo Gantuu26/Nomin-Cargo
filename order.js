@@ -449,6 +449,11 @@ document.addEventListener('DOMContentLoaded', () => {
   orderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!validateStep(4)) return;
+    const selectedBranch = document.querySelector('input[name="branchSelect"]:checked');
+    if (!selectedBranch || !window.NominBranches?.getByName(selectedBranch.value)) {
+      showCustomAlert('Салбарын үнэ татаж чадсангүй. Хуудсыг дахин ачаална уу.');
+      return;
+    }
 
     // Loading State
     const originalText = submitBtnEl.innerHTML;
@@ -567,6 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify(newOrder)
       });
       
+      if (res.status === 401) { localStorage.removeItem('nomin_user'); window.location.href = 'login'; return; }
       if (!res.ok) {
           throw new Error('Захиалга үүсгэхэд алдаа гарлаа');
       }

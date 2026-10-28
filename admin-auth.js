@@ -1,4 +1,16 @@
 (function () {
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = (input, options = {}) => {
+    const url = new URL(input instanceof Request ? input.url : input, location.href);
+    if (url.origin === location.origin && url.pathname.startsWith('/api/')) {
+      const headers = new Headers(input instanceof Request ? input.headers : undefined);
+      new Headers(options.headers).forEach((value, name) => headers.set(name, value));
+      const token = localStorage.getItem('admin_session');
+      if (token) headers.set('Authorization', 'Bearer ' + token);
+      return nativeFetch(input, { ...options, headers });
+    }
+    return nativeFetch(input, options);
+  };
   const LOGIN_URL = 'admin-login';
   const CHECK_INTERVAL_MS = 30000;
   let checking = false;

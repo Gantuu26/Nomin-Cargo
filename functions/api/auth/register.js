@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
 
     const { name, email, phone, password } = await request.json();
 
-    if (!name || !email || !phone || !password) {
+    if (!name || !email || !phone || typeof password !== 'string' || !password || password.startsWith('google_oauth_')) {
       return new Response(JSON.stringify({ success: false, error: 'Код/мэдээлэл дутуу байна.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },

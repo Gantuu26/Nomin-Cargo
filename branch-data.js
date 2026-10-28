@@ -1,9 +1,5 @@
 (function () {
-  const fallbackBranches = [
-    { id: 1, name: 'Салбар 1', manager_name: 'Одгэрэл / Дүгэрсүрэн', phone: '010-8138-4849 / 010-8460-5703', standard_price: 1800, express_price: 2500, service_area: 'Пусан, Кимхэ, Янсан, Пухан, Улсан, Дэжон, Чонан, Андун, Ёнжу, Чанвон' },
-    { id: 2, name: 'Салбар 2', manager_name: 'Оргил / Бооб', phone: '010-8256-2953 / 010-8174-5995', standard_price: 2000, express_price: 3000, service_area: 'Мугпу, Гуанжу, Сүнчон, Чонжу' },
-    { id: 3, name: 'Салбар 3', manager_name: 'Пүүжээ', phone: '010-5850-6206', standard_price: 1800, express_price: 2500, service_area: 'Тэгү, Күмин, Ёнчан, Кёнсан' }
-  ];
+  let branchLoadFailed = false;
 
   const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
@@ -75,13 +71,15 @@
 
   async function loadBranches() {
     try {
-      const response = await fetch('/api/branches');
+      const response = await fetch('/api/branches', { cache: 'no-store' });
       if (!response.ok) throw new Error('Branch API unavailable');
       const branches = await response.json();
-      return branches.length ? branches : fallbackBranches;
+      if (!Array.isArray(branches) || branches.some(branch => ['standard_price', 'express_price'].some(field => branch[field] == null || !Number.isFinite(Number(branch[field])) || Number(branch[field]) < 0))) throw new Error('Invalid branch prices');
+      return branches;
     } catch (error) {
       console.warn(error);
-      return fallbackBranches;
+      branchLoadFailed = true;
+      return [];
     }
   }
 
@@ -95,10 +93,10 @@
       return this.items.find(branch => branch.name === name);
     },
     renderInfo(container, branches) {
-      container.innerHTML = branches.map(branch => branchCard(branch, false)).join('');
+      container.innerHTML = branches.length ? branches.map(branch => branchCard(branch, false)).join('') : '<p role="alert">' + (branchLoadFailed ? 'Салбарын мэдээлэл татаж чадсангүй. Хуудсыг дахин ачаална уу.' : 'Одоогоор идэвхтэй салбар алга.') + '</p>';
     },
     renderOptions(container, branches) {
-      container.innerHTML = branches.map(branch => branchCard(branch, true)).join('');
+      container.innerHTML = branches.length ? branches.map(branch => branchCard(branch, true)).join('') : '<p role="alert">Салбар сонгох боломжгүй. Хуудсыг дахин ачаална уу.</p>';
       document.dispatchEvent(new CustomEvent('nomin:branches-rendered'));
     }
   };

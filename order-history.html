@@ -93,6 +93,7 @@
 
       try {
         const res = await fetch('/api/orders' + emailQuery);
+        if (res.status === 401) { localStorage.removeItem('nomin_user'); window.location.href = 'login'; return; }
         if (res.ok) {
            orders = await res.json();
         }

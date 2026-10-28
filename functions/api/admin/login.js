@@ -1,3 +1,4 @@
+import { isAdmin as verifyToken } from '../../_auth.js';
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -5,34 +6,6 @@ function json(data, status = 200) {
   });
 }
 
-async function verifyToken(request, env) {
-  const authorization = request.headers.get('Authorization') || '';
-  const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-  const [issuedAt, signatureText] = token.split('.');
-  const issuedAtNumber = Number(issuedAt);
-
-  if (!issuedAtNumber || !signatureText || Date.now() - issuedAtNumber > 12 * 60 * 60 * 1000) {
-    return false;
-  }
-
-  const secret = env.ADMIN_PASSWORD;
-  if (!secret) return false;
-
-  try {
-    const key = await crypto.subtle.importKey(
-      'raw',
-      new TextEncoder().encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
-    );
-    const padded = signatureText.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - signatureText.length % 4) % 4);
-    const signature = Uint8Array.from(atob(padded), char => char.charCodeAt(0));
-    return crypto.subtle.verify('HMAC', key, signature, new TextEncoder().encode(issuedAt));
-  } catch {
-    return false;
-  }
-}
 
 export async function onRequestGet({ request, env }) {
   const valid = await verifyToken(request, env);
