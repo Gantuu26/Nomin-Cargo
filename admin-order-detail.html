@@ -470,7 +470,7 @@
                   <div class="flex gap-3">
                      <div class="flex-1">
                         <label class="text-[12px] text-slate-500 font-medium block mb-1.5">Жингийн төлбөр (₩)</label>
-                        <input type="number" id="input-price" value="${o.total_price || ''}" placeholder="0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-bold text-primary text-[16px]">
+                        <input type="number" id="input-price" value="${(() => { try { const extras = JSON.parse(o.volume_items || '[]'); return o.total_price == null ? '' : Math.max(0, Number(o.total_price) - extras.reduce((sum, item) => sum + (Number(item.price) || 0), 0)); } catch { return ''; } })()}" placeholder="0" class="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none transition-all font-bold text-primary text-[16px]">
                      </div>
                      <div class="flex items-end">
                         <button onclick="calculatePrice(${cargoRate})" ${cargoRate === null ? 'disabled title="Салбарын үнэ татаж чадсангүй. Хуудсыг дахин ачаална уу."' : ''} class="h-12 px-5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold rounded-xl transition-colors text-[14px] flex items-center justify-center min-w-[90px] disabled:opacity-50 disabled:cursor-not-allowed">
@@ -607,10 +607,9 @@
             </div>
          </div>
       `;
+      initVolumeItems(o.volume_items || '[]');
+      document.getElementById('input-price').addEventListener('input', updatePricingSummary);
     });
-
-    // Initialize volume items after rendering
-    setTimeout(() => { initVolumeItems(currentOrder?.volume_items || '[]'); }, 50);
 
     window.updateOrderStatus = async function(orderId, newStatus) {
        try {
@@ -752,6 +751,9 @@
        updatePricingSummary();
     }
 
+    function escapeInvoiceHtml(value) {
+       return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+    }
     function addVolumeItemRow(name, price, checked, isCustom) {
        const list = document.getElementById('volume-items-list');
        const id = 'vol-' + (volumeItemCounter++);
@@ -761,7 +763,7 @@
        row.innerHTML = `
           <label class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer">
              <input type="checkbox" class="vol-check w-4 h-4 rounded accent-orange-500 cursor-pointer shrink-0" ${checked ? 'checked' : ''} onchange="updatePricingSummary()">
-             ${isCustom ? '<input type="text" class="vol-name flex-1 min-w-0 h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none text-[13px] font-medium" value="' + (name || '') + '" placeholder="Нэр оруулах..." onchange="updatePricingSummary()">' : '<span class="text-[13px] font-medium text-gray-700 truncate">' + name + '</span>'}
+             ${isCustom ? '<input type="text" class="vol-name flex-1 min-w-0 h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-primary outline-none text-[13px] font-medium" value="' + escapeInvoiceHtml(name) + '" placeholder="Нэр оруулах..." onchange="updatePricingSummary()">' : '<span class="text-[13px] font-medium text-gray-700 truncate">' + escapeInvoiceHtml(name) + '</span>'}
           </label>
           <input type="number" class="vol-price w-[110px] h-10 px-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:border-orange-400 outline-none text-[13px] font-bold text-orange-600 text-right" placeholder="₩ Үнэ" value="${price || ''}" oninput="updatePricingSummary()">
           ${isCustom ? '<button onclick="removeVolumeItem(\'' + id + '\')" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors shrink-0"><span class="material-symbols-outlined text-[18px]">close</span></button>' : '<div class="w-8"></div>'}
@@ -805,7 +807,7 @@
        const volRows = document.getElementById('summary-volume-rows');
        if (volumeItems.length > 0) {
           volRows.innerHTML = volumeItems.map(v => 
-             '<div class="flex justify-between items-center"><span class="text-[12px] text-orange-600 font-medium">• ' + v.name + '</span><span class="text-[13px] font-bold text-orange-600">' + v.price.toLocaleString() + ' ₩</span></div>'
+             '<div class="flex justify-between items-center"><span class="text-[12px] text-orange-600 font-medium">• ' + escapeInvoiceHtml(v.name) + '</span><span class="text-[13px] font-bold text-orange-600">' + v.price.toLocaleString() + ' ₩</span></div>'
           ).join('');
        } else {
           volRows.innerHTML = '';

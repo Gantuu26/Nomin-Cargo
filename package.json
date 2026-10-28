@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node tests/security-pricing.cjs",
     "deploy": "wrangler pages deploy . --project-name=nomin-cargo",
     "dev": "wrangler pages dev ."
   },

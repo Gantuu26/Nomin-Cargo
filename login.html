@@ -268,31 +268,13 @@
     // Google credential callback
     async function handleGoogleCredential(response) {
       try {
-        const payload = decodeJwt(response.credential);
-        const user = {
-          id: 'google_' + payload.sub,
-          name: payload.name,
-          email: payload.email,
-          phone: '',
-          picture: payload.picture
-        };
-
-        // Save session
-        localStorage.setItem('nomin_user', JSON.stringify(user));
-
-        // Also register in our DB (ignore if already exists)
-        try {
-          await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: user.name,
-              email: user.email,
-              phone: 'google',
-              password: 'google_oauth_' + payload.sub
-            })
-          });
-        } catch(e) { /* ignore duplicate */ }
+        const res = await fetch('/api/auth/google', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Нэвтрэхэд алдаа гарлаа');
+        localStorage.setItem('nomin_user', JSON.stringify(data.user));
 
         window.location.href = './';
       } catch (err) {

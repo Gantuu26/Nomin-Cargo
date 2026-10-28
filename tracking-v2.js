@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       // Fetch real data from API
       const [oRes, cRes] = await Promise.all([
-        fetch('/api/orders'),
+        fetch('/api/orders?id=' + encodeURIComponent(orderId)),
         fetch('/api/containers')
       ]);
       

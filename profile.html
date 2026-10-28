@@ -286,6 +286,7 @@
       if (!userEmail) return;
       try {
         const res = await fetch(`/api/orders?user_email=${encodeURIComponent(userEmail)}`);
+        if (res.status === 401) { localStorage.removeItem('nomin_user'); window.location.href = 'login'; return; }
         if (res.ok) {
            orders = await res.json();
         }
@@ -390,8 +391,9 @@
           const logoutBtn = document.createElement('button');
           logoutBtn.className = 'mt-2 text-[12px] font-bold text-red-500 hover:underline px-2 py-1 bg-red-50 rounded-lg';
           logoutBtn.innerText = 'Гарах';
-          logoutBtn.onclick = (e) => {
+          logoutBtn.onclick = async (e) => {
             e.stopPropagation();
+            await fetch('/api/auth/logout', { method: 'POST' });
             localStorage.removeItem('nomin_user');
             window.location.reload();
           };
