@@ -34,3 +34,16 @@ export async function sessionCookie(email, env) {
   const signature = encode(new Uint8Array(await crypto.subtle.sign('HMAC', await key(env), encoder.encode('user:' + payload))));
   return 'nomin_session=' + payload + '.' + signature + '; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=' + MAX_AGE;
 }
+
+const RECEIPT_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+export async function receiptToken(orderId, env, expires = Date.now() + RECEIPT_AGE_MS) {
+  if (!env.ADMIN_PASSWORD) throw new Error('Session configuration unavailable');
+  const signature = encode(new Uint8Array(await crypto.subtle.sign('HMAC', await key(env), encoder.encode('receipt:' + orderId + ':' + expires))));
+  return String(expires) + '.' + signature;
+}
+export async function canReadReceipt(orderId, token, env) {
+  if (typeof token !== 'string' || token.length > 256) return false;
+  const [expires, signature, extra] = token.split('.');
+  const remaining = Number(expires) - Date.now();
+  return !extra && Number.isFinite(remaining) && remaining > 0 && remaining <= RECEIPT_AGE_MS && await verify('receipt:' + orderId + ':' + expires, signature, env);
+}

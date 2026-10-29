@@ -2,6 +2,8 @@
 <html lang="mn">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Захиалгын дэлгэрэнгүй - Nomin Cargo</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -159,6 +161,7 @@
   </main>
 
   <script>
+    const escapeReceiptHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
     document.addEventListener('DOMContentLoaded', async () => {
        const urlParams = new URLSearchParams(window.location.search);
        const id = urlParams.get('id');
@@ -169,8 +172,16 @@
        }
 
        try {
-          const res = await fetch('/api/orders?id=' + id);
-          if (!res.ok) throw new Error();
+          const access = new URLSearchParams(window.location.hash.slice(1)).get('access');
+          const res = await fetch('/api/orders?id=' + encodeURIComponent(id), {
+            cache: 'no-store', headers: access ? { 'X-Receipt-Token': access } : {}
+          });
+          if (!res.ok) {
+            const problem = await res.json().catch(() => ({}));
+            const message = document.getElementById('error');
+            if (message && problem.error) message.textContent = problem.error;
+            throw new Error('Receipt unavailable');
+          }
           const data = await res.json();
           if (!data || data.length === 0) throw new Error();
           
@@ -209,7 +220,7 @@
           document.getElementById('r-status-badge').innerHTML = `<span class="material-symbols-outlined text-[18px]">${sObj.i}</span> ${sObj.t}`;
 
           document.getElementById('r-type').textContent = o.type === 'standard' ? 'Энгийн' : 'Экспресс';
-          document.getElementById('r-branch').innerHTML = `<span class="material-symbols-outlined text-[16px]">storefront</span> ${o.branch || '-'}`;
+          document.getElementById('r-branch').innerHTML = `<span class="material-symbols-outlined text-[16px]">storefront</span> ${escapeReceiptHtml(o.branch || '-')}`;
           
           document.getElementById('s-name').textContent = o.sender_name || '-';
           document.getElementById('s-phone').textContent = o.sender_phone || '-';
@@ -236,7 +247,7 @@
             if (volItems.length > 0 && volEl) {
               volEl.classList.remove('hidden');
               document.getElementById('volume-items-receipt-list').innerHTML = volItems.map(v => 
-                '<div class="flex justify-between items-center py-1.5 border-b border-dashed border-orange-100"><span class="text-[13px] text-slate-600 font-medium">' + v.name + '</span><span class="text-[13px] font-bold text-orange-600">' + parseInt(v.price).toLocaleString() + ' ₩</span></div>'
+                '<div class="flex justify-between items-center py-1.5 border-b border-dashed border-orange-100"><span class="text-[13px] text-slate-600 font-medium">' + escapeReceiptHtml(v.name) + '</span><span class="text-[13px] font-bold text-orange-600">' + parseInt(v.price).toLocaleString() + ' ₩</span></div>'
               ).join('');
             }
           } catch(e) {}
@@ -256,7 +267,7 @@
              
              if(imgs && imgs.length > 0) {
                 document.getElementById('i-images').classList.remove('hidden');
-                document.getElementById('i-images-container').innerHTML = imgs.map(i => `<div class="w-16 h-16 bg-white rounded-xl bg-cover bg-center border border-slate-200 shadow-sm shrink-0" style="background-image: url('${i}');"></div>`).join('');
+                document.getElementById('i-images-container').replaceChildren(...imgs.filter(url => typeof url === 'string').map(url => { const image = document.createElement('img'); image.src = url; image.alt = ''; image.className = 'w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-sm shrink-0'; return image; }));
              }
           }
 

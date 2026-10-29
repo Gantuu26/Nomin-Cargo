@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "node tests/security-pricing.cjs",
+    "test": "node tests/security-pricing.cjs && node tests/receipt-links.cjs",
     "deploy": "wrangler pages deploy . --project-name=nomin-cargo",
     "dev": "wrangler pages dev ."
   },
