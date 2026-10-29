@@ -1,3 +1,4 @@
+import { canReadReceipt } from '../_auth.js';
 export async function onRequest(context) {
     const { request, env } = context;
     const url = new URL(request.url);
@@ -13,6 +14,9 @@ export async function onRequest(context) {
             const email = url.searchParams.get('user_email');
             const targetId = url.searchParams.get('id');
             if (!admin && !targetId && (!emailSession || email !== emailSession)) return deny();
+            const receiptAccess = request.headers.get('X-Receipt-Token');
+            const shared = Boolean(targetId && receiptAccess && await canReadReceipt(targetId, receiptAccess, env));
+            if (receiptAccess && !shared) return new Response(JSON.stringify({ error: 'Холбоос хүчингүй эсвэл хугацаа дууссан байна. Шинэ холбоос авна уу.' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
             let results;
             
             if (targetId) {
@@ -36,6 +40,10 @@ export async function onRequest(context) {
             if (!admin && targetId) {
                 results = results.map(order => {
                     if (emailSession && order.user_email === emailSession) return order;
+                    if (shared) {
+                        const fields = ['order_id', 'type', 'branch', 'date', 'status', 'container_id', 'sender_name', 'sender_phone', 'sender_address', 'receiver_name', 'receiver_phone', 'receiver_address', 'item_category', 'item_quantity', 'large_items', 'volume_items', 'weight', 'total_price', 'images'];
+                        return Object.fromEntries(fields.map(field => [field, order[field]]));
+                    }
                     const mask = value => value ? String(value).slice(0, 1) + '***' : '';
                     return { order_id: order.order_id, type: order.type, branch: order.branch, date: order.date,
                         status: order.status, container_id: order.container_id, weight: order.weight,
